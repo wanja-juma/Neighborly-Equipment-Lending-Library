@@ -278,13 +278,19 @@ function Dashboard() {
         </div>
 
         <div className="request-buttons">
-          <button className="decline-button" type="button">
-            Decline
-          </button>
+            <button
+                className="decline-button"
+                type="button"
+                onClick={() => handleRequest(request.id, "declined")}>
+                Decline
+            </button>
 
-          <button className="approve-button" type="button">
-            Approve
-          </button>
+            <button
+                className="approve-button"
+                type="button"
+                onClick={() => handleRequest(request.id, "approved")}>
+                Approve
+            </button>
         </div>
       </article>
     ))}
