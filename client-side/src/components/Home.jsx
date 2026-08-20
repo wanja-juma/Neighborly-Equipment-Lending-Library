@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { House, Search, MapPin, Calendar, Plus, Users, ShieldCheck, Leaf } from 'lucide-react';
+import { House, Search, MapPin, Calendar, Plus } from 'lucide-react';
 import heroPhoto from '../assets/hero-photo.jpg';
 import './Home.css';
 
@@ -30,11 +30,6 @@ function Home() {
           <br />
           <span className="home__accent">Share</span> what you have.
         </h1>
-
-        <p className="home__subtext">
-          Neighborly is a community platform that connects neighbors to lend
-          and borrow tools and equipment with ease and trust.
-        </p>
 
         <form className="home__search" onSubmit={handleSearch}>
           <span className="home__search-icon" aria-hidden="true">
@@ -76,41 +71,6 @@ function Home() {
           alt="A toolbox full of hand tools next to a lawnmower, ready to be borrowed"
           className="home__photo"
         />
-        <div className="home__highlights">
-          <div className="home__highlight">
-            <span className="home__highlight-icon">
-              <Users size={20} />
-            </span>
-            <div>
-              <p className="home__highlight-title">Share</p>
-              <p className="home__highlight-desc">
-                Save money by borrowing locally
-              </p>
-            </div>
-          </div>
-          <div className="home__highlight">
-            <span className="home__highlight-icon">
-              <ShieldCheck size={20} />
-            </span>
-            <div>
-              <p className="home__highlight-title">Trust</p>
-              <p className="home__highlight-desc">
-                Verified users and safe transactions
-              </p>
-            </div>
-          </div>
-          <div className="home__highlight">
-            <span className="home__highlight-icon">
-              <Leaf size={20} />
-            </span>
-            <div>
-              <p className="home__highlight-title">Sustain</p>
-              <p className="home__highlight-desc">
-                Reduce waste and build community
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
