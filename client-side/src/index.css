@@ -273,102 +273,41 @@ container {
   border-top: 1px solid #f1f5f9;
   padding-top: 0.75rem;
 }
+:root {
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
 
-.contact-section {
-  max-width: 72rem;
-  margin: 0 auto;
-  padding: 3rem 1rem;
-  border-top: 1px solid #e2e8f0;
+  font: 16px/145% var(--sans);
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (min-width: 640px) {
-  .contact-section {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
+* {
+  box-sizing: border-box;
 }
 
-.contact-box {
-  background-color: #ffffff;
-  border-radius: 1rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
-  padding: 1.5rem;
+body {
+  margin: 0;
 }
 
-@media (min-width: 640px) {
-  .contact-box {
-    padding: 2.5rem;
-  }
+#root {
+  min-height: 100svh;
 }
 
-.success-card {
-  height: 100%;
-  background-color: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+h1,
+h2,
+h3 {
+  font-family: var(--heading);
+  margin: 0;
 }
 
-.success-icon {
-  width: 3rem;
-  height: 3rem;
-  background-color: #155235;
-  color: #ffffff;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.75rem;
+p {
+  margin: 0;
 }
 
-.form-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #334155;
-  text-transform: uppercase;
-  margin-bottom: 0.25rem;
-}
-
-.form-input {
-  width: 100%;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.5rem;
-  outline: none;
-  transition: all 150ms ease;
-}
-
-.form-input:focus {
-  border-color: #155235;
-  box-shadow: 0 0 0 2px rgba(21, 82, 53, 0.2);
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #155235;
-  color: #ffffff;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: background-color 200ms ease;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: none;
-  cursor: pointer;
-}
-
-.submit-btn:hover {
-  background-color: #0f3d26;
+button {
+  font-family: inherit;
 }
