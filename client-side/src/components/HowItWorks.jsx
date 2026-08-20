@@ -35,7 +35,7 @@ export default function HowItWorks() {
   return (
     <div className="container">
       
-      {/* HEADER / HERO SECTION */}
+       
       <section className="hero">
         
         <h1 className="title">
@@ -140,6 +140,31 @@ export default function HowItWorks() {
 
 
 
+      
+      <section className="section">
+        <div className="banner">
+          <div className="banner-item">
+            <div className="banner-icon"><DollarSign className="w-6 h-6" /></div>
+            <h4 className="font-bold text-base">Save & Earn</h4>
+            <p className="banner-desc">Why buy expensive tools when you can borrow or monetize idle equipment?</p>
+          </div>
+          <div className="banner-item">
+            <div className="banner-icon"><Users className="w-6 h-6" /></div>
+            <h4 className="font-bold text-base">Build Community</h4>
+            <p className="banner-desc">Connect with verified people living right down your street.</p>
+          </div>
+          <div className="banner-item">
+            <div className="banner-icon"><ShieldCheck className="w-6 h-6" /></div>
+            <h4 className="font-bold text-base">Safe & Secure</h4>
+            <p className="banner-desc">Identity checks, clear agreements, and trusted user reviews.</p>
+          </div>
+          <div className="banner-item">
+            <div className="banner-icon"><Leaf className="w-6 h-6" /></div>
+            <h4 className="font-bold text-base">Reduce Waste</h4>
+            <p className="banner-desc">Promote sustainable eco-friendly living through shared usage.</p>
+          </div>
+        </div>
+      </section>
 
 
       
