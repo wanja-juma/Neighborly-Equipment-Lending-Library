@@ -69,6 +69,39 @@ const requests = [
   },
 ];
 
+const loans = [
+  {
+    id: 1,
+    icon: "🔧",
+    item: "Socket Wrench Set",
+    loanType: "borrowed",
+    person: "Mary Njeri",
+    dueDate: "21 Aug",
+    status: "Due Soon",
+    statusColor: "warning",
+  },
+  {
+    id: 2,
+    icon: "🪜",
+    item: "Extension Ladder",
+    loanType: "lent",
+    person: "David Kimani",
+    dueDate: "25 Aug",
+    status: "On Track",
+    statusColor: "success",
+  },
+  {
+    id: 3,
+    icon: "🧰",
+    item: "Tool Box",
+    loanType: "lent",
+    person: "Grace Wambui",
+    dueDate: "17 Aug",
+    status: "Overdue",
+    statusColor: "danger",
+  },
+];
+
 function Dashboard() {
 
   const [activePage, setActivePage] = useState("Dashboard");
@@ -198,9 +231,9 @@ console.log(dashboardSummary);
           </div>
         </header>
 
-        {/* Dashboard content will be added in the next step */}
+ {/* Dashboard content will be added in the next step */}
         
-  <section className="dashboard-content">
+<section className="dashboard-content">
   {notice && (
     <div className="request-notice" role="status">
       <span>{notice}</span>
@@ -326,6 +359,56 @@ console.log(dashboardSummary);
       </div>
     </div>
   )}
+  </div>
+</section>
+
+{/* Active loans section */}
+<section className="loans-panel">
+  <div className="panel-heading">
+    <div>
+      <h2>Active Loans</h2>
+      <p>Items you are currently borrowing or lending.</p>
+    </div>
+
+    <button className="view-all-button" type="button">
+      View All
+    </button>
+  </div>
+
+  <div className="loans-list">
+    {loans.map((loan) => (
+      <article className="loan-card" key={loan.id}>
+        <span className="loan-item-icon">{loan.icon}</span>
+
+        <div className="loan-information">
+          <strong>{loan.item}</strong>
+
+          <span className="loan-person">
+            {loan.loanType === "borrowed"
+              ? `Borrowed from ${loan.person}`
+              : `Lent to ${loan.person}`}
+          </span>
+
+          <small className="loan-due-date">
+            Due {loan.dueDate}
+          </small>
+        </div>
+
+        <span
+          className={`loan-status ${loan.statusColor}`}
+        >
+          {loan.status}
+        </span>
+
+        <button
+          className="loan-options-button"
+          type="button"
+          aria-label={`View options for ${loan.item}`}
+        >
+          •••
+        </button>
+      </article>
+    ))}
   </div>
 </section>
 
