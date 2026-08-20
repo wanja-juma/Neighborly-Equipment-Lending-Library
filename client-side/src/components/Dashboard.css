@@ -1,5 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
-
+:root {
+  --navbar-height: 70px;
+}
 * {
   box-sizing: border-box;
 }
@@ -26,7 +28,8 @@ button {
 
 .neighborly-app {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--navbar-height));
+ 
   background-color: #f5f7f4;
 }
 
@@ -34,7 +37,7 @@ button {
 
 .sidebar {
   position: fixed;
-  top: 0;
+  top: var(--navbar-height);
   bottom: 0;
   left: 0;
 
@@ -45,6 +48,7 @@ button {
   padding: 28px 18px 22px;
   color: #d9e7df;
   background-color: #123f31;
+  z-index: 100;
 }
 
 /* Logo */
@@ -175,7 +179,7 @@ button {
 
 .dashboard-main {
   width: calc(100% - 245px);
-  min-height: 100vh;
+  min-height: calc(100vh - var(--navbar-height));
   margin-left: 245px;
 }
 
