@@ -1,8 +1,46 @@
 import { useState } from "react";
 import "./Dashboard.css";
 
+const summaryCards = [
+  {
+    id: 1,
+    title: "My Listings",
+    value: 12,
+    icon: "▦",
+    color: "green",
+  },
+  {
+    id: 2,
+    title: "Pending Requests",
+    value: 3,
+    icon: "◷",
+    color: "orange",
+  },
+  {
+    id: 3,
+    title: "Items Borrowed",
+    value: 2,
+    icon: "↓",
+    color: "blue",
+  },
+  {
+    id: 4,
+    title: "Items Lent Out",
+    value: 4,
+    icon: "↑",
+    color: "purple",
+  },
+];
+
 function Dashboard() {
   const [activePage, setActivePage] = useState("Dashboard");
+
+  const currentDate = new Intl.DateTimeFormat("en-GB", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+}).format(new Date());
 
   const navigationItems = [
     "Dashboard",
@@ -98,9 +136,45 @@ function Dashboard() {
 
         {/* Dashboard content will be added in the next step */}
         <section className="dashboard-content">
-          <h1>{activePage}</h1>
-          <p>Manage your community lending activities.</p>
-        </section>
+  {/* Welcome section */}
+  <div className="welcome-row">
+    <div className="welcome-message">
+      <p className="current-date">{currentDate}</p>
+
+      <h1>Welcome back, Wanja!</h1>
+
+      <p className="welcome-description">
+        Here is what is happening in your community today.
+      </p>
+    </div>
+
+    <button className="primary-button" type="button">
+      <span className="button-icon">+</span>
+      Add New Item
+    </button>
+  </div>
+
+  {/* Summary cards */}
+  <section
+    className="summary-grid"
+    aria-label="Dashboard summary"
+  >
+    {summaryCards.map((card) => (
+      <article className="summary-card" key={card.id}>
+        <span className={`summary-icon ${card.color}`}>
+          {card.icon}
+        </span>
+
+        <div className="summary-information">
+          <strong>{card.value}</strong>
+          <span>{card.title}</span>
+        </div>
+
+        <span className="summary-arrow">›</span>
+      </article>
+    ))}
+  </section>
+</section>
       </main>
     </div>
   );
