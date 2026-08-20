@@ -104,6 +104,33 @@ const loans = [
   },
 ];
 
+const listings = [
+  {
+    id: 1,
+    icon: "🔩",
+    name: "Electric Drill",
+    condition: "Good condition",
+    availability: "Available",
+    statusColor: "available",
+  },
+  {
+    id: 2,
+    icon: "🌿",
+    name: "Garden Mower",
+    condition: "Excellent condition",
+    availability: "Requested",
+    statusColor: "requested",
+  },
+  {
+    id: 3,
+    icon: "🪚",
+    name: "Circular Saw",
+    condition: "Good condition",
+    availability: "On Loan",
+    statusColor: "on-loan",
+  },
+];
+
 function Dashboard() {
 
   const [activePage, setActivePage] = useState("Dashboard");
@@ -415,9 +442,78 @@ function Dashboard() {
 </section>
 </div>
 
-</section>
-      </main>
+{/* Listings and reminder section */}
+<div className="listings-reminder-layout">
+  {/* My Listings section */}
+  <section className="listings-panel">
+    <div className="panel-heading">
+      <div>
+        <h2>My Listings</h2>
+        <p>Your recently added tools and equipment.</p>
+      </div>
+
+      <button className="view-all-button" type="button">
+        View All
+      </button>
     </div>
+
+    <div className="listings-grid">
+      {listings.map((item) => (
+        <article className="listing-card" key={item.id}>
+          <div className="listing-image">
+            <span>{item.icon}</span>
+
+            <button
+              className="listing-options-button"
+              type="button"
+              aria-label={`View options for ${item.name}`}
+            >
+              •••
+            </button>
+          </div>
+
+          <div className="listing-information">
+            <strong>{item.name}</strong>
+
+            <span className="item-condition">
+              {item.condition}
+            </span>
+
+            <small
+              className={`availability-status ${item.statusColor}`}
+            >
+              <span className="status-dot"></span>
+              {item.availability}
+            </small>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {/* Return reminder */}
+  <aside className="return-reminder">
+    <span className="reminder-icon">!</span>
+
+    <div className="reminder-information">
+      <small>RETURN REMINDER</small>
+
+      <strong>Socket Wrench Set</strong>
+
+      <p>
+        Return to Mary Njeri by <b>tomorrow</b>.
+      </p>
+    </div>
+
+    <button className="view-loan-button" type="button">
+      View Loan
+    </button>
+  </aside>
+</div>
+
+</section>
+</main>
+</div>
   );
 }
 
