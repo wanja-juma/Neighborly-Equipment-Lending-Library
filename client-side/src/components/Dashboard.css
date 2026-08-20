@@ -488,6 +488,136 @@ button {
   text-decoration: underline;
 }
 
+/* Requests list */
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.request-card {
+  display: flex;
+  min-height: 90px;
+  align-items: center;
+  gap: 14px;
+
+  padding: 16px 20px;
+  border-bottom: 1px solid #eff2ef;
+}
+
+.request-card:last-child {
+  border-bottom: none;
+}
+
+.request-card:hover {
+  background-color: #fafcfa;
+}
+
+/* Borrower avatar */
+
+.borrower-avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  place-items: center;
+
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.borrower-avatar.orange {
+  color: #9a5b1a;
+  background-color: #f7dfc5;
+}
+
+.borrower-avatar.green {
+  color: #1e7669;
+  background-color: #d5eeea;
+}
+
+.borrower-avatar.blue {
+  color: #35638b;
+  background-color: #dbe8f4;
+}
+
+/* Borrower information */
+
+.request-information {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.request-information strong {
+  color: #193d31;
+  font-size: 13px;
+}
+
+.request-description {
+  color: #73847b;
+  font-size: 12px;
+}
+
+.request-description b {
+  color: #385b4d;
+}
+
+.request-dates {
+  margin-top: 3px;
+  color: #8b9891;
+  font-size: 11px;
+}
+
+.request-dates::before {
+  margin-right: 5px;
+  content: "◷";
+}
+
+/* Request buttons */
+
+.request-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.request-buttons button {
+  padding: 8px 13px;
+  border-radius: 7px;
+
+  font-size: 11px;
+  font-weight: 700;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.decline-button {
+  border: 1px solid #dfe5e1;
+  color: #5f7168;
+  background-color: white;
+}
+
+.decline-button:hover {
+  border-color: #e1b6b2;
+  color: #a3423a;
+  background-color: #fff5f4;
+}
+
+.approve-button {
+  border: 1px solid #236c4d;
+  color: white;
+  background-color: #236c4d;
+}
+
+.approve-button:hover {
+  border-color: #174f37;
+  background-color: #174f37;
+}
+
 /* Add item button */
 
 .primary-button {
@@ -557,6 +687,13 @@ button {
   .dashboard-content {
     padding: 28px 20px 40px;
   }
+  .panel-heading {
+    align-items: flex-start;
+  }
+   .request-buttons {
+    width: 100%;
+    padding-left: 56px;
+  }
 
   .welcome-row {
     align-items: flex-start;
@@ -579,5 +716,23 @@ button {
 
   .primary-button {
     width: 100%;
+  }
+  .panel-heading {
+    gap: 10px;
+    padding: 16px;
+  }
+   .panel-heading p {
+    display: none;
+  }
+  .request-card {
+    padding: 16px;
+  }
+
+  .request-buttons {
+    padding-left: 0;
+  }
+
+  .request-buttons button {
+    flex: 1;
   }
 }
