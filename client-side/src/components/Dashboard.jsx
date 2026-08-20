@@ -32,6 +32,36 @@ const summaryCards = [
   },
 ];
 
+const requests = [
+  {
+    id: 1,
+    initials: "JK",
+    borrower: "John Kamau",
+    item: "Electric Drill",
+    startDate: "22 Aug",
+    endDate: "24 Aug",
+    avatarColor: "orange",
+  },
+  {
+    id: 2,
+    initials: "AN",
+    borrower: "Amina Noor",
+    item: "Garden Mower",
+    startDate: "25 Aug",
+    endDate: "27 Aug",
+    avatarColor: "green",
+  },
+  {
+    id: 3,
+    initials: "PO",
+    borrower: "Peter Otieno",
+    item: "Extension Ladder",
+    startDate: "28 Aug",
+    endDate: "30 Aug",
+    avatarColor: "blue",
+  },
+];
+
 function Dashboard() {
   const [activePage, setActivePage] = useState("Dashboard");
 
@@ -174,6 +204,55 @@ function Dashboard() {
       </article>
     ))}
   </section>
+
+  {/* Borrowing requests section */}
+<section className="requests-panel">
+  <div className="panel-heading">
+    <div>
+      <h2>Borrowing Requests</h2>
+      <p>Review requests from neighbours who want to borrow your items.</p>
+    </div>
+
+    <button className="view-all-button" type="button">
+      View All
+    </button>
+  </div>
+
+  <div className="requests-list">
+    {requests.map((request) => (
+      <article className="request-card" key={request.id}>
+        <span
+          className={`borrower-avatar ${request.avatarColor}`}
+        >
+          {request.initials}
+        </span>
+
+        <div className="request-information">
+          <strong>{request.borrower}</strong>
+
+          <span className="request-description">
+            wants to borrow <b>{request.item}</b>
+          </span>
+
+          <small className="request-dates">
+            {request.startDate} – {request.endDate}
+          </small>
+        </div>
+
+        <div className="request-buttons">
+          <button className="decline-button" type="button">
+            Decline
+          </button>
+
+          <button className="approve-button" type="button">
+            Approve
+          </button>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
 </section>
       </main>
     </div>
