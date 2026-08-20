@@ -576,6 +576,24 @@ button {
   content: "◷";
 }
 
+/* Active loans panel */
+
+.loans-panel {
+  margin-top: 22px;
+  overflow: hidden;
+
+  border: 1px solid #e0e6e1;
+  border-radius: 13px;
+
+  background-color: white;
+  box-shadow: 0 3px 12px rgba(23, 60, 39, 0.04);
+}
+
+.loans-list {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Request buttons */
 
 .request-buttons {
