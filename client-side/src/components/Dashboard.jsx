@@ -292,6 +292,7 @@ console.log(dashboardSummary);
   </section>
 
   {/* Borrowing requests section */}
+<div className="dashboard-panels">
 <section className="requests-panel">
   <div className="panel-heading">
     <div>
@@ -411,6 +412,7 @@ console.log(dashboardSummary);
     ))}
   </div>
 </section>
+</div>
 
 </section>
       </main>
