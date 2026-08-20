@@ -1157,6 +1157,18 @@ button {
   .loan-options-button {
     margin-left: auto;
   }
+  .listings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .return-reminder {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .view-loan-button {
+    margin-left: 53px;
+  }
 }
 
 @media (max-width: 500px) {
@@ -1199,5 +1211,21 @@ button {
 
   .loan-status {
     margin-left: 60px;
+  }
+   .listings-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .listing-image {
+    height: 120px;
+  }
+
+  .return-reminder {
+    padding: 16px;
+  }
+
+  .view-loan-button {
+    margin-left: 53px;
   }
 }
