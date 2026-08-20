@@ -436,6 +436,58 @@ button {
   font-size: 24px;
 }
 
+/* Borrowing requests panel */
+
+.requests-panel {
+  margin-top: 22px;
+  overflow: hidden;
+
+  border: 1px solid #e0e6e1;
+  border-radius: 13px;
+
+  background-color: white;
+  box-shadow: 0 3px 12px rgba(23, 60, 39, 0.04);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 20px;
+  border-bottom: 1px solid #edf0ed;
+}
+
+.panel-heading h2 {
+  margin: 0 0 4px;
+  color: #193d31;
+  font-size: 17px;
+}
+
+.panel-heading p {
+  margin: 0;
+  color: #84928b;
+  font-size: 12px;
+}
+
+.view-all-button {
+  flex-shrink: 0;
+  padding: 7px 10px;
+
+  border: none;
+  color: #267153;
+  background-color: transparent;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.view-all-button:hover {
+  color: #174c37;
+  text-decoration: underline;
+}
+
 /* Add item button */
 
 .primary-button {

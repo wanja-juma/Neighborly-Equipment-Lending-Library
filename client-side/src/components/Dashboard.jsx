@@ -165,7 +165,8 @@ function Dashboard() {
         </header>
 
         {/* Dashboard content will be added in the next step */}
-        <section className="dashboard-content">
+<section className="dashboard-content">
+  
   {/* Welcome section */}
   <div className="welcome-row">
     <div className="welcome-message">
@@ -185,10 +186,9 @@ function Dashboard() {
   </div>
 
   {/* Summary cards */}
-  <section
+<section
     className="summary-grid"
-    aria-label="Dashboard summary"
-  >
+    aria-label="Dashboard summary">
     {summaryCards.map((card) => (
       <article className="summary-card" key={card.id}>
         <span className={`summary-icon ${card.color}`}>
