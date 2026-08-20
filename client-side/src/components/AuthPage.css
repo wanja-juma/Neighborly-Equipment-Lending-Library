@@ -111,13 +111,6 @@
   box-shadow: 0 0 0 4px rgba(241, 211, 173, 0.45);
 }
 
-.field em {
-  font-style: normal;
-  color: var(--danger);
-  font-size: 12px;
-  font-weight: 600;
-}
-
 .password-input {
   position: relative;
   display: flex;
