@@ -4,13 +4,7 @@ import {
   Calendar, 
   Handshake, 
   PlusCircle, 
-  ShieldCheck, 
-  MessageSquare, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Send, 
-  HelpCircle,
+  ShieldCheck,
   ChevronDown,
   DollarSign,
   Users,
@@ -35,18 +29,17 @@ export default function HowItWorks() {
   return (
     <div className="container">
       
-       
+      
       <section className="hero">
         
         <h1 className="title">
           How <span className="brand-color">Neighborly</span> Works
         </h1>
         <p className="subtitle">
-            Neighbourly is a website used to hire tools and equipments where one
+          Neighbourly is a website used to hire tools and equipments where one
           borrow tools you need for quick fixes, or share your own equipment to earn extra income and support your local community.
         </p>
 
-        {/* TAB TOGGLE */}
         <div className="tab-wrapper">
           <div className="tab-container">
             <button
@@ -63,7 +56,9 @@ export default function HowItWorks() {
             </button>
           </div>
         </div>
+      </section>
 
+      
       <section className="section">
         {activeTab === 'borrow' ? (
           <div className="grid">
@@ -139,8 +134,6 @@ export default function HowItWorks() {
       </section>
 
 
-
-      
       <section className="section">
         <div className="banner">
           <div className="banner-item">
@@ -166,9 +159,7 @@ export default function HowItWorks() {
         </div>
       </section>
 
-
-
-      {/* FAQ SECTION */}
+      
       <section className="faq-section">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-slate-900">Frequently Asked Questions</h2>
@@ -196,7 +187,7 @@ export default function HowItWorks() {
                 className="faq-btn"
               >
                 <span>{faq.q}</span>
-                <ChevronDown className={w-5 h-5 text-slate-400 transition-transform ${faqOpen === idx ? 'transform rotate-180' : ''}} />
+                <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${faqOpen === idx ? 'transform rotate-180' : ''}`} />
               </button>
               {faqOpen === idx && (
                 <div className="faq-answer">
@@ -208,6 +199,6 @@ export default function HowItWorks() {
         </div>
       </section>
 
-
-      
-    
+    </div>
+  );
+}
