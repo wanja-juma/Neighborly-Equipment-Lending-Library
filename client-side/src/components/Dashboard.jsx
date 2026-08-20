@@ -9,22 +9,16 @@ const summaryCards = [
     icon: "▦",
     color: "green",
   },
+  
   {
     id: 2,
-    title: "Pending Requests",
-    value: 3,
-    icon: "◷",
-    color: "orange",
-  },
-  {
-    id: 3,
     title: "Items Borrowed",
     value: 2,
     icon: "↓",
     color: "blue",
   },
   {
-    id: 4,
+    id: 3,
     title: "Items Lent Out",
     value: 4,
     icon: "↑",
@@ -67,6 +61,12 @@ function Dashboard() {
   const [activePage, setActivePage] = useState("Dashboard");
   const [pendingRequests, setPendingRequests] = useState(requests);
   const [notice, setNotice] = useState("");
+
+  const dashboardSummary = summaryCards.map((card) =>
+    card.title === "Pending Requests"
+      ? { ...card, value: pendingRequests.length }
+      : card
+  );
 
   const currentDate = new Intl.DateTimeFormat("en-GB", {
   weekday: "long",
@@ -227,7 +227,7 @@ function Dashboard() {
 <section
     className="summary-grid"
     aria-label="Dashboard summary">
-    {summaryCards.map((card) => (
+    {dashboardSummary.map((card) => (
       <article className="summary-card" key={card.id}>
         <span className={`summary-icon ${card.color}`}>
           {card.icon}
@@ -257,7 +257,8 @@ function Dashboard() {
   </div>
 
   <div className="requests-list">
-    {pendingRequests.map((request) => (
+   {pendingRequests.length > 0 ? (
+    pendingRequests.map((request) => (
       <article className="request-card" key={request.id}>
         <span
           className={`borrower-avatar ${request.avatarColor}`}
@@ -278,22 +279,38 @@ function Dashboard() {
         </div>
 
         <div className="request-buttons">
-            <button
-                className="decline-button"
-                type="button"
-                onClick={() => handleRequest(request.id, "declined")}>
-                Decline
-            </button>
+          <button
+            className="decline-button"
+            type="button"
+            onClick={() =>
+              handleRequest(request.id, "declined")
+            }
+          >
+            Decline
+          </button>
 
-            <button
-                className="approve-button"
-                type="button"
-                onClick={() => handleRequest(request.id, "approved")}>
-                Approve
-            </button>
+          <button
+            className="approve-button"
+            type="button"
+            onClick={() =>
+              handleRequest(request.id, "approved")
+            }
+          >
+            Approve
+          </button>
         </div>
       </article>
-    ))}
+    ))
+  ) : (
+    <div className="requests-empty-state">
+      <span className="empty-state-icon">✓</span>
+
+      <div>
+        <strong>All requests reviewed</strong>
+        <p>You have no pending borrowing requests.</p>
+      </div>
+    </div>
+  )}
   </div>
 </section>
 
