@@ -9,16 +9,22 @@ const summaryCards = [
     icon: "▦",
     color: "green",
   },
-  
   {
     id: 2,
+    title: "Pending Requests",
+    value: 3,
+    icon: "◷",
+    color: "orange",
+  },
+  {
+    id: 3,
     title: "Items Borrowed",
     value: 2,
     icon: "↓",
     color: "blue",
   },
   {
-    id: 3,
+    id: 4,
     title: "Items Lent Out",
     value: 4,
     icon: "↑",
@@ -38,6 +44,13 @@ const requests = [
   },
   {
     id: 2,
+    title: "Pending Requests",
+    value: 3,
+    icon: "◷",
+    color: "orange",
+  },
+  {
+    id: 3,
     initials: "AN",
     borrower: "Amina Noor",
     item: "Garden Mower",
@@ -46,7 +59,7 @@ const requests = [
     avatarColor: "green",
   },
   {
-    id: 3,
+    id: 4,
     initials: "PO",
     borrower: "Peter Otieno",
     item: "Extension Ladder",
@@ -99,6 +112,8 @@ function Dashboard() {
 
   setNotice(`${selected.item} request ${action}.`);
 };
+
+console.log(dashboardSummary);
 
   return (
     <div className="neighborly-app">
