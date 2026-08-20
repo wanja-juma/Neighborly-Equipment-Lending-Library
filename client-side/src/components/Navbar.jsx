@@ -1,4 +1,5 @@
 import { House, Wrench, Info, LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
@@ -10,37 +11,37 @@ function Navbar() {
       </div>
 
       <div className="navbar__links">
-        <a href="/">
+        <Link to="/">
           <House size={18} />
           Home
-        </a>
+        </Link>
 
-        <a href="/tools">
+        <Link to="/tools">
           <Wrench size={18} />
           Browse Tools
-        </a>
+        </Link>
 
-        <a href="/about">
+        <Link to="/about">
           <Info size={18} />
           About
-        </a>
+        </Link>
 
-        <a href="/dashboard">
+        <Link to="/dashboard">
           <LayoutDashboard size={18} />
           Dashboard
-        </a>
+        </Link>
       </div>
 
       <div className="navbar__actions">
-        <a href="/login" className="navbar__login">
+        <Link to="/login" className="navbar__login">
           <LogIn size={18} />
           Login
-        </a>
+        </Link>
 
-        <a href="/register" className="navbar__register">
+        <Link to="/register" className="navbar__register">
           <UserPlus size={18} />
           Register
-        </a>
+        </Link>
       </div>
     </nav>
   );

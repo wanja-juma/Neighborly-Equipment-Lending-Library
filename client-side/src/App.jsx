@@ -1,15 +1,11 @@
-
-import AuthPage from './components/AuthPage.jsx'
-import Home from './components/Home';
 import Navbar from './components/Navbar';
-import './App.css';
+import AppRoutes from './routes';
 
 function App() {
   return (
     <>
       <Navbar />
-      <Home />
-    <AuthPage />
+      <AppRoutes />
     </>
   );
 }
