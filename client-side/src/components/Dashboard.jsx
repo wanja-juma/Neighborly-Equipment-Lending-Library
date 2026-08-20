@@ -276,10 +276,6 @@ function Dashboard() {
     </div>
   )}
 
-  <div className="welcome-row">
-    {/* Welcome section */}
-  </div>
-        
   
   {/* Welcome section */}
   <div className="welcome-row">
