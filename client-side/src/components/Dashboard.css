@@ -618,6 +618,90 @@ button {
   background-color: #174f37;
 }
 
+/* Request confirmation notice */
+
+.request-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+  padding: 13px 16px;
+
+  border: 1px solid #b8dcc8;
+  border-radius: 10px;
+
+  color: #185d3d;
+  background-color: #eaf8ef;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.request-notice button {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+
+  border: none;
+  border-radius: 50%;
+
+  color: #185d3d;
+  background-color: transparent;
+
+  font-size: 20px;
+  line-height: 1;
+}
+
+.request-notice button:hover {
+  background-color: #d5eedf;
+}
+
+/* Empty requests state */
+
+.requests-empty-state {
+  display: flex;
+  min-height: 130px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  padding: 25px;
+  color: #62776d;
+  text-align: left;
+}
+
+.empty-state-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+
+  border-radius: 50%;
+  color: #1f704e;
+  background-color: #dff2e7;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.requests-empty-state div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.requests-empty-state strong {
+  color: #24483a;
+  font-size: 13px;
+}
+
+.requests-empty-state p {
+  margin: 0;
+  font-size: 11px;
+}
+
 /* Add item button */
 
 .primary-button {
