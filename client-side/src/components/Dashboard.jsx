@@ -36,7 +36,7 @@ const requests = [
   {
     id: 1,
     initials: "JK",
-    borrower: "John Kamau",
+    borrower: "Frank Kamau",
     item: "Electric Drill",
     startDate: "22 Aug",
     endDate: "24 Aug",
@@ -44,10 +44,12 @@ const requests = [
   },
   {
     id: 2,
-    title: "Pending Requests",
-    value: 3,
-    icon: "◷",
-    color: "orange",
+    initials: "SM",
+    borrower: "Tonny Mwangi",
+    item: "Cordless Screwdriver",
+    startDate: "23 Aug",
+    endDate: "25 Aug",
+    avatarColor: "blue",
   },
   {
     id: 3,
@@ -146,7 +148,6 @@ function Dashboard() {
   setNotice(`${selected.item} request ${action}.`);
 };
 
-console.log(dashboardSummary);
 
   return (
     <div className="neighborly-app">
