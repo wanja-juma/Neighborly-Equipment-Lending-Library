@@ -307,22 +307,83 @@ button {
   color: #819087;
 }
 
-/* Temporary dashboard content */
+/* Dashboard content */
 
 .dashboard-content {
-  padding: 40px;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 36px 40px 50px;
 }
 
-.dashboard-content h1 {
-  margin: 0 0 8px;
+/* Welcome section */
+
+.welcome-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.current-date {
+  margin: 0 0 6px;
+  color: #6d8177;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.welcome-message h1 {
+  margin: 0 0 6px;
   color: #193d31;
+  font-size: 32px;
+  letter-spacing: -0.04em;
 }
 
-.dashboard-content p {
+.welcome-description {
   margin: 0;
   color: #75867e;
+  font-size: 14px;
 }
 
+/* Add item button */
+
+.primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+
+  color: white;
+  background-color: #176646;
+  box-shadow: 0 6px 14px rgba(23, 102, 70, 0.17);
+
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.primary-button:hover {
+  background-color: #105338;
+  transform: translateY(-1px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+.button-icon {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+}
 /* Basic responsiveness */
 
 @media (max-width: 800px) {
