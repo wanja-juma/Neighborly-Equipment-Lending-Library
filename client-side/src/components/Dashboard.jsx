@@ -63,7 +63,10 @@ const requests = [
 ];
 
 function Dashboard() {
+
   const [activePage, setActivePage] = useState("Dashboard");
+  const [pendingRequests, setPendingRequests] = useState(requests);
+  const [notice, setNotice] = useState("");
 
   const currentDate = new Intl.DateTimeFormat("en-GB", {
   weekday: "long",
@@ -80,6 +83,22 @@ function Dashboard() {
     "Loans",
     "Damage Reports",
   ];
+
+  const handleRequest = (id, action) => {
+  const selected = pendingRequests.find(
+    (request) => request.id === id
+  );
+
+  if (!selected) {
+    return;
+  }
+
+  setPendingRequests((currentRequests) =>
+    currentRequests.filter((request) => request.id !== id)
+  );
+
+  setNotice(`${selected.item} request ${action}.`);
+};
 
   return (
     <div className="neighborly-app">
@@ -165,7 +184,26 @@ function Dashboard() {
         </header>
 
         {/* Dashboard content will be added in the next step */}
-<section className="dashboard-content">
+        
+  <section className="dashboard-content">
+  {notice && (
+    <div className="request-notice" role="status">
+      <span>{notice}</span>
+
+      <button
+        type="button"
+        onClick={() => setNotice("")}
+        aria-label="Dismiss notification"
+      >
+        ×
+      </button>
+    </div>
+  )}
+
+  <div className="welcome-row">
+    {/* Welcome section */}
+  </div>
+        
   
   {/* Welcome section */}
   <div className="welcome-row">
@@ -219,7 +257,7 @@ function Dashboard() {
   </div>
 
   <div className="requests-list">
-    {requests.map((request) => (
+    {pendingRequests.map((request) => (
       <article className="request-card" key={request.id}>
         <span
           className={`borrower-avatar ${request.avatarColor}`}
