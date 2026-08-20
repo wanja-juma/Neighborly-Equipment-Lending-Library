@@ -1,0 +1,79 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 6%;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e3e3dd;
+  font-family: 'Inter', sans-serif;
+}
+
+.navbar__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1e5e3d;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navbar__links a,
+.navbar__login,
+.navbar__register {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.navbar__links a {
+  color: #55534e;
+}
+
+.navbar__links a:hover {
+  color: #1e5e3d;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navbar__login {
+  color: #1e5e3d;
+}
+
+.navbar__register {
+  padding: 0.6rem 1rem;
+  color: #ffffff;
+  background-color: #1e5e3d;
+  border: 1px solid #1e5e3d;
+  border-radius: 7px;
+}
+
+.navbar__register:hover {
+  background-color: #164a30;
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .navbar__links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
