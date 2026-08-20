@@ -182,3 +182,219 @@
     border-right-color: var(--border);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Layout & Page Structure */
+  .how-it-works-container {
+    @apply min-h-screen bg-slate-50 text-slate-800 font-sans;
+  }
+
+  .hero-section {
+    @apply bg-gradient-to-b from-emerald-900/10 via-slate-50 to-slate-50 pt-12 pb-10 px-4 sm:px-6 lg:px-8 text-center max-w-5xl mx-auto;
+  }
+
+  .badge-pill {
+    @apply inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-semibold tracking-wide uppercase mb-3;
+  }
+
+  .hero-title {
+    @apply text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight;
+  }
+
+  .brand-text-highlight {
+    @apply text-[#155235];
+  }
+
+  .hero-subtitle {
+    @apply mt-3 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto;
+  }
+
+  /* Tab Controls */
+  .tab-wrapper {
+    @apply flex justify-center mt-8;
+  }
+
+  .tab-container {
+    @apply inline-flex p-1 bg-slate-200 rounded-xl;
+  }
+
+  .tab-button {
+    @apply px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900;
+  }
+
+  .tab-button-active {
+    @apply bg-[#155235] text-white shadow-md;
+  }
+
+  /* Grid Layouts */
+  .steps-grid-section {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  .process-grid {
+    @apply grid md:grid-cols-3 gap-8;
+  }
+
+  /* Step Cards */
+  .step-card {
+    @apply bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative flex flex-col items-center text-center;
+  }
+
+  .step-number {
+    @apply absolute -top-3 left-6 bg-[#155235] text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shadow;
+  }
+
+  .icon-wrapper-emerald {
+    @apply w-14 h-14 bg-emerald-50 text-[#155235] rounded-2xl flex items-center justify-center mb-4 mt-2;
+  }
+
+  .card-title {
+    @apply text-lg font-bold text-slate-900 mb-2;
+  }
+
+  .card-description {
+    @apply text-sm text-slate-600;
+  }
+
+  /* Value Banner */
+  .banner-section {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  .banner-card {
+    @apply bg-[#155235] text-white rounded-2xl p-6 sm:p-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center;
+  }
+
+  .banner-icon {
+    @apply flex justify-center mb-2 text-emerald-200;
+  }
+
+  .banner-heading {
+    @apply font-bold text-base;
+  }
+
+  .banner-subtext {
+    @apply text-xs text-emerald-100 mt-1;
+  }
+
+  /* Accordion / FAQ Section */
+  .faq-section {
+    @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10;
+  }
+
+  .section-header {
+    @apply text-center mb-8;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-slate-900;
+  }
+
+  .section-subtitle {
+    @apply text-slate-600 text-sm mt-1;
+  }
+
+  .faq-list {
+    @apply space-y-3;
+  }
+
+  .faq-item {
+    @apply bg-white rounded-xl border border-slate-200 overflow-hidden;
+  }
+
+  .faq-trigger {
+    @apply w-full px-5 py-4 text-left font-semibold text-slate-800 flex justify-between items-center focus:outline-none;
+  }
+
+  .faq-chevron {
+    @apply w-5 h-5 text-slate-400 transition-transform duration-200;
+  }
+
+  .faq-chevron-open {
+    @apply transform rotate-180;
+  }
+
+  .faq-answer {
+    @apply px-5 pb-4 text-sm text-slate-600 border-t border-slate-100 pt-3;
+  }
+
+  /* Contact Section */
+  .contact-section {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-slate-200;
+  }
+
+  .contact-card {
+    @apply bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10;
+  }
+
+  .contact-grid {
+    @apply grid md:grid-cols-2 gap-10;
+  }
+
+  .contact-info-list {
+    @apply space-y-4;
+  }
+
+  .contact-info-item {
+    @apply flex items-start space-x-3;
+  }
+
+  .contact-icon {
+    @apply w-5 h-5 text-[#155235] mt-1;
+  }
+
+  .contact-label {
+    @apply text-xs font-semibold text-slate-500 uppercase;
+  }
+
+  .contact-value {
+    @apply text-sm font-medium text-slate-800;
+  }
+
+  /* Contact Form Elements */
+  .form-wrapper {
+    @apply space-y-4;
+  }
+
+  .form-group {
+    @apply block;
+  }
+
+  .form-label {
+    @apply block text-xs font-semibold text-slate-700 uppercase mb-1;
+  }
+
+  .form-input {
+    @apply w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155235];
+  }
+
+  .btn-submit {
+    @apply w-full py-3 bg-[#155235] hover:bg-emerald-900 text-white font-semibold rounded-lg text-sm transition duration-200 shadow flex items-center justify-center space-x-2;
+  }
+
+  .feedback-success-card {
+    @apply h-full bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex flex-col items-center justify-center text-center;
+  }
+
+  .feedback-icon-wrapper {
+    @apply w-12 h-12 bg-[#155235] text-white rounded-full flex items-center justify-center mb-3;
+  }
+}
