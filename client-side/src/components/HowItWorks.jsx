@@ -167,5 +167,47 @@ export default function HowItWorks() {
       </section>
 
 
+
+      {/* FAQ SECTION */}
+      <section className="faq-section">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-slate-900">Frequently Asked Questions</h2>
+          <p className="text-slate-600 text-sm mt-1">Quick answers to common questions about sharing and borrowing.</p>
+        </div>
+
+        <div className="space-y-3">
+          {[
+            {
+              q: "What happens if a tool is damaged during borrowing?",
+              a: "Borrowers are expected to cover repairs or replacement costs for damaged items. Neighborly offers community guidelines and optional coverage for peace of mind."
+            },
+            {
+              q: "How are payments handled?",
+              a: "Payments are processed securely via local payment channels (e.g., M-Pesa / cards) upon approval of the borrowing request."
+            },
+            {
+              q: "How do you verify identity?",
+              a: "All active members verify their phone numbers and government IDs before borrowing or listing equipment."
+            }
+          ].map((faq, idx) => (
+            <div key={idx} className="faq-item">
+              <button
+                onClick={() => toggleFaq(idx)}
+                className="faq-btn"
+              >
+                <span>{faq.q}</span>
+                <ChevronDown className={w-5 h-5 text-slate-400 transition-transform ${faqOpen === idx ? 'transform rotate-180' : ''}} />
+              </button>
+              {faqOpen === idx && (
+                <div className="faq-answer">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+
       
     
