@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useItems } from "../context/ItemsContext";
+import useItems from "../hooks/useItems";
 import "./Dashboard.css";
 
 const summaryCards = [
@@ -109,20 +109,33 @@ const loans = [
 function Dashboard() {
 
   
-  const [pendingRequests, setPendingRequests] = useState(requests);
-  const [notice, setNotice] = useState("");
+    const [pendingRequests, setPendingRequests] = useState(requests);
+    const [notice, setNotice] = useState("");
 
-  const { items } = useItems();
+    const { items } = useItems();
 
-const myItems = items.filter((item) => item.ownerId === 1);
+    const myItems = items.filter((item) => item.ownerId === 1);
 
-const recentListings = myItems.slice(0, 3);
+    const recentListings = myItems.slice(0, 3);
 
-  const dashboardSummary = summaryCards.map((card) =>
-    card.title === "Pending Requests"
-      ? { ...card, value: pendingRequests.length }
-      : card
-  );
+
+  const dashboardSummary = summaryCards.map((card) => {
+  if (card.title === "Pending Requests") {
+    return {
+      ...card,
+      value: pendingRequests.length,
+    };
+  }
+
+  if (card.title === "My Listings") {
+    return {
+      ...card,
+      value: myItems.length,
+    };
+  }
+
+  return card;
+});
 
   const currentDate = new Intl.DateTimeFormat("en-GB", {
   weekday: "long",
@@ -387,7 +400,7 @@ const recentListings = myItems.slice(0, 3);
     </div>
 
     <div className="listings-grid">
-      {listings.map((item) => (
+      {recentListings.map((item) => (
         <article className="listing-card" key={item.id}>
           <div className="listing-image">
             <span>{item.icon}</span>

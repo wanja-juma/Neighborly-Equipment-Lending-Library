@@ -9,7 +9,7 @@ import DamageReports from "./pages/DamageReports";
 import Loans from "./pages/Loans";
 import MyListings from "./pages/MyListings";
 import Requests from "./pages/Requests";
-import { ItemsProvider } from "./context/ItemsContext";
+import ItemsProvider from "./context/ItemsProvider";
 import "./App.css";
 
 function App() {

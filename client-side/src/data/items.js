@@ -1,8 +1,4 @@
-import { createContext, useContext, useState } from "react";
-
-const ItemsContext = createContext(null);
-
-const initialItems = [
+export const initialItems = [
   {
     id: 1,
     name: "Electric Drill",
@@ -109,43 +105,3 @@ const initialItems = [
   },
 ];
 
-export function ItemsProvider({ children }) {
-  const [items, setItems] = useState(initialItems);
-
-  const addItem = (itemData) => {
-    const newItem = {
-      id: Date.now(),
-      ...itemData,
-      ownerId: 1,
-      owner: "Wanja Juma",
-      location: "Greenview Estate",
-      availability: "Available",
-      statusColor: "available",
-    };
-
-    setItems((currentItems) => [newItem, ...currentItems]);
-
-    return newItem;
-  };
-
-  const value = {
-    items,
-    addItem,
-  };
-
-  return (
-    <ItemsContext.Provider value={value}>
-      {children}
-    </ItemsContext.Provider>
-  );
-}
-
-export function useItems() {
-  const context = useContext(ItemsContext);
-
-  if (!context) {
-    throw new Error("useItems must be used inside an ItemsProvider");
-  }
-
-  return context;
-}
