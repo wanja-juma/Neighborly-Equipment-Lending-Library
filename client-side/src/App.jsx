@@ -1,6 +1,5 @@
 import AuthPage from './components/AuthPage.jsx';
 import Dashboard from './components/Dashboard';
-import Home from './components/Home';
 import HowItWorks from './components/HowItWorks';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -13,10 +12,9 @@ const App = () => {
   
     <div>    
     <>
-      <Home />
+
       <HowItWorks />
       <Navbar />
-      <HowItWorks />
       <AuthPage />
       <Dashboard /> 
       <Footer />
