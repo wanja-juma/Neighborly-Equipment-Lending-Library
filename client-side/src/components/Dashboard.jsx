@@ -133,7 +133,7 @@ const listings = [
 
 function Dashboard() {
 
-  const [activePage, setActivePage] = useState("Dashboard");
+  
   const [pendingRequests, setPendingRequests] = useState(requests);
   const [notice, setNotice] = useState("");
 
@@ -149,15 +149,6 @@ function Dashboard() {
   month: "long",
   year: "numeric",
 }).format(new Date());
-
-  const navigationItems = [
-    "Dashboard",
-    "Browse Items",
-    "My Listings",
-    "Requests",
-    "Loans",
-    "Damage Reports",
-  ];
 
   const handleRequest = (id, action) => {
   const selected = pendingRequests.find(
@@ -178,48 +169,7 @@ function Dashboard() {
 
   return (
     <div className="neighborly-app">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        {/* Logo */}
-        <div className="logo">
-          <span className="logo-icon">N</span>
-          <span className="logo-text">Neighborly</span>
-        </div>
-
-        {/* Navigation links */}
-        <nav className="sidebar-navigation">
-          {navigationItems.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={
-                activePage === item
-                  ? "navigation-link active"
-                  : "navigation-link"
-              }
-              onClick={() => setActivePage(item)}
-            >
-              <span className="navigation-icon">○</span>
-              <span>{item}</span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Community information */}
-        <div className="community-card">
-          <span className="community-icon">⌂</span>
-
-          <div>
-            <small>Your community</small>
-            <strong>Greenview Estate</strong>
-          </div>
-        </div>
-
-        <button className="logout-button" type="button">
-          Log out
-        </button>
-      </aside>
-
+      
       {/* Main dashboard area */}
       <main className="dashboard-main">
         {/* Top navigation bar */}
