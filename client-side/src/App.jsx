@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
-import Home from "./components/Home";
+import HowItWorks from "./components/HowItWorks";
 import Navbar from "./components/Navbar";
 import BrowseItems from "./pages/BrowseItems";
 import DamageReports from "./pages/DamageReports";
@@ -17,7 +17,7 @@ function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HowItWorks />} />
 
         <Route path="/auth" element={<AuthPage />} />
 

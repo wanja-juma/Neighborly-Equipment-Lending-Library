@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Dashboard.css";
 
 const summaryCards = [
@@ -239,10 +240,10 @@ function Dashboard() {
       </p>
     </div>
 
-    <button className="primary-button" type="button">
-      <span className="button-icon">+</span>
-      Add New Item
-    </button>
+    <Link className="primary-button" to="/items/new">
+        <span className="button-icon">+</span>
+        Add New Item
+    </Link>
   </div>
 
   {/* Summary cards */}
@@ -274,9 +275,10 @@ function Dashboard() {
       <p>Review requests from neighbours who want to borrow your items.</p>
     </div>
 
-    <button className="view-all-button" type="button">
-      View All
-    </button>
+    <Link className="view-all-button" to="/requests">
+        View All
+    </Link>
+
   </div>
 
   <div className="requests-list">
@@ -344,10 +346,10 @@ function Dashboard() {
       <h2>Active Loans</h2>
       <p>Items you are currently borrowing or lending.</p>
     </div>
-
-    <button className="view-all-button" type="button">
-      View All
-    </button>
+    <Link className="view-all-button" to="/loans">
+        View All
+    </Link>
+    
   </div>
 
   <div className="loans-list">
@@ -398,9 +400,10 @@ function Dashboard() {
         <p>Your recently added tools and equipment.</p>
       </div>
 
-      <button className="view-all-button" type="button">
+    <Link className="view-all-button" to="/listings">
         View All
-      </button>
+    </Link>
+
     </div>
 
     <div className="listings-grid">
