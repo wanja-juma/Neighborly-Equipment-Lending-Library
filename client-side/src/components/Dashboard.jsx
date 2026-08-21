@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useItems } from "../context/ItemsContext";
 import "./Dashboard.css";
 
 const summaryCards = [
@@ -105,38 +106,17 @@ const loans = [
   },
 ];
 
-const listings = [
-  {
-    id: 1,
-    icon: "🔩",
-    name: "Electric Drill",
-    condition: "Good condition",
-    availability: "Available",
-    statusColor: "available",
-  },
-  {
-    id: 2,
-    icon: "🌿",
-    name: "Garden Mower",
-    condition: "Excellent condition",
-    availability: "Requested",
-    statusColor: "requested",
-  },
-  {
-    id: 3,
-    icon: "🪚",
-    name: "Circular Saw",
-    condition: "Good condition",
-    availability: "On Loan",
-    statusColor: "on-loan",
-  },
-];
-
 function Dashboard() {
 
   
   const [pendingRequests, setPendingRequests] = useState(requests);
   const [notice, setNotice] = useState("");
+
+  const { items } = useItems();
+
+const myItems = items.filter((item) => item.ownerId === 1);
+
+const recentListings = myItems.slice(0, 3);
 
   const dashboardSummary = summaryCards.map((card) =>
     card.title === "Pending Requests"
@@ -349,7 +329,7 @@ function Dashboard() {
     <Link className="view-all-button" to="/loans">
         View All
     </Link>
-    
+
   </div>
 
   <div className="loans-list">

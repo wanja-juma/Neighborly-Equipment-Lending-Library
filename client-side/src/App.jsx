@@ -9,11 +9,13 @@ import DamageReports from "./pages/DamageReports";
 import Loans from "./pages/Loans";
 import MyListings from "./pages/MyListings";
 import Requests from "./pages/Requests";
+import { ItemsProvider } from "./context/ItemsContext";
 import "./App.css";
 
 function App() {
   return (
-    <>
+    
+    <ItemsProvider>
       <Navbar />
 
       <Routes>
@@ -39,7 +41,7 @@ function App() {
           element={<Navigate to="/" replace />}
         />
       </Routes>
-    </>
+    </ItemsProvider>
   );
 }
 

@@ -1,0 +1,151 @@
+import { createContext, useContext, useState } from "react";
+
+const ItemsContext = createContext(null);
+
+const initialItems = [
+  {
+    id: 1,
+    name: "Electric Drill",
+    category: "Power Tools",
+    description: "Corded electric drill suitable for household projects.",
+    condition: "Good condition",
+    availability: "Available",
+    statusColor: "available",
+    icon: "🔩",
+    ownerId: 1,
+    owner: "Wanja Juma",
+    location: "Greenview Estate",
+  },
+  {
+    id: 2,
+    name: "Garden Mower",
+    category: "Garden Equipment",
+    description: "Electric lawn mower suitable for medium-sized gardens.",
+    condition: "Excellent condition",
+    availability: "Requested",
+    statusColor: "requested",
+    icon: "🌿",
+    ownerId: 1,
+    owner: "Wanja Juma",
+    location: "Greenview Estate",
+  },
+  {
+    id: 3,
+    name: "Circular Saw",
+    category: "Power Tools",
+    description: "Circular saw with an adjustable cutting depth.",
+    condition: "Good condition",
+    availability: "On Loan",
+    statusColor: "on-loan",
+    icon: "🪚",
+    ownerId: 1,
+    owner: "Wanja Juma",
+    location: "Greenview Estate",
+  },
+  {
+    id: 4,
+    name: "Extension Ladder",
+    category: "Ladders",
+    description: "Strong aluminium ladder for indoor and outdoor work.",
+    condition: "Good condition",
+    availability: "Available",
+    statusColor: "available",
+    icon: "🪜",
+    ownerId: 2,
+    owner: "David Kimani",
+    location: "Greenview Estate",
+  },
+  {
+    id: 5,
+    name: "Pressure Washer",
+    category: "Cleaning Equipment",
+    description: "High-pressure washer for vehicles and outdoor surfaces.",
+    condition: "Excellent condition",
+    availability: "Available",
+    statusColor: "available",
+    icon: "💦",
+    ownerId: 3,
+    owner: "Mary Njeri",
+    location: "Greenview Estate",
+  },
+  {
+    id: 6,
+    name: "Socket Wrench Set",
+    category: "Hand Tools",
+    description: "Complete socket wrench set with multiple socket sizes.",
+    condition: "Good condition",
+    availability: "Available",
+    statusColor: "available",
+    icon: "🔧",
+    ownerId: 3,
+    owner: "Mary Njeri",
+    location: "Greenview Estate",
+  },
+  {
+    id: 7,
+    name: "Wheelbarrow",
+    category: "Garden Equipment",
+    description: "Heavy-duty wheelbarrow for gardening and construction.",
+    condition: "Fair condition",
+    availability: "Available",
+    statusColor: "available",
+    icon: "🛒",
+    ownerId: 4,
+    owner: "Peter Otieno",
+    location: "Greenview Estate",
+  },
+  {
+    id: 8,
+    name: "Tool Box",
+    category: "Hand Tools",
+    description: "Portable tool box containing common household tools.",
+    condition: "Good condition",
+    availability: "On Loan",
+    statusColor: "on-loan",
+    icon: "🧰",
+    ownerId: 5,
+    owner: "Grace Wambui",
+    location: "Greenview Estate",
+  },
+];
+
+export function ItemsProvider({ children }) {
+  const [items, setItems] = useState(initialItems);
+
+  const addItem = (itemData) => {
+    const newItem = {
+      id: Date.now(),
+      ...itemData,
+      ownerId: 1,
+      owner: "Wanja Juma",
+      location: "Greenview Estate",
+      availability: "Available",
+      statusColor: "available",
+    };
+
+    setItems((currentItems) => [newItem, ...currentItems]);
+
+    return newItem;
+  };
+
+  const value = {
+    items,
+    addItem,
+  };
+
+  return (
+    <ItemsContext.Provider value={value}>
+      {children}
+    </ItemsContext.Provider>
+  );
+}
+
+export function useItems() {
+  const context = useContext(ItemsContext);
+
+  if (!context) {
+    throw new Error("useItems must be used inside an ItemsProvider");
+  }
+
+  return context;
+}
