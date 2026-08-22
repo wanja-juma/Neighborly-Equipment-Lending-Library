@@ -11,12 +11,14 @@ import MyListings from "./pages/MyListings";
 import Requests from "./pages/Requests";
 import ItemsProvider from "./context/ItemsProvider";
 import AddItem from "./pages/AddItem";
+import RequestsProvider from "./context/RequestsProvider";
 import "./App.css";
 
 function App() {
   return (
     
     <ItemsProvider>
+      <RequestsProvider>
       <Navbar />
 
       <Routes>
@@ -43,6 +45,7 @@ function App() {
           element={<Navigate to="/" replace />}
         />
       </Routes>
+      </RequestsProvider>
     </ItemsProvider>
   );
 }
