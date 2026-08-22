@@ -93,6 +93,16 @@ export const getLoans = () => {
   return request("/loans");
 };
 
+export const updateLoan = (
+  loanId,
+  updatedData
+) => {
+  return request(`/loans/${loanId}`, {
+    method: "PATCH",
+    body: JSON.stringify(updatedData),
+  });
+};
+
 /* Damage reports */
 
 export const getDamageReports = () => {
