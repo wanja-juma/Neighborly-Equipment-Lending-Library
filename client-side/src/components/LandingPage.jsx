@@ -26,6 +26,19 @@ function Home() {
             <span className="home__accent">Share</span> what you have{' '}
             <Sparkles className="home__sparkle" size={22} aria-hidden="true" />
           </h1>
+
+          
+          <div className="home__actions">
+            <button type="button" className="home__btn home__btn--filled">
+              <Calendar size={18} />
+              Browse Tools
+            </button>
+            <button type="button" className="home__btn home__btn--outline">
+              <Plus size={18} />
+              List Your Tool
+            </button>
+          </div>
+ 
         </div>
       </section>
     </>
