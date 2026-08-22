@@ -721,6 +721,229 @@
   box-shadow: none;
 }
 
+/* Borrowing modal */
+
+.borrow-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: grid;
+  place-items: center;
+
+  padding: 20px;
+
+  background-color: rgba(14, 37, 28, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.borrow-modal {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+
+  border: 1px solid #dce5df;
+  border-radius: 15px;
+
+  background-color: white;
+  box-shadow: 0 24px 70px rgba(10, 35, 24, 0.25);
+}
+
+/* Modal header */
+
+.borrow-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 23px 24px 18px;
+  border-bottom: 1px solid #edf0ed;
+}
+
+.borrow-modal-header h2 {
+  margin: 0 0 5px;
+  color: #193d31;
+  font-size: 20px;
+}
+
+.borrow-modal-header p:not(.page-label) {
+  margin: 0;
+  color: #7b8a82;
+  font-size: 11px;
+}
+
+.close-modal-button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  place-items: center;
+
+  border: none;
+  border-radius: 50%;
+
+  color: #677a70;
+  background-color: #f0f3f1;
+
+  font-size: 21px;
+}
+
+.close-modal-button:hover {
+  color: #284a3c;
+  background-color: #e2e9e4;
+}
+
+/* Selected item summary */
+
+.borrow-item-summary {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  margin: 20px 24px 0;
+  padding: 14px;
+
+  border: 1px solid #e2e8e3;
+  border-radius: 10px;
+
+  background-color: #f8faf8;
+}
+
+.borrow-summary-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  place-items: center;
+
+  border-radius: 9px;
+  background-color: #e4ebe2;
+
+  font-size: 25px;
+}
+
+.borrow-item-summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.borrow-item-summary strong {
+  color: #234638;
+  font-size: 13px;
+}
+
+.borrow-item-summary span {
+  color: #718178;
+  font-size: 10px;
+}
+
+.borrow-item-summary small {
+  color: #8b9891;
+  font-size: 9px;
+}
+
+/* Date form */
+
+.borrow-date-form {
+  padding: 21px 24px 24px;
+}
+
+.borrow-date-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.borrow-date-fields .item-form-field {
+  margin-bottom: 15px;
+}
+
+.borrow-form-error {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+
+  border: 1px solid #efc1bc;
+  border-radius: 8px;
+
+  color: #a9423a;
+  background-color: #fff3f2;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Request information */
+
+.borrow-request-information {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  border: 1px solid #dce8e0;
+  border-radius: 9px;
+
+  color: #66786f;
+  background-color: #f4f8f5;
+
+  font-size: 10px;
+}
+
+.borrow-request-information strong {
+  color: #365849;
+  font-size: 11px;
+}
+
+.borrow-request-information ul {
+  margin: 8px 0 0;
+  padding-left: 17px;
+}
+
+.borrow-request-information li {
+  margin-bottom: 4px;
+}
+
+/* Modal buttons */
+
+.borrow-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding-top: 18px;
+  border-top: 1px solid #edf0ed;
+}
+
+.cancel-request-button,
+.submit-request-button {
+  padding: 10px 17px;
+  border-radius: 8px;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.cancel-request-button {
+  border: 1px solid #d9e2dc;
+  color: #5c7066;
+  background-color: white;
+}
+
+.cancel-request-button:hover {
+  background-color: #f1f4f2;
+}
+
+.submit-request-button {
+  border: 1px solid #176646;
+  color: white;
+  background-color: #176646;
+}
+
+.submit-request-button:hover {
+  border-color: #105338;
+  background-color: #105338;
+}
+
 /* Responsive layout */
 
 @media (max-width: 1100px) {
@@ -806,5 +1029,36 @@
   .submit-item-button {
     width: 100%;
     text-align: center;
+  }
+}
+@media (max-width: 550px) {
+  .borrow-modal-overlay {
+    align-items: end;
+    padding: 0;
+  }
+
+  .borrow-modal {
+    width: 100%;
+    max-height: 94vh;
+
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+
+    border-radius: 16px 16px 0 0;
+  }
+
+  .borrow-date-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .borrow-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-request-button,
+  .submit-request-button {
+    width: 100%;
   }
 }
