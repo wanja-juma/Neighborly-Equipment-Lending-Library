@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import {
   createDamageReport,
   getDamageReports,
+  updateDamageReport,
 } from "../services/api";
 import DamageReportsContext from "./DamageReportsContext.js";
+
 
 function DamageReportsProvider({
   children,
@@ -100,12 +102,70 @@ function DamageReportsProvider({
     }
   };
 
+  const updateDamageReportStatus = async (
+  reportId,
+  newStatus
+) => {
+  const allowedStatuses = [
+    "Submitted",
+    "Under Review",
+    "Resolved",
+  ];
+
+  if (!allowedStatuses.includes(newStatus)) {
+    return {
+      success: false,
+      message:
+        "Invalid damage report status.",
+    };
+  }
+
+  try {
+    const updates = {
+      status: newStatus,
+      resolvedAt:
+        newStatus === "Resolved"
+          ? new Date().toISOString()
+          : null,
+    };
+
+    const updatedReport =
+      await updateDamageReport(
+        reportId,
+        updates
+      );
+
+    setDamageReports((currentReports) =>
+      currentReports.map((report) =>
+        String(report.id) ===
+        String(reportId)
+          ? updatedReport
+          : report
+      )
+    );
+
+    return {
+      success: true,
+      report: updatedReport,
+      message: `Damage report marked as ${newStatus.toLowerCase()}.`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error.message ||
+        "Failed to update the damage report.",
+    };
+  }
+};
+
   const value = {
-    damageReports,
-    damageReportsLoading,
-    damageReportsError,
-    addDamageReport,
-  };
+  damageReports,
+  damageReportsLoading,
+  damageReportsError,
+  addDamageReport,
+  updateDamageReportStatus,
+};
 
   return (
     <DamageReportsContext.Provider

@@ -125,3 +125,16 @@ export const createDamageReport = (reportData) => {
     body: JSON.stringify(reportData),
   });
 };
+
+export const updateDamageReport = (
+  reportId,
+  updates
+) => {
+  return request(
+    `/damageReports/${reportId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    }
+  );
+};
