@@ -69,7 +69,7 @@ function ItemsProvider({ children }) {
 
     setItems((currentItems) =>
       currentItems.map((item) =>
-        item.id === itemId ? updatedItem : item
+        String(item.id) === String(itemId) ? updatedItem : item
       )
     );
 

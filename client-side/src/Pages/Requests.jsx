@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useRequests from "../hooks/useRequests";
 import useLoans from "../hooks/useLoans";
+import useItems from "../hooks/useItems";
 import "./BrowseItems.css";
 
 const CURRENT_USER_ID = "1";
@@ -15,6 +16,7 @@ function Requests() {
   } = useRequests();
 
   const { addLoan } = useLoans();
+  const { updateItem } = useItems();
 
   const [notice, setNotice] = useState("");
   const [actionError, setActionError] =
@@ -116,17 +118,34 @@ function Requests() {
     });
 
     if (!loanResult.success) {
-      setActionError(
-        `The request was approved, but the loan could not be created: ${loanResult.message}`
-      );
+  setActionError(
+    `The request was approved, but the loan could not be created: ${loanResult.message}`
+  );
 
-      setUpdatingRequestId(null);
-      return;
+  setUpdatingRequestId(null);
+  return;
+}
+
+try {
+  await updateItem(
+    selectedRequest.itemId,
+    {
+      availability: "Unavailable",
     }
+  );
+} catch (error) {
+  setActionError(
+    error.message ||
+      "The loan was created, but the item availability could not be updated."
+  );
 
-    setNotice(
-      "Request approved and active loan created."
-    );
+  setUpdatingRequestId(null);
+  return;
+}
+
+setNotice(
+  "Request approved, active loan created and item marked unavailable."
+);
   } else {
     setNotice(requestResult.message);
   }
