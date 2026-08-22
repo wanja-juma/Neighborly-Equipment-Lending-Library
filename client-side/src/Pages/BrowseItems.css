@@ -224,6 +224,264 @@
   background-color: #105338;
 }
 
+/* Borrowing requests page */
+
+.requests-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.requests-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.requests-page-header h1 {
+  margin: 0.25rem 0 0.5rem;
+}
+
+.requests-page-header > div > p:last-child {
+  margin: 0;
+  color: #64748b;
+}
+
+.requests-summary {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.requests-summary div {
+  min-width: 100px;
+  padding: 1rem;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.requests-summary strong,
+.requests-summary span {
+  display: block;
+}
+
+.requests-summary strong {
+  color: #166534;
+  font-size: 1.5rem;
+}
+
+.requests-summary span {
+  margin-top: 0.25rem;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.request-page-section {
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.request-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.request-section-heading h2 {
+  margin: 0 0 0.25rem;
+}
+
+.request-section-heading p {
+  margin: 0;
+  color: #64748b;
+}
+
+.request-count {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: #166534;
+  font-weight: 700;
+  background: #dcfce7;
+  border-radius: 50%;
+}
+
+.request-page-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.request-page-card {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.request-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.request-item-details {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.request-item-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  font-size: 1.5rem;
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.request-type-label {
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.request-item-details h3 {
+  margin: 0.25rem 0 0;
+}
+
+.request-status-badge {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.request-status-badge.pending {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.request-status-badge.approved {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.request-status-badge.declined {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.request-status-badge.cancelled {
+  color: #475569;
+  background: #e2e8f0;
+}
+
+.request-page-information {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  color: #475569;
+}
+
+.request-page-information p {
+  margin: 0;
+}
+
+.request-page-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cancel-request-button {
+  padding: 0.65rem 1rem;
+  color: #991b1b;
+  font-weight: 600;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+}
+
+.cancel-request-button:hover {
+  background: #fef2f2;
+}
+
+.request-page-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.request-action-notice {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+}
+
+.request-action-notice.success {
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.request-action-notice.error,
+.requests-page-message.error {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.request-page-empty,
+.requests-page-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.request-page-empty p {
+  margin: 0.25rem 0 0;
+}
+
+@media (max-width: 700px) {
+  .requests-page-header {
+    flex-direction: column;
+  }
+
+  .requests-summary {
+    width: 100%;
+  }
+
+  .requests-summary div {
+    flex: 1;
+  }
+
+  .request-card-top {
+    flex-direction: column;
+  }
+
+  .request-page-actions {
+    flex-direction: column;
+  }
+
+  .request-page-actions button {
+    width: 100%;
+  }
+}
+
 @media (max-width: 1100px) {
     .browse-filters {
   grid-template-columns: 1fr 1fr;
