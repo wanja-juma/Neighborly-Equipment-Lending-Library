@@ -58,10 +58,10 @@ function AddItem() {
       [name]: value,
     }));
 
-    // Remove the error when the user starts correcting a field
     setErrors((currentErrors) => ({
       ...currentErrors,
       [name]: "",
+      submit: "",
     }));
   };
 
@@ -73,13 +73,16 @@ function AddItem() {
     }
 
     if (!formData.category) {
-      newErrors.category = "Please select a category.";
+      newErrors.category =
+        "Please select a category.";
     }
 
     if (!formData.description.trim()) {
       newErrors.description =
         "Item description is required.";
-    } else if (formData.description.trim().length < 10) {
+    } else if (
+      formData.description.trim().length < 10
+    ) {
       newErrors.description =
         "Description must contain at least 10 characters.";
     }
@@ -102,40 +105,46 @@ function AddItem() {
     }
 
     try {
-  await addItem({
-    name: formData.name.trim(),
-    category: formData.category,
-    description:
-      formData.description.trim(),
-    condition: formData.condition,
-    icon: formData.icon,
-  });
+      await addItem({
+        name: formData.name.trim(),
+        category: formData.category,
+        description:
+          formData.description.trim(),
+        condition: formData.condition,
+        icon: formData.icon,
+      });
 
-  navigate("/listings");
-
-} catch (error) {
-  setErrors((currentErrors) => ({
-    ...currentErrors,
-    submit:
-      error.message || "Failed to add item.",
-  }));
-}
+      navigate("/listings");
+    } catch (error) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        submit:
+          error.message || "Failed to add item.",
+      }));
+    }
+  };
 
   return (
     <main className="dashboard-main">
       <section className="add-item-page">
         <header className="add-item-header">
           <div>
-            <p className="page-label">NEW LISTING</p>
+            <p className="page-label">
+              NEW LISTING
+            </p>
+
             <h1>Add New Item</h1>
 
             <p>
-              Share a tool or piece of equipment with your
-              community.
+              Share a tool or piece of equipment with
+              your community.
             </p>
           </div>
 
-          <Link className="back-link" to="/listings">
+          <Link
+            className="back-link"
+            to="/listings"
+          >
             ← Back to My Listings
           </Link>
         </header>
@@ -148,9 +157,11 @@ function AddItem() {
           >
             <div className="form-section-heading">
               <h2>Item information</h2>
+
               <p>
-                Provide clear information to help neighbours
-                understand what you are offering.
+                Provide clear information to help
+                neighbours understand what you are
+                offering.
               </p>
             </div>
 
@@ -166,7 +177,9 @@ function AddItem() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="For example, Electric Drill"
-                className={errors.name ? "input-error" : ""}
+                className={
+                  errors.name ? "input-error" : ""
+                }
               />
 
               {errors.name && (
@@ -188,7 +201,9 @@ function AddItem() {
                   value={formData.category}
                   onChange={handleChange}
                   className={
-                    errors.category ? "input-error" : ""
+                    errors.category
+                      ? "input-error"
+                      : ""
                   }
                 >
                   <option value="">
@@ -223,7 +238,9 @@ function AddItem() {
                   value={formData.condition}
                   onChange={handleChange}
                   className={
-                    errors.condition ? "input-error" : ""
+                    errors.condition
+                      ? "input-error"
+                      : ""
                   }
                 >
                   <option value="">
@@ -260,8 +277,11 @@ function AddItem() {
                 onChange={handleChange}
                 placeholder="Describe the item, how it works and any important usage information..."
                 rows="5"
+                maxLength="300"
                 className={
-                  errors.description ? "input-error" : ""
+                  errors.description
+                    ? "input-error"
+                    : ""
                 }
               />
 
@@ -272,8 +292,8 @@ function AddItem() {
                   </small>
                 ) : (
                   <small>
-                    Include any important usage or safety
-                    information.
+                    Include any important usage or
+                    safety information.
                   </small>
                 )}
 
@@ -301,7 +321,9 @@ function AddItem() {
                       type="radio"
                       name="icon"
                       value={icon}
-                      checked={formData.icon === icon}
+                      checked={
+                        formData.icon === icon
+                      }
                       onChange={handleChange}
                     />
 
@@ -310,6 +332,16 @@ function AddItem() {
                 ))}
               </div>
             </fieldset>
+
+            {/* API submission error */}
+            {errors.submit && (
+              <div
+                className="borrow-form-error"
+                role="alert"
+              >
+                {errors.submit}
+              </div>
+            )}
 
             <div className="form-actions">
               <Link
@@ -328,7 +360,7 @@ function AddItem() {
             </div>
           </form>
 
-          {/* Preview */}
+          {/* Listing preview */}
           <aside className="item-preview-panel">
             <p className="preview-label">
               LISTING PREVIEW
@@ -345,11 +377,13 @@ function AddItem() {
 
               <div className="equipment-content">
                 <span className="equipment-category">
-                  {formData.category || "Item Category"}
+                  {formData.category ||
+                    "Item Category"}
                 </span>
 
                 <h2>
-                  {formData.name || "Your Item Name"}
+                  {formData.name ||
+                    "Your Item Name"}
                 </h2>
 
                 <p className="equipment-description">
@@ -360,7 +394,8 @@ function AddItem() {
                 <div className="equipment-details">
                   <span>
                     <b>Condition:</b>{" "}
-                    {formData.condition || "Not selected"}
+                    {formData.condition ||
+                      "Not selected"}
                   </span>
 
                   <span>
@@ -368,7 +403,8 @@ function AddItem() {
                   </span>
 
                   <span>
-                    <b>Location:</b> Greenview Estate
+                    <b>Location:</b>{" "}
+                    Greenview Estate
                   </span>
                 </div>
               </div>
@@ -377,7 +413,8 @@ function AddItem() {
         </div>
       </section>
     </main>
-  );}
+  );
 }
+
 
 export default AddItem;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useItems from "../hooks/useItems";
+import useRequests from "../hooks/useRequests";
 import "./Dashboard.css";
 
 const summaryCards = [
@@ -31,45 +32,6 @@ const summaryCards = [
     value: 4,
     icon: "↑",
     color: "purple",
-  },
-];
-
-const requests = [
-  {
-    id: 1,
-    initials: "JK",
-    borrower: "Frank Kamau",
-    item: "Electric Drill",
-    startDate: "22 Aug",
-    endDate: "24 Aug",
-    avatarColor: "orange",
-  },
-  {
-    id: 2,
-    initials: "SM",
-    borrower: "Tonny Mwangi",
-    item: "Cordless Screwdriver",
-    startDate: "23 Aug",
-    endDate: "25 Aug",
-    avatarColor: "blue",
-  },
-  {
-    id: 3,
-    initials: "AN",
-    borrower: "Amina Noor",
-    item: "Garden Mower",
-    startDate: "25 Aug",
-    endDate: "27 Aug",
-    avatarColor: "green",
-  },
-  {
-    id: 4,
-    initials: "PO",
-    borrower: "Peter Otieno",
-    item: "Extension Ladder",
-    startDate: "28 Aug",
-    endDate: "30 Aug",
-    avatarColor: "blue",
   },
 ];
 
@@ -108,17 +70,27 @@ const loans = [
 
 function Dashboard() {
 
-  
-    const [pendingRequests, setPendingRequests] = useState(requests);
-    const [notice, setNotice] = useState("");
+    
 
     const { items } = useItems();
 
     const myItems = items.filter((item) => item.ownerId === "1");
 
     const recentListings = myItems.slice(0, 3);
+    const {
+  borrowingRequests,
+  requestsLoading,
+  requestsError,
+  updateRequestStatus,
+} = useRequests();
 
-
+const [notice, setNotice] = useState("");
+const pendingRequests = borrowingRequests.filter(
+  (request) =>
+    request.status?.toLowerCase() === "pending"
+);
+const recentPendingRequests =
+  pendingRequests.slice(0, 3);
 
   const dashboardSummary = summaryCards.map((card) => {
   if (card.title === "Pending Requests") {
@@ -145,22 +117,19 @@ function Dashboard() {
   year: "numeric",
 }).format(new Date());
 
-  const handleRequest = (id, action) => {
-  const selected = pendingRequests.find(
-    (request) => request.id === id
+  const handleRequest = async (
+  requestId,
+  newStatus
+) => {
+  setNotice("");
+
+  const result = await updateRequestStatus(
+    requestId,
+    newStatus
   );
 
-  if (!selected) {
-    return;
-  }
-
-  setPendingRequests((currentRequests) =>
-    currentRequests.filter((request) => request.id !== id)
-  );
-
-  setNotice(`${selected.item} request ${action}.`);
+  setNotice(result.message);
 };
-
 
   return (
     <div className="neighborly-app">
@@ -262,76 +231,124 @@ function Dashboard() {
 
   {/* Borrowing requests section */}
 <div className="dashboard-panels">
-<section className="requests-panel">
-  <div className="panel-heading">
-    <div>
-      <h2>Borrowing Requests</h2>
-      <p>Review requests from neighbours who want to borrow your items.</p>
+  <section className="requests-panel">
+    <div className="panel-heading">
+      <div>
+        <h2>Borrowing Requests</h2>
+
+        <p>
+          Review requests from neighbours who want to
+          borrow your items.
+        </p>
+      </div>
+
+      <Link
+        className="view-all-button"
+        to="/requests"
+      >
+        View All
+      </Link>
     </div>
 
-    <Link className="view-all-button" to="/requests">
-        View All
-    </Link>
+    {notice && (
+      <p className="request-notice" role="status">
+        {notice}
+      </p>
+    )}
 
-  </div>
+    <div className="requests-list">
+      {requestsLoading ? (
+        <div className="requests-empty-state">
+          <p>Loading borrowing requests...</p>
+        </div>
+      ) : requestsError ? (
+        <div className="requests-empty-state error">
+          <p>{requestsError}</p>
+        </div>
+      ) : recentPendingRequests.length > 0 ? (
+        recentPendingRequests.map((request) => (
+          <article
+            className="request-card"
+            key={request.id}
+          >
+            <span
+              className={`borrower-avatar ${
+                request.avatarColor || "blue"
+              }`}
+            >
+              {request.initials || "NB"}
+            </span>
 
-  <div className="requests-list">
-   {pendingRequests.length > 0 ? (
-    pendingRequests.map((request) => (
-      <article className="request-card" key={request.id}>
-        <span
-          className={`borrower-avatar ${request.avatarColor}`}
-        >
-          {request.initials}
-        </span>
+            <div className="request-information">
+              <strong>
+                {request.borrower ||
+                  request.borrowerName ||
+                  "Neighbour"}
+              </strong>
 
-        <div className="request-information">
-          <strong>{request.borrower}</strong>
+              <span className="request-description">
+                wants to borrow{" "}
+                <b>
+                  {request.item ||
+                    request.itemName ||
+                    "your item"}
+                </b>
+              </span>
 
-          <span className="request-description">
-            wants to borrow <b>{request.item}</b>
+              <small className="request-dates">
+                {request.startDate} –{" "}
+                {request.endDate}
+              </small>
+            </div>
+
+            <div className="request-buttons">
+              <button
+                className="decline-button"
+                type="button"
+                onClick={() =>
+                  handleRequest(
+                    request.id,
+                    "Declined"
+                  )
+                }
+              >
+                Decline
+              </button>
+
+              <button
+                className="approve-button"
+                type="button"
+                onClick={() =>
+                  handleRequest(
+                    request.id,
+                    "Approved"
+                  )
+                }
+              >
+                Approve
+              </button>
+            </div>
+          </article>
+        ))
+      ) : (
+        <div className="requests-empty-state">
+          <span className="empty-state-icon">
+            ✓
           </span>
 
-          <small className="request-dates">
-            {request.startDate} – {request.endDate}
-          </small>
+          <div>
+            <strong>All requests reviewed</strong>
+
+            <p>
+              You have no pending borrowing requests.
+            </p>
+          </div>
         </div>
-
-        <div className="request-buttons">
-          <button
-            className="decline-button"
-            type="button"
-            onClick={() =>
-              handleRequest(request.id, "declined")
-            }
-          >
-            Decline
-          </button>
-
-          <button
-            className="approve-button"
-            type="button"
-            onClick={() =>
-              handleRequest(request.id, "approved")
-            }
-          >
-            Approve
-          </button>
-        </div>
-      </article>
-    ))
-  ) : (
-    <div className="requests-empty-state">
-      <span className="empty-state-icon">✓</span>
-
-      <div>
-        <strong>All requests reviewed</strong>
-        <p>You have no pending borrowing requests.</p>
-      </div>
+      )}
     </div>
-  )}
-  </div>
-</section>
+  </section>
+</div>
+
 
 {/* Active loans section */}
 <section className="loans-panel">
@@ -382,7 +399,7 @@ function Dashboard() {
     ))}
   </div>
 </section>
-</div>
+
 
 {/* Listings and reminder section */}
 <div className="listings-reminder-layout">

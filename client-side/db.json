@@ -135,6 +135,19 @@
       "ownerId": "5",
       "owner": "Grace Wambui",
       "location": "Greenview Estate"
+    },
+    {
+      "name": "Vacuum Cleaner",
+      "category": "Cleaning Equipment",
+      "description": "A powerful and efficient vacuum cleaner designed to remove dust, dirt and debris from floors and carpets. It is easy to use and helps keep your home clean and fresh.",
+      "condition": "Good condition",
+      "icon": "💦",
+      "ownerId": "1",
+      "owner": "Wanja Juma",
+      "location": "Greenview Estate",
+      "availability": "Available",
+      "statusColor": "available",
+      "id": "L4NMspq4Z5Q"
     }
   ],
   "borrowingRequests": [
@@ -149,7 +162,7 @@
       "borrowerName": "Frank Kamau",
       "startDate": "2026-08-25",
       "endDate": "2026-08-27",
-      "status": "Pending",
+      "status": "Approved",
       "createdAt": "2026-08-22T08:00:00.000Z"
     },
     {
@@ -176,7 +189,7 @@
       "borrowerName": "Wanja Juma",
       "startDate": "2026-08-23",
       "endDate": "2026-08-26",
-      "status": "Pending",
+      "status": "Declined",
       "createdAt": "2026-08-22T11:34:43.916Z",
       "id": "oh9_fFSimpw"
     },
@@ -193,6 +206,20 @@
       "status": "Pending",
       "createdAt": "2026-08-22T11:35:51.900Z",
       "id": "oy5pGtYBIuE"
+    },
+    {
+      "itemId": "4",
+      "itemName": "Extension Ladder",
+      "itemIcon": "🪜",
+      "ownerId": "2",
+      "ownerName": "David Kimani",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-25",
+      "endDate": "2026-08-28",
+      "status": "Approved",
+      "createdAt": "2026-08-22T14:00:42.436Z",
+      "id": "U3KPbXwYCPc"
     }
   ],
   "loans": [

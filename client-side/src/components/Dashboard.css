@@ -1121,7 +1121,20 @@ button {
   font-size: 14px;
 }
 
+.request-notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  color: #166534;
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+}
 
+.requests-empty-state.error {
+  color: #b91c1c;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+}
 
 /* Basic responsiveness */
 
