@@ -10,6 +10,7 @@ import Loans from "./pages/Loans";
 import MyListings from "./pages/MyListings";
 import Requests from "./pages/Requests";
 import ItemsProvider from "./context/ItemsProvider";
+import AddItem from "./pages/AddItem";
 import "./App.css";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/items" element={<BrowseItems />} />
+          <Route path="/items/new" element={<AddItem />} />
           <Route path="/listings" element={<MyListings />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/loans" element={<Loans />} />

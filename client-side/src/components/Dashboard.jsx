@@ -118,6 +118,7 @@ function Dashboard() {
 
     const recentListings = myItems.slice(0, 3);
 
+    
 
   const dashboardSummary = summaryCards.map((card) => {
   if (card.title === "Pending Requests") {
