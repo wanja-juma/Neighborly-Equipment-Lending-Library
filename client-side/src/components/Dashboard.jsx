@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import useItems from "../hooks/useItems";
 import useRequests from "../hooks/useRequests";
 import useLoans from "../hooks/useLoans";
+import getLoanStatus from "../utils/getLoanStatus";
 import "./Dashboard.css";
 
 const summaryCards = [
@@ -57,9 +58,9 @@ function Dashboard() {
         loansError,
     } = useLoans();
 
-    const activeLoans = loans.filter(
+   const activeLoans = loans.filter(
   (loan) =>
-    loan.status?.toLowerCase() !== "returned"
+    getLoanStatus(loan) !== "Returned"
 );
 
 const borrowedLoans = activeLoans.filter(
@@ -280,71 +281,70 @@ const getLoanStatusClass = (loan) => {
           <p>{requestsError}</p>
         </div>
       ) : recentPendingRequests.length > 0 ? (
-        recentPendingRequests.map((request) => (
-          <article
-            className="request-card"
-            key={request.id}
-          >
-            <span
-              className={`borrower-avatar ${
-                request.avatarColor || "blue"
+        recentActiveLoans.map((loan) => {
+  const currentStatus =
+    getLoanStatus(loan);
+
+  return (
+    <article
+      className="loan-card"
+      key={loan.id}
+    >
+      <span className="loan-item-icon">
+        {loan.icon || "🧰"}
+      </span>
+
+      <div className="loan-information">
+        <strong>
+          {loan.item ||
+            loan.itemName ||
+            "Equipment"}
+        </strong>
+
+        <span className="loan-person">
+          {loan.loanType === "borrowed" ||
+          String(loan.borrowerId) === "1"
+            ? `Borrowed from ${
+                loan.person ||
+                loan.ownerName ||
+                "Neighbour"
+              }`
+            : `Lent to ${
+                loan.person ||
+                loan.borrowerName ||
+                "Neighbour"
               }`}
-            >
-              {request.initials || "NB"}
-            </span>
+        </span>
 
-            <div className="request-information">
-              <strong>
-                {request.borrower ||
-                  request.borrowerName ||
-                  "Neighbour"}
-              </strong>
+        <small className="loan-due-date">
+          Due{" "}
+          {loan.dueDate ||
+            "date not provided"}
+        </small>
+      </div>
 
-              <span className="request-description">
-                wants to borrow{" "}
-                <b>
-                  {request.item ||
-                    request.itemName ||
-                    "your item"}
-                </b>
-              </span>
+      <span
+        className={`loan-status ${getLoanStatusClass(
+          currentStatus
+        )}`}
+      >
+        {currentStatus}
+      </span>
 
-              <small className="request-dates">
-                {request.startDate} –{" "}
-                {request.endDate}
-              </small>
-            </div>
-
-            <div className="request-buttons">
-              <button
-                className="decline-button"
-                type="button"
-                onClick={() =>
-                  handleRequest(
-                    request.id,
-                    "Declined"
-                  )
-                }
-              >
-                Decline
-              </button>
-
-              <button
-                className="approve-button"
-                type="button"
-                onClick={() =>
-                  handleRequest(
-                    request.id,
-                    "Approved"
-                  )
-                }
-              >
-                Approve
-              </button>
-            </div>
-          </article>
-        ))
-      ) : (
+      <Link
+        className="loan-options-button"
+        to="/loans"
+        aria-label={`View details for ${
+          loan.item ||
+          loan.itemName ||
+          "loan"
+        }`}
+      >
+        •••
+      </Link>
+    </article>
+  );
+})  (
         <div className="requests-empty-state">
           <span className="empty-state-icon">
             ✓
@@ -452,7 +452,8 @@ const getLoanStatusClass = (loan) => {
           </Link>
         </article>
       ))
-    ) : (
+    ) 
+    : (
       <div className="loans-empty-state">
         <span className="empty-state-icon">
           ✓

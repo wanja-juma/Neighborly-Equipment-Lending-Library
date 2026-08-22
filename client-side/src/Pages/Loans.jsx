@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useLoans from "../hooks/useLoans";
 import useItems from "../hooks/useItems";
+import getLoanStatus from "../utils/getLoanStatus";
 import "./BrowseItems.css";
 
 const CURRENT_USER_ID = "1";
@@ -97,9 +98,11 @@ function Loans() {
 };
 
   const renderLoanCard = (loan, type) => {
-    const isReturned =
-      loan.status?.toLowerCase() ===
-      "returned";
+    const currentStatus =
+  getLoanStatus(loan);
+
+const isReturned =
+  currentStatus === "Returned";
 
     const isUpdating =
       updatingLoanId === loan.id;
@@ -132,10 +135,10 @@ function Loans() {
 
           <span
             className={`loan-page-status ${getStatusClass(
-              loan.status
+              currentStatus
             )}`}
           >
-            {loan.status || "On Track"}
+            {currentStatus}
           </span>
         </div>
 
