@@ -10,6 +10,7 @@ import {
   Users,
   Leaf
 } from 'lucide-react';
+import './HowItWorks.css';
 
 export default function HowItWorks() {
   const [activeTab, setActiveTab] = useState('borrow');
