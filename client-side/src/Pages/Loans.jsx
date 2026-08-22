@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useLoans from "../hooks/useLoans";
+import useItems from "../hooks/useItems";
 import "./BrowseItems.css";
 
 const CURRENT_USER_ID = "1";
@@ -11,6 +12,8 @@ function Loans() {
     loansError,
     updateLoanStatus,
   } = useLoans();
+
+  const { updateItem } = useItems();
 
   const [notice, setNotice] = useState("");
   const [actionError, setActionError] =
@@ -37,25 +40,61 @@ function Loans() {
   };
 
   const handleMarkReturned = async (
-    loanId
-  ) => {
-    setNotice("");
-    setActionError("");
-    setUpdatingLoanId(loanId);
+  loanId
+) => {
+  setNotice("");
+  setActionError("");
+  setUpdatingLoanId(loanId);
 
-    const result = await updateLoanStatus(
-      loanId,
-      "Returned"
+  const selectedLoan = loans.find(
+    (loan) =>
+      String(loan.id) === String(loanId)
+  );
+
+  if (!selectedLoan) {
+    setActionError(
+      "The selected loan could not be found."
     );
-
-    if (result.success) {
-      setNotice(result.message);
-    } else {
-      setActionError(result.message);
-    }
-
     setUpdatingLoanId(null);
-  };
+    return;
+  }
+
+  const loanResult = await updateLoanStatus(
+    loanId,
+    "Returned"
+  );
+
+  if (!loanResult.success) {
+    setActionError(loanResult.message);
+    setUpdatingLoanId(null);
+    return;
+  }
+
+  if (!selectedLoan.itemId) {
+    setActionError(
+      "The loan was returned, but it is not linked to an item."
+    );
+    setUpdatingLoanId(null);
+    return;
+  }
+
+  try {
+    await updateItem(selectedLoan.itemId, {
+      availability: "Available",
+    });
+
+    setNotice(
+      "Loan marked as returned and item made available."
+    );
+  } catch (error) {
+    setActionError(
+      error.message ||
+        "The loan was returned, but the item availability could not be updated."
+    );
+  } finally {
+    setUpdatingLoanId(null);
+  }
+};
 
   const renderLoanCard = (loan, type) => {
     const isReturned =
