@@ -20,6 +20,11 @@ export default function HowItWorks() {
     setFaqOpen(faqOpen === index ? null : index);
   };
 
+  // const handleContactSubmit = (e) => {
+  //   e.preventDefault();
+  //   setContactSubmitted(true);
+  //   setTimeout(() => setContactSubmitted(false), 4000);
+  // };
 
   return (
     <div className="container">
