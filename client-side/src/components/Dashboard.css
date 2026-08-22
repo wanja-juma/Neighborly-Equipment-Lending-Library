@@ -1136,6 +1136,42 @@ button {
   border: 1px solid #fecaca;
 }
 
+.loans-empty-state {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1.25rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.loans-empty-state p {
+  margin: 0;
+}
+
+.loans-empty-state.error {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.loan-status.on-track {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.loan-status.due-soon {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.loan-status.overdue {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
 /* Basic responsiveness */
 
 @media (max-width: 800px) {

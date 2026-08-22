@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useItems from "../hooks/useItems";
 import useRequests from "../hooks/useRequests";
+import useLoans from "../hooks/useLoans";
 import "./Dashboard.css";
 
 const summaryCards = [
@@ -35,87 +36,100 @@ const summaryCards = [
   },
 ];
 
-const loans = [
-  {
-    id: 1,
-    icon: "🔧",
-    item: "Socket Wrench Set",
-    loanType: "borrowed",
-    person: "Mary Njeri",
-    dueDate: "21 Aug",
-    status: "Due Soon",
-    statusColor: "warning",
-  },
-  {
-    id: 2,
-    icon: "🪜",
-    item: "Extension Ladder",
-    loanType: "lent",
-    person: "David Kimani",
-    dueDate: "25 Aug",
-    status: "On Track",
-    statusColor: "success",
-  },
-  {
-    id: 3,
-    icon: "🧰",
-    item: "Tool Box",
-    loanType: "lent",
-    person: "Grace Wambui",
-    dueDate: "17 Aug",
-    status: "Overdue",
-    statusColor: "danger",
-  },
-];
-
 function Dashboard() {
-
-    
 
     const { items } = useItems();
 
     const myItems = items.filter((item) => item.ownerId === "1");
 
     const recentListings = myItems.slice(0, 3);
+    
     const {
-  borrowingRequests,
-  requestsLoading,
-  requestsError,
-  updateRequestStatus,
-} = useRequests();
+        borrowingRequests,
+        requestsLoading,
+        requestsError,
+        updateRequestStatus,
+    } = useRequests();
 
-const [notice, setNotice] = useState("");
-const pendingRequests = borrowingRequests.filter(
-  (request) =>
-    request.status?.toLowerCase() === "pending"
+    const {
+        loans,
+        loansLoading,
+        loansError,
+    } = useLoans();
+
+    const activeLoans = loans.filter(
+  (loan) =>
+    loan.status?.toLowerCase() !== "returned"
 );
-const recentPendingRequests =
-  pendingRequests.slice(0, 3);
 
-  const dashboardSummary = summaryCards.map((card) => {
-  if (card.title === "Pending Requests") {
-    return {
-      ...card,
-      value: pendingRequests.length,
-    };
+const borrowedLoans = activeLoans.filter(
+  (loan) =>
+    String(loan.borrowerId) === "1" ||
+    loan.loanType === "borrowed"
+);
+
+const lentLoans = activeLoans.filter(
+  (loan) =>
+    String(loan.ownerId) === "1" ||
+    loan.loanType === "lent"
+);
+
+const recentActiveLoans = activeLoans.slice(
+  0,
+  3
+);
+
+const getLoanStatusClass = (loan) => {
+  if (loan.statusColor) {
+    return loan.statusColor;
   }
 
-  if (card.title === "My Listings") {
-    return {
-      ...card,
-      value: myItems.length,
-    };
+  return (loan.status || "On Track")
+    .toLowerCase()
+    .replaceAll(" ", "-");
+};
+
+    const [notice, setNotice] = useState("");
+    const pendingRequests = borrowingRequests.filter(
+        (request) =>
+        request.status?.toLowerCase() === "pending"
+    );
+    const recentPendingRequests =
+        pendingRequests.slice(0, 3);
+
+    const dashboardSummary = summaryCards.map(
+  (card) => {
+    if (card.title === "Pending Requests") {
+      return {
+        ...card,
+        value: pendingRequests.length,
+      };
+    }
+
+    if (card.title === "Items Borrowed") {
+      return {
+        ...card,
+        value: borrowedLoans.length,
+      };
+    }
+
+    if (card.title === "Items Lent Out") {
+      return {
+        ...card,
+        value: lentLoans.length,
+      };
+    }
+
+    return card;
   }
+);
 
-  return card;
-});
-
-  const currentDate = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-}).format(new Date());
+    const currentDate = new Intl.DateTimeFormat("en-GB", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(new Date());
 
   const handleRequest = async (
   requestId,
@@ -355,48 +369,105 @@ const recentPendingRequests =
   <div className="panel-heading">
     <div>
       <h2>Active Loans</h2>
-      <p>Items you are currently borrowing or lending.</p>
-    </div>
-    <Link className="view-all-button" to="/loans">
-        View All
-    </Link>
 
+      <p>
+        Items you are currently borrowing or
+        lending.
+      </p>
+    </div>
+
+    <Link
+      className="view-all-button"
+      to="/loans"
+    >
+      View All
+    </Link>
   </div>
 
   <div className="loans-list">
-    {loans.map((loan) => (
-      <article className="loan-card" key={loan.id}>
-        <span className="loan-item-icon">{loan.icon}</span>
-
-        <div className="loan-information">
-          <strong>{loan.item}</strong>
-
-          <span className="loan-person">
-            {loan.loanType === "borrowed"
-              ? `Borrowed from ${loan.person}`
-              : `Lent to ${loan.person}`}
+    {loansLoading ? (
+      <div className="loans-empty-state">
+        <p>Loading active loans...</p>
+      </div>
+    ) : loansError ? (
+      <div className="loans-empty-state error">
+        <p>{loansError}</p>
+      </div>
+    ) : recentActiveLoans.length > 0 ? (
+      recentActiveLoans.map((loan) => (
+        <article
+          className="loan-card"
+          key={loan.id}
+        >
+          <span className="loan-item-icon">
+            {loan.icon || "🧰"}
           </span>
 
-          <small className="loan-due-date">
-            Due {loan.dueDate}
-          </small>
-        </div>
+          <div className="loan-information">
+            <strong>
+              {loan.item ||
+                loan.itemName ||
+                "Equipment"}
+            </strong>
 
-        <span
-          className={`loan-status ${loan.statusColor}`}
-        >
-          {loan.status}
+            <span className="loan-person">
+              {loan.loanType === "borrowed" ||
+              String(loan.borrowerId) === "1"
+                ? `Borrowed from ${
+                    loan.person ||
+                    loan.ownerName ||
+                    "Neighbour"
+                  }`
+                : `Lent to ${
+                    loan.person ||
+                    loan.borrowerName ||
+                    "Neighbour"
+                  }`}
+            </span>
+
+            <small className="loan-due-date">
+              Due{" "}
+              {loan.dueDate || "date not provided"}
+            </small>
+          </div>
+
+          <span
+            className={`loan-status ${getLoanStatusClass(
+              loan
+            )}`}
+          >
+            {loan.status || "On Track"}
+          </span>
+
+          <Link
+            className="loan-options-button"
+            to="/loans"
+            aria-label={`View details for ${
+              loan.item ||
+              loan.itemName ||
+              "loan"
+            }`}
+          >
+            •••
+          </Link>
+        </article>
+      ))
+    ) : (
+      <div className="loans-empty-state">
+        <span className="empty-state-icon">
+          ✓
         </span>
 
-        <button
-          className="loan-options-button"
-          type="button"
-          aria-label={`View options for ${loan.item}`}
-        >
-          •••
-        </button>
-      </article>
-    ))}
+        <div>
+          <strong>No active loans</strong>
+
+          <p>
+            You have no borrowed or lent items at
+            the moment.
+          </p>
+        </div>
+      </div>
+    )}
   </div>
 </section>
 
