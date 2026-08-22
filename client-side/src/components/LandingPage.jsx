@@ -38,7 +38,28 @@ function Home() {
               List Your Tool
             </button>
           </div>
- 
+
+          <div className="home__social-proof">
+            <div className="home__avatar-stack" aria-hidden="true">
+              <span className="home__avatar" style={{ backgroundColor: '#1E5E3D' }}>JM</span>
+              <span className="home__avatar" style={{ backgroundColor: '#B5432B' }}>AK</span>
+              <span className="home__avatar" style={{ backgroundColor: '#8B8A84' }}>SW</span>
+            </div>
+            <div>
+              <p className="home__social-proof-stat">500+ neighbors sharing</p>
+              <p className="home__social-proof-caption">
+                Join your street and start borrowing today
+              </p>
+            </div>
+          </div>
+        </div>
+
+         <div className="home__right">
+          <img
+            src={heroPhoto}
+            alt="A set of tools on the wall with a hand reached out, ready to be borrowed"
+            className="home__photo"
+          />
         </div>
       </section>
     </>
