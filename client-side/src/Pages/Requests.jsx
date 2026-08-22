@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useRequests from "../hooks/useRequests";
+import useLoans from "../hooks/useLoans";
 import "./BrowseItems.css";
 
 const CURRENT_USER_ID = "1";
@@ -12,6 +13,8 @@ function Requests() {
     updateRequestStatus,
     cancelBorrowingRequest,
   } = useRequests();
+
+  const { addLoan } = useLoans();
 
   const [notice, setNotice] = useState("");
   const [actionError, setActionError] =
@@ -34,26 +37,102 @@ function Requests() {
     );
 
   const handleStatusChange = async (
-    requestId,
-    newStatus
-  ) => {
-    setNotice("");
-    setActionError("");
-    setUpdatingRequestId(requestId);
+  requestId,
+  newStatus
+) => {
+  setNotice("");
+  setActionError("");
+  setUpdatingRequestId(requestId);
 
-    const result = await updateRequestStatus(
+  const selectedRequest =
+    borrowingRequests.find(
+      (request) =>
+        String(request.id) ===
+        String(requestId)
+    );
+
+  if (!selectedRequest) {
+    setActionError(
+      "The borrowing request could not be found."
+    );
+    setUpdatingRequestId(null);
+    return;
+  }
+
+  const requestResult =
+    await updateRequestStatus(
       requestId,
       newStatus
     );
 
-    if (result.success) {
-      setNotice(result.message);
-    } else {
-      setActionError(result.message);
+  if (!requestResult.success) {
+    setActionError(requestResult.message);
+    setUpdatingRequestId(null);
+    return;
+  }
+
+  if (newStatus === "Approved") {
+    const loanResult = await addLoan({
+      requestId: selectedRequest.id,
+      itemId: selectedRequest.itemId,
+
+      item:
+        selectedRequest.item ||
+        selectedRequest.itemName ||
+        "Equipment",
+
+      icon:
+        selectedRequest.itemIcon ||
+        selectedRequest.icon ||
+        "🧰",
+
+      ownerId: selectedRequest.ownerId,
+      borrowerId: selectedRequest.borrowerId,
+
+      ownerName:
+        selectedRequest.ownerName ||
+        selectedRequest.owner ||
+        "Item owner",
+
+      borrowerName:
+        selectedRequest.borrowerName ||
+        selectedRequest.borrower ||
+        "Neighbour",
+
+      person:
+        selectedRequest.borrowerName ||
+        selectedRequest.borrower ||
+        "Neighbour",
+
+      loanType:
+        String(selectedRequest.ownerId) ===
+        CURRENT_USER_ID
+          ? "lent"
+          : "borrowed",
+
+      startDate: selectedRequest.startDate,
+      dueDate: selectedRequest.endDate,
+      status: "On Track",
+    });
+
+    if (!loanResult.success) {
+      setActionError(
+        `The request was approved, but the loan could not be created: ${loanResult.message}`
+      );
+
+      setUpdatingRequestId(null);
+      return;
     }
 
-    setUpdatingRequestId(null);
-  };
+    setNotice(
+      "Request approved and active loan created."
+    );
+  } else {
+    setNotice(requestResult.message);
+  }
+
+  setUpdatingRequestId(null);
+};
 
   const handleCancelRequest = async (
     requestId
@@ -180,20 +259,18 @@ function Requests() {
               </button>
 
               <button
-                className="approve-button"
-                type="button"
-                disabled={isUpdating}
-                onClick={() =>
-                  handleStatusChange(
-                    request.id,
-                    "Approved"
-                  )
-                }
-              >
-                {isUpdating
-                  ? "Updating..."
-                  : "Approve"}
-              </button>
+  className="approve-button"
+  type="button"
+  disabled={isUpdating}
+  onClick={() =>
+    handleStatusChange(
+      request.id,
+      "Approved"
+    )
+  }
+>
+  {isUpdating ? "Updating..." : "Approve"}
+</button>
             </div>
           )}
 
