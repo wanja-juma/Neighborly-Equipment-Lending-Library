@@ -4,7 +4,7 @@ import './Home.css';
  
 function Home() {
   return (
-     <>
+    <>
       <section className="home">
         <div className="home__blob home__blob--green" aria-hidden="true" />
         <div className="home__blob home__blob--amber" aria-hidden="true" />
@@ -19,6 +19,13 @@ function Home() {
               </span>
             </div>
           </div>
+ 
+          <h1 className="home__headline">
+            Borrow what you need.
+            <br />
+            <span className="home__accent">Share</span> what you have{' '}
+            <Sparkles className="home__sparkle" size={22} aria-hidden="true" />
+          </h1>
         </div>
       </section>
     </>
