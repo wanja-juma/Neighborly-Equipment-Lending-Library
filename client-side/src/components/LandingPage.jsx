@@ -1,8 +1,8 @@
 import { House, Calendar, Plus, Sparkles } from 'lucide-react';
 import heroPhoto from '../assets/hero-photo.jpg';
-import './Home.css';
+import './LandingPage.css';
 
-function Home() {
+function LandingPage() {
   return (
     <>
       <section className="home">
@@ -56,7 +56,7 @@ function Home() {
         <div className="home__right">
           <img
             src={heroPhoto}
-            alt="A toolbox full of hand tools next to a lawnmower, ready to be borrowed"
+            alt="A wall unit with tools and a hand reaching out to pick one , ready to be borrowed"
             className="home__photo"
           />
         </div>
@@ -87,4 +87,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default LandingPage;
