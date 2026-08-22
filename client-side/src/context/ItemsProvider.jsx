@@ -76,15 +76,16 @@ function ItemsProvider({ children }) {
     return updatedItem;
   };
 
-  const deleteItem = async (itemId) => {
-    await deleteItemRequest(itemId);
+ const deleteItem = async (itemId) => {
+  await deleteItemRequest(itemId);
 
-    setItems((currentItems) =>
-      currentItems.filter(
-        (item) => item.id !== itemId
-      )
-    );
-  };
+  setItems((currentItems) =>
+    currentItems.filter(
+      (item) =>
+        String(item.id) !== String(itemId)
+    )
+  );
+};
 
   const value = {
     items,
