@@ -13,11 +13,12 @@ const initialFormData = {
 
 function DamageReports() {
   const {
-    damageReports,
-    damageReportsLoading,
-    damageReportsError,
-    addDamageReport,
-  } = useDamageReports();
+  damageReports,
+  damageReportsLoading,
+  damageReportsError,
+  addDamageReport,
+  updateDamageReportStatus,
+} = useDamageReports();
 
   const {
     loans,
@@ -32,6 +33,13 @@ function DamageReports() {
   const [notice, setNotice] = useState("");
   const [isSubmitting, setIsSubmitting] =
     useState(false);
+    const [statusError, setStatusError] =
+  useState("");
+
+const [
+  updatingReportId,
+  setUpdatingReportId,
+] = useState(null);
 
   const userLoans = loans.filter(
     (loan) =>
@@ -146,6 +154,29 @@ function DamageReports() {
     setIsSubmitting(false);
   };
 
+  const handleReportStatus = async (
+  reportId,
+  newStatus
+) => {
+  setNotice("");
+  setStatusError("");
+  setUpdatingReportId(reportId);
+
+  const result =
+    await updateDamageReportStatus(
+      reportId,
+      newStatus
+    );
+
+  if (result.success) {
+    setNotice(result.message);
+  } else {
+    setStatusError(result.message);
+  }
+
+  setUpdatingReportId(null);
+};
+
   if (
     damageReportsLoading ||
     loansLoading
@@ -204,6 +235,15 @@ function DamageReports() {
             {notice}
           </p>
         )}
+
+        {statusError && (
+  <p
+    className="damage-notice error"
+    role="alert"
+  >
+    {statusError}
+  </p>
+)}
 
         <div className="damage-page-layout">
           <form
@@ -429,6 +469,56 @@ function DamageReports() {
                         : "recently"}
                     </small>
                   </div>
+
+                  {String(report.ownerId) ===
+  CURRENT_USER_ID &&
+  report.status?.toLowerCase() !==
+    "resolved" && (
+    <div className="damage-report-actions">
+      {report.status?.toLowerCase() ===
+        "submitted" && (
+        <button
+          className="review-report-button"
+          type="button"
+          disabled={
+            updatingReportId === report.id
+          }
+          onClick={() =>
+            handleReportStatus(
+              report.id,
+              "Under Review"
+            )
+          }
+        >
+          {updatingReportId === report.id
+            ? "Updating..."
+            : "Review Report"}
+        </button>
+      )}
+
+      {report.status?.toLowerCase() ===
+        "under review" && (
+        <button
+          className="resolve-report-button"
+          type="button"
+          disabled={
+  String(updatingReportId) ===
+  String(report.id)
+}
+          onClick={() =>
+            handleReportStatus(
+              report.id,
+              "Resolved"
+            )
+          }
+        >
+          {updatingReportId === report.id
+            ? "Updating..."
+            : "Mark as Resolved"}
+        </button>
+      )}
+    </div>
+  )}
                 </article>
               ))
             ) : (
