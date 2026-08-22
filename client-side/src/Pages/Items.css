@@ -993,6 +993,248 @@
   cursor: not-allowed;
   opacity: 0.6;
 }
+/* Edit item page */
+
+.edit-item-page {
+  padding: 2rem;
+}
+
+.edit-item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.edit-item-header h1 {
+  margin: 0.25rem 0 0.5rem;
+}
+
+.edit-item-header p {
+  margin-bottom: 0;
+  color: #64748b;
+}
+
+.back-to-listings {
+  color: #166534;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.edit-item-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(320px, 1fr)
+    minmax(260px, 0.6fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.edit-item-form,
+.edit-item-preview {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.edit-item-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.edit-form-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.edit-form-field > span,
+.edit-icon-fieldset legend {
+  color: #334155;
+  font-weight: 700;
+}
+
+.edit-form-field b {
+  color: #dc2626;
+}
+
+.edit-form-field input,
+.edit-form-field select,
+.edit-form-field textarea {
+  width: 100%;
+  padding: 0.75rem;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.edit-form-field input:focus,
+.edit-form-field select:focus,
+.edit-form-field textarea:focus {
+  border-color: #16a34a;
+  outline: 3px solid #dcfce7;
+}
+
+.edit-form-field .input-error {
+  border-color: #dc2626;
+}
+
+.field-error,
+.edit-submit-error {
+  color: #b91c1c;
+}
+
+.edit-fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.edit-description-help {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.edit-icon-fieldset {
+  padding: 0;
+  border: none;
+}
+
+.edit-icon-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.edit-icon-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.edit-icon-option span {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+}
+
+.edit-icon-option.selected span {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.edit-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.cancel-edit-button,
+.save-edit-button {
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.cancel-edit-button {
+  color: #475569;
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.save-edit-button {
+  color: #ffffff;
+  cursor: pointer;
+  background: #166534;
+  border: 1px solid #166534;
+}
+
+.save-edit-button:hover {
+  background: #14532d;
+}
+
+.save-edit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.edit-item-preview {
+  position: sticky;
+  top: 1rem;
+}
+
+.edit-preview-icon {
+  display: grid;
+  height: 160px;
+  margin-bottom: 1rem;
+  place-items: center;
+  font-size: 4rem;
+  background: #f1f5f9;
+  border-radius: 12px;
+}
+
+.edit-item-preview h2 {
+  margin: 0.5rem 0;
+}
+
+.edit-item-preview > p:not(
+    .page-label
+  ) {
+  color: #64748b;
+}
+
+.edit-preview-details {
+  display: grid;
+  gap: 0.5rem;
+  color: #475569;
+}
+
+.edit-item-empty {
+  padding: 3rem;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 14px;
+}
+
+.edit-item-empty a {
+  color: #166534;
+  font-weight: 700;
+}
+
+.edit-item-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+@media (max-width: 800px) {
+  .edit-item-header {
+    flex-direction: column;
+  }
+
+  .edit-item-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-item-preview {
+    position: static;
+  }
+}
+
 
 @media (max-width: 600px) {
   .listing-actions {
@@ -1120,5 +1362,23 @@
   .cancel-request-button,
   .submit-request-button {
     width: 100%;
+  }
+   .edit-item-page {
+    padding: 1rem;
+  }
+
+  .edit-fields-row {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-form-actions {
+    flex-direction: column;
+  }
+
+  .cancel-edit-button,
+  .save-edit-button {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
   }
 }

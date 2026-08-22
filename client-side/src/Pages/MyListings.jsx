@@ -216,12 +216,12 @@ function MyListings() {
                     </div>
 
                     <div className="listing-actions">
-                      <button
-                        className="edit-item-button"
-                        type="button"
-                      >
-                        Edit Listing
-                      </button>
+                      <Link
+  className="edit-item-button"
+  to={`/listings/${item.id}/edit`}
+>
+  Edit Listing
+</Link>
 
                       <button
                         className="availability-button"

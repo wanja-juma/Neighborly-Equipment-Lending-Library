@@ -13,6 +13,7 @@ import ItemsProvider from "./context/ItemsProvider";
 import AddItem from "./pages/AddItem";
 import RequestsProvider from "./context/RequestsProvider";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
+import EditItem from "./pages/EditItem";
 import "./App.css";
 
 function App() {
@@ -35,6 +36,10 @@ function App() {
           <Route path="/listings" element={<MyListings />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/loans" element={<Loans />} />
+          <Route
+  path="/listings/:itemId/edit"
+  element={<EditItem />}
+/>
 
           <Route
             path="/damage-reports"
