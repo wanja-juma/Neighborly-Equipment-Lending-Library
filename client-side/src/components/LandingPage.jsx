@@ -14,17 +14,17 @@ import {
 export default function HowItWorks() {
   const [activeTab, setActiveTab] = useState('borrow');
   const [faqOpen, setFaqOpen] = useState(null);
-  const [contactSubmitted, setContactSubmitted] = useState(false);
+  
 
   const toggleFaq = (index) => {
     setFaqOpen(faqOpen === index ? null : index);
   };
 
-  const handleContactSubmit = (e) => {
-    e.preventDefault();
-    setContactSubmitted(true);
-    setTimeout(() => setContactSubmitted(false), 4000);
-  };
+  // const handleContactSubmit = (e) => {
+  //   e.preventDefault();
+  //   setContactSubmitted(true);
+  //   setTimeout(() => setContactSubmitted(false), 4000);
+  // };
 
   return (
     <div className="container">

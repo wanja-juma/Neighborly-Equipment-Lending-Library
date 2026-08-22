@@ -1,6 +1,6 @@
 import AuthPage from './components/AuthPage.jsx';
 import Home from './components/Home';
-import HowItWorks from './components/HowItWorks';
+import LandingPage from './components/LandingPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import reactLogo from './assets/react.svg'
@@ -15,11 +15,14 @@ function App() {
   return (
     <div>
     <>
-      <Home />
-      <HowItWorks />
       <Navbar />
       <Home />
+
+      <LandingPage />
       <AuthPage />
+      
+      
+      
       <Footer />
     </>
   
