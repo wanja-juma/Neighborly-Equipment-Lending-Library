@@ -1,0 +1,273 @@
+.container {
+  min-height: 100vh;
+  background-color: #FBF6ED;
+  color: #1E5E3D;
+  font-family: inherit;
+}
+
+.hero {
+  background: linear-gradient(to bottom, #FBF6ED 60%, #FBF6ED);
+  padding: 3rem 1rem 2.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .hero {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: #DCEEE2;
+  color: #1E5E3D;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #141414;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 640px) {
+  .title {
+    font-size: 2.25rem;
+  }
+}
+
+.brand-color {
+  color: #1E5E3D;
+}
+
+.subtitle {
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  color: #55534E;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 640px) {
+  .subtitle {
+    font-size: 1.125rem;
+  }
+}
+
+.tab-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.tab-container {
+  display: inline-flex;
+  padding: 0.25rem;
+  background-color: #E3E3DD;
+  border-radius: 0.75rem;
+}
+
+.tab-btn {
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 200ms ease;
+  color: #55534E;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-btn:hover {
+  color: #141414;
+}
+
+.tab-btn.active {
+  background-color: #1E5E3D;
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.section {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .section {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.grid {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid #E3E3DD;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.step-number {
+  position: absolute;
+  top: -0.75rem;
+  left: 1.5rem;
+  background-color: #1E5E3D;
+  color: #ffffff;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.icon-box {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: #F1D3AD;
+  color: #1E5E3D;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #141414;
+  margin-bottom: 0.5rem;
+}
+
+.card-desc {
+  font-size: 0.875rem;
+  color: #55534E;
+}
+
+.banner {
+  background-color: #1E5E3D;
+  color: #ffffff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .banner {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 2rem;
+  }
+}
+
+.banner-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.banner-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  color: #F1D3AD;
+}
+
+.banner-desc {
+  font-size: 0.75rem;
+  color: #FBEEDA;
+  margin-top: 0.25rem;
+}
+
+.faq-section {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 2.5rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .faq-section {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+.faq-item {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid #E3E3DD;
+  overflow: hidden;
+}
+
+.faq-btn {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-weight: 600;
+  color: #141414;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.faq-answer {
+  padding: 0 1.25rem 1rem;
+  font-size: 0.875rem;
+  color: #55534E;
+  border-top: 1px solid #E3E3DD;
+  padding-top: 0.75rem;
+}
