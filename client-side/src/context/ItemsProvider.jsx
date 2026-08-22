@@ -1,32 +1,98 @@
-import { useState } from "react";
-import { initialItems } from "../data/items";
+import { useEffect, useState } from "react";
+import {
+  createItem,
+  deleteItem as deleteItemRequest,
+  getItems,
+  updateItem as updateItemRequest,
+} from "../services/api";
 import ItemsContext from "./ItemsContext";
 
 function ItemsProvider({ children }) {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState([]);
+  const [itemsLoading, setItemsLoading] =
+    useState(true);
+    
+  const [itemsError, setItemsError] =
+    useState("");
 
-  const addItem = (itemData) => {
-    const newItem = {
-      id: Date.now(),
+  useEffect(() => {
+    const loadItems = async () => {
+      try {
+        setItemsLoading(true);
+        setItemsError("");
+
+        const data = await getItems();
+
+        setItems(data);
+      } catch (error) {
+        setItemsError(
+          error.message || "Failed to load items."
+        );
+      } finally {
+        setItemsLoading(false);
+      }
+    };
+
+    loadItems();
+  }, []);
+
+  const addItem = async (itemData) => {
+    const newItemData = {
       ...itemData,
-      ownerId: 1,
+      ownerId: "1",
       owner: "Wanja Juma",
       location: "Greenview Estate",
       availability: "Available",
       statusColor: "available",
     };
 
+    const savedItem = await createItem(
+      newItemData
+    );
+
     setItems((currentItems) => [
-      newItem,
+      savedItem,
       ...currentItems,
     ]);
 
-    return newItem;
+    return savedItem;
+  };
+
+  const updateItem = async (
+    itemId,
+    updates
+  ) => {
+    const updatedItem = await updateItemRequest(
+      itemId,
+      updates
+    );
+
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === itemId ? updatedItem : item
+      )
+    );
+
+    return updatedItem;
+  };
+
+  const deleteItem = async (itemId) => {
+    await deleteItemRequest(itemId);
+
+    setItems((currentItems) =>
+      currentItems.filter(
+        (item) => item.id !== itemId
+      )
+    );
   };
 
   const value = {
     items,
+    itemsLoading,
+    itemsError,
     addItem,
+    updateItem,
+    deleteItem,
   };
 
   return (

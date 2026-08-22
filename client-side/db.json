@@ -1,5 +1,4 @@
 {
-  
   "users": [
     {
       "id": "1",
@@ -166,6 +165,34 @@
       "endDate": "2026-08-30",
       "status": "Approved",
       "createdAt": "2026-08-22T09:00:00.000Z"
+    },
+    {
+      "itemId": "5",
+      "itemName": "Pressure Washer",
+      "itemIcon": "💦",
+      "ownerId": "3",
+      "ownerName": "Mary Njeri",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-23",
+      "endDate": "2026-08-26",
+      "status": "Pending",
+      "createdAt": "2026-08-22T11:34:43.916Z",
+      "id": "oh9_fFSimpw"
+    },
+    {
+      "itemId": "7",
+      "itemName": "Wheelbarrow",
+      "itemIcon": "🛒",
+      "ownerId": "4",
+      "ownerName": "Peter Otieno",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-26",
+      "status": "Pending",
+      "createdAt": "2026-08-22T11:35:51.900Z",
+      "id": "oy5pGtYBIuE"
     }
   ],
   "loans": [
@@ -200,5 +227,6 @@
       "deposit": 1500
     }
   ],
-  "damageReports": []
+  "damageReports": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }

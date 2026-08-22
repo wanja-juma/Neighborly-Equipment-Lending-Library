@@ -20,7 +20,11 @@ const getLocalDate = () => {
 };
 
 function BrowseItems() {
-  const { items } = useItems();
+   const {
+    items,
+    itemsLoading,
+    itemsError,
+  } = useItems();
 
   const { addBorrowingRequest } = useRequests();
 
@@ -44,7 +48,7 @@ const minimumDate = getLocalDate();
 
   // Do not show the current user's items on the community page
   const communityItems = items.filter(
-    (item) => item.ownerId !== 1
+    (item) => item.ownerId !== "1"
   );
 
   const categories = [
@@ -87,6 +91,26 @@ const minimumDate = getLocalDate();
     selectedCategory,
     selectedAvailability,
   ]);
+  if (itemsLoading) {
+    return (
+      <main className="dashboard-main">
+        <section className="items-page">
+          <p>Loading available items...</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (itemsError) {
+    return (
+      <main className="dashboard-main">
+        <section className="items-page">
+          <p>{itemsError}</p>
+        </section>
+      </main>
+    );
+  }
+
 
  const openBorrowForm = (item) => {
   if (item.availability !== "Available") {
@@ -130,7 +154,7 @@ const handleDateChange = (event) => {
   setFormError("");
 };
 
-const handleBorrowRequest = (event) => {
+const handleBorrowRequest = async (event) => {
   event.preventDefault();
 
   if (!selectedItem) {
@@ -166,13 +190,13 @@ const handleBorrowRequest = (event) => {
     return;
   }
 
-  const result = addBorrowingRequest({
+  const result = await addBorrowingRequest({
     itemId: selectedItem.id,
     itemName: selectedItem.name,
     itemIcon: selectedItem.icon,
     ownerId: selectedItem.ownerId,
     ownerName: selectedItem.owner,
-    borrowerId: 1,
+    borrowerId: "1",
     borrowerName: "Wanja Juma",
     startDate: borrowDates.startDate,
     endDate: borrowDates.endDate,

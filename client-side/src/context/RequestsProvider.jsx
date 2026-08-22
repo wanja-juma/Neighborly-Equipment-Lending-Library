@@ -1,18 +1,59 @@
-import { useState } from "react";
-import { initialBorrowingRequests } from "../data/requests";
+import { useEffect, useState } from "react";
+import {
+  createBorrowingRequest,
+  getBorrowingRequests,
+  updateBorrowingRequest,
+} from "../services/api";
 import RequestsContext from "./RequestsContext";
 
 function RequestsProvider({ children }) {
-  const [borrowingRequests, setBorrowingRequests] =
-    useState(initialBorrowingRequests);
+  const [
+    borrowingRequests,
+    setBorrowingRequests,
+  ] = useState([]);
 
-  const addBorrowingRequest = (requestData) => {
-    const duplicateRequest = borrowingRequests.find(
-      (request) =>
-        request.itemId === requestData.itemId &&
-        request.borrowerId === requestData.borrowerId &&
-        request.status === "Pending"
-    );
+  const [
+    requestsLoading,
+    setRequestsLoading,
+  ] = useState(true);
+
+  const [requestsError, setRequestsError] =
+    useState("");
+
+  useEffect(() => {
+    const loadRequests = async () => {
+      try {
+        setRequestsLoading(true);
+        setRequestsError("");
+
+        const data =
+          await getBorrowingRequests();
+
+        setBorrowingRequests(data);
+      } catch (error) {
+        setRequestsError(
+          error.message ||
+            "Failed to load borrowing requests."
+        );
+      } finally {
+        setRequestsLoading(false);
+      }
+    };
+
+    loadRequests();
+  }, []);
+
+  const addBorrowingRequest = async (
+    requestData
+  ) => {
+    const duplicateRequest =
+      borrowingRequests.find(
+        (request) =>
+          request.itemId === requestData.itemId &&
+          request.borrowerId ===
+            requestData.borrowerId &&
+          request.status === "Pending"
+      );
 
     if (duplicateRequest) {
       return {
@@ -22,26 +63,45 @@ function RequestsProvider({ children }) {
       };
     }
 
-    const newRequest = {
-      id: Date.now(),
-      ...requestData,
-      status: "Pending",
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      const newRequestData = {
+        ...requestData,
+        status: "Pending",
+        createdAt: new Date().toISOString(),
+      };
 
-    setBorrowingRequests((currentRequests) => [
-      newRequest,
-      ...currentRequests,
-    ]);
+      const savedRequest =
+        await createBorrowingRequest(
+          newRequestData
+        );
 
-    return {
-      success: true,
-      request: newRequest,
-      message: "Borrowing request submitted successfully.",
-    };
+      setBorrowingRequests(
+        (currentRequests) => [
+          savedRequest,
+          ...currentRequests,
+        ]
+      );
+
+      return {
+        success: true,
+        request: savedRequest,
+        message:
+          "Borrowing request submitted successfully.",
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.message ||
+          "Failed to submit borrowing request.",
+      };
+    }
   };
 
-  const updateRequestStatus = (requestId, newStatus) => {
+  const updateRequestStatus = async (
+    requestId,
+    newStatus
+  ) => {
     const allowedStatuses = [
       "Pending",
       "Approved",
@@ -56,40 +116,52 @@ function RequestsProvider({ children }) {
       };
     }
 
-    const requestExists = borrowingRequests.some(
-      (request) => request.id === requestId
-    );
+    try {
+      const updatedRequest =
+        await updateBorrowingRequest(
+          requestId,
+          {
+            status: newStatus,
+          }
+        );
 
-    if (!requestExists) {
+      setBorrowingRequests(
+        (currentRequests) =>
+          currentRequests.map((request) =>
+            request.id === requestId
+              ? updatedRequest
+              : request
+          )
+      );
+
+      return {
+        success: true,
+        request: updatedRequest,
+        message: `Request ${newStatus.toLowerCase()}.`,
+      };
+    } catch (error) {
       return {
         success: false,
-        message: "Borrowing request not found.",
+        message:
+          error.message ||
+          "Failed to update request.",
       };
     }
-
-    setBorrowingRequests((currentRequests) =>
-      currentRequests.map((request) =>
-        request.id === requestId
-          ? {
-              ...request,
-              status: newStatus,
-            }
-          : request
-      )
-    );
-
-    return {
-      success: true,
-      message: `Request ${newStatus.toLowerCase()}.`,
-    };
   };
 
-  const cancelBorrowingRequest = (requestId) => {
-    return updateRequestStatus(requestId, "Cancelled");
+  const cancelBorrowingRequest = (
+    requestId
+  ) => {
+    return updateRequestStatus(
+      requestId,
+      "Cancelled"
+    );
   };
 
   const value = {
     borrowingRequests,
+    requestsLoading,
+    requestsError,
     addBorrowingRequest,
     updateRequestStatus,
     cancelBorrowingRequest,

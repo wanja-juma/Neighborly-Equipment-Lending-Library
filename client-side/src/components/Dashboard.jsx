@@ -114,11 +114,11 @@ function Dashboard() {
 
     const { items } = useItems();
 
-    const myItems = items.filter((item) => item.ownerId === 1);
+    const myItems = items.filter((item) => item.ownerId === "1");
 
     const recentListings = myItems.slice(0, 3);
 
-    
+
 
   const dashboardSummary = summaryCards.map((card) => {
   if (card.title === "Pending Requests") {

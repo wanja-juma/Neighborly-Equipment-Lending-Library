@@ -94,23 +94,32 @@ function AddItem() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    addItem({
-      name: formData.name.trim(),
-      category: formData.category,
-      description: formData.description.trim(),
-      condition: formData.condition,
-      icon: formData.icon,
-    });
+    try {
+  await addItem({
+    name: formData.name.trim(),
+    category: formData.category,
+    description:
+      formData.description.trim(),
+    condition: formData.condition,
+    icon: formData.icon,
+  });
 
-    navigate("/listings");
-  };
+  navigate("/listings");
+
+} catch (error) {
+  setErrors((currentErrors) => ({
+    ...currentErrors,
+    submit:
+      error.message || "Failed to add item.",
+  }));
+}
 
   return (
     <main className="dashboard-main">
@@ -368,7 +377,7 @@ function AddItem() {
         </div>
       </section>
     </main>
-  );
+  );}
 }
 
 export default AddItem;

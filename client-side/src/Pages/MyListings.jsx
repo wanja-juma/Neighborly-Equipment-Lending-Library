@@ -3,11 +3,34 @@ import useItems from "../hooks/useItems";
 import "./Items.css";
 
 function MyListings() {
-  const { items } = useItems();
+  const {
+  items,
+  itemsLoading,
+  itemsError,
+} = useItems();
 
   const myItems = items.filter(
-    (item) => item.ownerId === 1
+    (item) => item.ownerId === "1"
   );
+  if (itemsLoading) {
+  return (
+    <main className="dashboard-main">
+      <section className="items-page">
+        <p>Loading your listings...</p>
+      </section>
+    </main>
+  );
+}
+
+if (itemsError) {
+  return (
+    <main className="dashboard-main">
+      <section className="items-page">
+        <p>{itemsError}</p>
+      </section>
+    </main>
+  );
+}
 
   return (
     <main className="dashboard-main">
