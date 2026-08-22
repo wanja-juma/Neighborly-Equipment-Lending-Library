@@ -12,6 +12,7 @@ import Requests from "./pages/Requests";
 import ItemsProvider from "./context/ItemsProvider";
 import AddItem from "./pages/AddItem";
 import RequestsProvider from "./context/RequestsProvider";
+import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 import "./App.css";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
     
     <ItemsProvider>
       <RequestsProvider>
+        <DamageReportsProvider>
       <Navbar />
 
       <Routes>
@@ -45,6 +47,7 @@ function App() {
           element={<Navigate to="/" replace />}
         />
       </Routes>
+      </DamageReportsProvider>
       </RequestsProvider>
     </ItemsProvider>
   );
