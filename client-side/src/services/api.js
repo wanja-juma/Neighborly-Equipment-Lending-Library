@@ -93,6 +93,13 @@ export const getLoans = () => {
   return request("/loans");
 };
 
+export const createLoan = (loanData) => {
+  return request("/loans", {
+    method: "POST",
+    body: JSON.stringify(loanData),
+  });
+};
+
 export const updateLoan = (
   loanId,
   updatedData
