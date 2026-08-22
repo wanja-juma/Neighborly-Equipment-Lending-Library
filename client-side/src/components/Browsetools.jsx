@@ -29,4 +29,18 @@ function BrowseTools() {
       </p>
     );
   }
+
+    return (
+    <section className="browse-tools">
+      <h2 className="browse-tools__heading">Browse tools</h2>
+      <div className="browse-tools__grid">
+        {tools.map((tool) => (
+          <div className="tool-card" key={tool.id}>
+            <div className="tool-card__image-wrap">
+              <img
+                src={tool.imageUrl}
+                alt={tool.name}
+                className="tool-card__image"
+              />
+
 }
