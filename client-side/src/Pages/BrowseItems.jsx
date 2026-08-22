@@ -113,11 +113,14 @@ const minimumDate = getLocalDate();
 
 
  const openBorrowForm = (item) => {
-  if (item.availability !== "Available") {
-    setNotice(
-      `${item.name} is not currently available to borrow.`
-    );
+  const isAvailable =
+    item.availability?.toLowerCase() ===
+    "available";
 
+  if (!isAvailable) {
+    setNotice(
+      "This item is currently unavailable."
+    );
     return;
   }
 
@@ -156,6 +159,17 @@ const handleDateChange = (event) => {
 
 const handleBorrowRequest = async (event) => {
   event.preventDefault();
+
+  if (
+  selectedItem?.availability?.toLowerCase() !==
+  "available"
+) {
+  setFormError(
+    "This item is no longer available to borrow."
+  );
+
+  return;
+}
 
   if (!selectedItem) {
     return;
@@ -370,10 +384,14 @@ const handleBorrowRequest = async (event) => {
                   <button
                     className="borrow-item-button"
                     type="button"
-                    disabled={item.availability !== "Available"}
-                    onClick={() => openBorrowForm(item)}
-              >
-                    {item.availability === "Available"
+                    disabled={
+                    item.availability?.toLowerCase() !==
+                    "available"
+                  }
+                  onClick={() => openBorrowForm(item)}
+                >
+                  {item.availability?.toLowerCase() ===
+                  "available"
                     ? "Request to Borrow"
                     : "Currently Unavailable"}
                 </button>

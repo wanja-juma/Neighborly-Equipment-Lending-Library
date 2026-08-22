@@ -681,6 +681,18 @@
   margin: 0;
 }
 
+.request-item-button:disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+.request-item-button:disabled:hover {
+  color: #94a3b8;
+  background: #e2e8f0;
+  transform: none;
+}
 @media (max-width: 700px) {
   .requests-page-header {
     flex-direction: column;
