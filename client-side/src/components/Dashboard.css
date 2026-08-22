@@ -1172,6 +1172,61 @@ button {
   background: #fee2e2;
 }
 
+.return-reminder {
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.return-reminder.on-track {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.return-reminder.due-soon {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+.return-reminder.overdue {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.return-reminder.empty {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.reminder-due-status {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+.return-reminder.due-soon
+  .reminder-due-status {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.return-reminder.overdue
+  .reminder-due-status {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.return-reminder.on-track
+  .reminder-due-status {
+  color: #166534;
+  background: #dcfce7;
+}
+
 /* Basic responsiveness */
 
 @media (max-width: 800px) {
