@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
 import { getTools } from '../services/tools';
-import './Browsetools.css';
+import './BrowseTools.css';
 
 function BrowseTools() {
   const [tools, setTools] = useState([]);
