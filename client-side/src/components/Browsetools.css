@@ -1,0 +1,17 @@
+browse-tools {
+  padding: 3rem 6%;
+  font-family: 'Inter', sans-serif;
+}
+ 
+.browse-tools__heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1F2B38;
+  margin: 0 0 1.5rem;
+}
+ 
+.browse-tools__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
