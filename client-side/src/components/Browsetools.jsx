@@ -42,5 +42,23 @@ function BrowseTools() {
                 alt={tool.name}
                 className="tool-card__image"
               />
-
+              {!tool.available && (
+                <span className="tool-card__badge">Unavailable</span>
+              )}
+            </div>
+            <div className="tool-card__body">
+              <p className="tool-card__name">{tool.name}</p>
+              <p className="tool-card__price">KSh {tool.pricePerDay} / day</p>
+              <p className="tool-card__condition">{tool.condition}</p>
+              <p className="tool-card__distance">
+                <MapPin size={14} /> {tool.distanceKm} km away
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
+ 
+export default BrowseTools;
