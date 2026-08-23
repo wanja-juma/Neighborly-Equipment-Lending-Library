@@ -1,34 +1,21 @@
-import AuthPage from './components/AuthPage.jsx';
-import Dashboard from './components/Dashboard';
-import Home from './components/Home';
-import HowItWorks from './components/HowItWorks';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import Navbar from "./components/Navbar";
+import LandingPage from "./components/LandingPage";
+import AuthPage from "./components/AuthPage";
+import Dashboard from "./components/Dashboard";
+import Footer from "./components/Footer";
+import "./App.css";
+import "./index.css";
 
-import './App.css';
-
-
-const App = () => {
+function App() {
   return (
-  
-    <div>    
     <>
-      <Home />
-      <HowItWorks />
       <Navbar />
-      <HowItWorks />
+      <LandingPage.jsx />
       <AuthPage />
-      <Dashboard /> 
+      <Dashboard />
       <Footer />
-  
-
-
     </>
-      </div>
-  
-  
   );
 }
 
-export default App
-
+export default App;
