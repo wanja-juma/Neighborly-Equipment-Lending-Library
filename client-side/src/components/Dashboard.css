@@ -97,6 +97,8 @@ button {
   color: #b9cec4;
   background-color: transparent;
   text-align: left;
+
+  text-decoration: none;
 }
 
 .navigation-link:hover {
@@ -488,6 +490,8 @@ button {
 
   font-size: 12px;
   font-weight: 700;
+
+  text-decoration: none;
 }
 
 .view-all-button:hover {
@@ -1068,6 +1072,7 @@ button {
   padding: 12px 18px;
   border: none;
   border-radius: 9px;
+  text-decoration: none;
 
   color: white;
   background-color: #176646;
@@ -1094,6 +1099,134 @@ button {
   font-weight: 400;
   line-height: 1;
 }
+
+
+/* Temporary styles for the dashboard page */
+
+.page-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.page-content h1 {
+  margin: 0 0 8px;
+  color: #193d31;
+  font-size: 30px;
+}
+
+.page-content p {
+  margin: 0;
+  color: #75867e;
+  font-size: 14px;
+}
+
+.request-notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  color: #166534;
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+}
+
+.requests-empty-state.error {
+  color: #b91c1c;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.loans-empty-state {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1.25rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.loans-empty-state p {
+  margin: 0;
+}
+
+.loans-empty-state.error {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.loan-status.on-track {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.loan-status.due-soon {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.loan-status.overdue {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.return-reminder {
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.return-reminder.on-track {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.return-reminder.due-soon {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+.return-reminder.overdue {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.return-reminder.empty {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.reminder-due-status {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+.return-reminder.due-soon
+  .reminder-due-status {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.return-reminder.overdue
+  .reminder-due-status {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.return-reminder.on-track
+  .reminder-due-status {
+  color: #166534;
+  background: #dcfce7;
+}
+
 /* Basic responsiveness */
 
 @media (max-width: 800px) {
