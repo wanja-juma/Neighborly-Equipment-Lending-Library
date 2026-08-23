@@ -1,0 +1,1364 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
+:root {
+  --navbar-height: 70px;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  font-family: "DM Sans", sans-serif;
+  color: #18362b;
+  background-color: #f5f7f4;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Main dashboard layout */
+
+.neighborly-app {
+  display: flex;
+  min-height: calc(100vh - var(--navbar-height));
+ 
+  background-color: #f5f7f4;
+}
+
+/* Sidebar */
+
+.sidebar {
+  position: fixed;
+  top: var(--navbar-height);
+  bottom: 0;
+  left: 0;
+
+  display: flex;
+  width: 245px;
+  flex-direction: column;
+
+  padding: 28px 18px 22px;
+  color: #d9e7df;
+  background-color: #123f31;
+  z-index: 100;
+}
+
+/* Logo */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 0 10px 38px;
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.logo-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+
+  border-radius: 10px 10px 18px;
+  color: #123f31;
+  background-color: #d9f264;
+  font-weight: 700;
+}
+
+/* Sidebar navigation */
+
+.sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.navigation-link {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 14px;
+  border: none;
+  border-radius: 9px;
+
+  color: #b9cec4;
+  background-color: transparent;
+  text-align: left;
+
+  text-decoration: none;
+}
+
+.navigation-link:hover {
+  color: white;
+  background-color: #1d4b3b;
+}
+
+.navigation-link.active {
+  color: white;
+  background-color: #265746;
+}
+
+.navigation-icon {
+  font-size: 16px;
+}
+
+.navigation-link.active .navigation-icon {
+  color: #d9f264;
+}
+
+/* Community card */
+
+.community-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: auto;
+  padding: 12px;
+
+  border: 1px solid #386353;
+  border-radius: 12px;
+  background-color: #1a4a3a;
+}
+
+.community-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+
+  border-radius: 8px;
+  color: #123f31;
+  background-color: #d9f264;
+}
+
+.community-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.community-card small {
+  color: #9db9ad;
+  font-size: 10px;
+}
+
+.community-card strong {
+  color: white;
+  font-size: 12px;
+}
+
+/* Logout button */
+
+.logout-button {
+  margin-top: 16px;
+  padding: 10px 12px;
+
+  border: none;
+  color: #b7ccc2;
+  background-color: transparent;
+  text-align: left;
+}
+
+.logout-button:hover {
+  color: white;
+}
+
+/* Main content area */
+
+.dashboard-main {
+  width: calc(100% - 245px);
+  min-height: calc(100vh - var(--navbar-height));
+  margin-left: 245px;
+}
+
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+/* Top navigation */
+
+.top-navigation {
+  display: flex;
+  height: 78px;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 40px;
+  border-bottom: 1px solid #e2e8e3;
+  background-color: white;
+}
+
+/* Search bar */
+
+.search-bar {
+  display: flex;
+  width: min(440px, 42vw);
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+  border: 1px solid #dfe6e0;
+  border-radius: 9px;
+
+  color: #809188;
+  background-color: #fafbfa;
+}
+
+.search-icon {
+  font-size: 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #18362b;
+  background-color: transparent;
+}
+
+.search-bar input::placeholder {
+  color: #94a199;
+}
+
+/* Top navigation actions */
+
+.top-navigation-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Notification button */
+
+.notification-button {
+  position: relative;
+
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 9px;
+
+  color: #345146;
+  background-color: #f1f4f1;
+}
+
+.notification-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  width: 7px;
+  height: 7px;
+
+  border: 2px solid white;
+  border-radius: 50%;
+  background-color: #ea654f;
+}
+
+/* User profile */
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding-left: 16px;
+  border-left: 1px solid #e4e9e5;
+}
+
+.profile-avatar {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+
+  border-radius: 50%;
+  color: #174333;
+  background-color: #d7efc8;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-details strong {
+  font-size: 13px;
+}
+
+.profile-details small {
+  color: #819087;
+  font-size: 11px;
+}
+
+.profile-arrow {
+  color: #819087;
+}
+
+/* Dashboard content */
+
+.dashboard-content {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 36px 40px 50px;
+}
+
+/* Welcome section */
+
+.welcome-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.current-date {
+  margin: 0 0 6px;
+  color: #6d8177;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.welcome-message h1 {
+  margin: 0 0 6px;
+  color: #193d31;
+  font-size: 32px;
+  letter-spacing: -0.04em;
+}
+
+.welcome-description {
+  margin: 0;
+  color: #75867e;
+  font-size: 14px;
+}
+
+/* Summary cards */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.summary-card {
+  display: flex;
+  min-height: 100px;
+  align-items: center;
+  gap: 14px;
+
+  padding: 20px;
+  border: 1px solid #e1e7e2;
+  border-radius: 13px;
+
+  background-color: white;
+  box-shadow: 0 3px 12px rgba(23, 60, 39, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(23, 60, 39, 0.08);
+}
+
+/* Summary card icons */
+
+.summary-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  place-items: center;
+
+  border-radius: 11px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.summary-icon.green {
+  color: #1c7453;
+  background-color: #e2f3e9;
+}
+
+.summary-icon.orange {
+  color: #aa6913;
+  background-color: #fff0d2;
+}
+
+.summary-icon.blue {
+  color: #3973a2;
+  background-color: #e5f1fa;
+}
+
+.summary-icon.purple {
+  color: #7459a8;
+  background-color: #eee8fa;
+}
+
+/* Summary card information */
+
+.summary-information {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.summary-information strong {
+  color: #173b2f;
+  font-size: 24px;
+}
+
+.summary-information span {
+  color: #788980;
+  font-size: 12px;
+}
+
+.summary-arrow {
+  margin-left: auto;
+  color: #a8b4ae;
+  font-size: 24px;
+}
+
+/* Borrowing requests panel */
+
+/*.requests-panel {
+  margin-top: 22px;
+  overflow: hidden;
+
+  border: 1px solid #e0e6e1;
+  border-radius: 13px;
+
+  background-color: white;
+  box-shadow: 0 3px 12px rgba(23, 60, 39, 0.04);
+}*/
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 20px;
+  border-bottom: 1px solid #edf0ed;
+}
+
+.panel-heading h2 {
+  margin: 0 0 4px;
+  color: #193d31;
+  font-size: 17px;
+}
+
+.panel-heading p {
+  margin: 0;
+  color: #84928b;
+  font-size: 12px;
+}
+
+.view-all-button {
+  flex-shrink: 0;
+  padding: 7px 10px;
+
+  border: none;
+  color: #267153;
+  background-color: transparent;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.view-all-button:hover {
+  color: #174c37;
+  text-decoration: underline;
+}
+
+/* Requests list */
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.request-card {
+  display: flex;
+  min-height: 90px;
+  align-items: center;
+  gap: 14px;
+
+  padding: 16px 20px;
+  border-bottom: 1px solid #eff2ef;
+}
+
+.request-card:last-child {
+  border-bottom: none;
+}
+
+.request-card:hover {
+  background-color: #fafcfa;
+}
+
+.requests-panel,
+.loans-panel {
+  margin-top: 0;
+  overflow: hidden;
+
+  border: 1px solid #e0e6e1;
+  border-radius: 13px;
+
+  background-color: white;
+  box-shadow: 0 3px 12px rgba(23, 60, 39, 0.04);
+}
+
+/* Borrower avatar */
+
+.borrower-avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  place-items: center;
+
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.borrower-avatar.orange {
+  color: #9a5b1a;
+  background-color: #f7dfc5;
+}
+
+.borrower-avatar.green {
+  color: #1e7669;
+  background-color: #d5eeea;
+}
+
+.borrower-avatar.blue {
+  color: #35638b;
+  background-color: #dbe8f4;
+}
+
+/* Borrower information */
+
+.request-information {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.request-information strong {
+  color: #193d31;
+  font-size: 13px;
+}
+
+.request-description {
+  color: #73847b;
+  font-size: 12px;
+}
+
+.request-description b {
+  color: #385b4d;
+}
+
+.request-dates {
+  margin-top: 3px;
+  color: #8b9891;
+  font-size: 11px;
+}
+
+.request-dates::before {
+  margin-right: 5px;
+  content: "◷";
+}
+
+/* Active loans panel */
+
+/*.loans-panel {
+  margin-top: 22px;
+  overflow: hidden;
+
+  border: 1px solid #e0e6e1;
+  border-radius: 13px;
+
+  background-color: white;
+  box-shadow: 0 3px 12px rgba(23, 60, 39, 0.04);
+}*/
+
+.loans-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Individual loan */
+
+.loan-card {
+  display: flex;
+  min-height: 90px;
+  align-items: center;
+  gap: 14px;
+
+  padding: 16px 20px;
+  border-bottom: 1px solid #eff2ef;
+}
+
+.loan-card:last-child {
+  border-bottom: none;
+}
+
+.loan-card:hover {
+  background-color: #fafcfa;
+}
+
+/* Loan item icon */
+
+.loan-item-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  place-items: center;
+
+  border-radius: 10px;
+  background-color: #f0f2ed;
+
+  font-size: 23px;
+}
+
+/* Loan information */
+
+.loan-information {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.loan-information strong {
+  color: #193d31;
+  font-size: 13px;
+}
+
+.loan-person {
+  color: #73847b;
+  font-size: 12px;
+}
+
+.loan-due-date {
+  margin-top: 3px;
+  color: #8b9891;
+  font-size: 11px;
+}
+
+.loan-due-date::before {
+  margin-right: 5px;
+  content: "◷";
+}
+
+/* Loan status badges */
+
+.loan-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.loan-status.warning {
+  color: #9c6814;
+  background-color: #fff1ce;
+}
+
+.loan-status.success {
+  color: #23704d;
+  background-color: #def3e7;
+}
+
+.loan-status.danger {
+  color: #b0473d;
+  background-color: #fbe2df;
+}
+
+/* Loan options button */
+
+.loan-options-button {
+  padding: 7px;
+
+  border: none;
+  color: #97a29c;
+  background-color: transparent;
+
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.loan-options-button:hover {
+  color: #35594a;
+}
+
+/* Listings and reminder layout */
+
+.listings-reminder-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+/* My Listings panel */
+
+.listings-panel {
+  overflow: hidden;
+
+  border: 1px solid #e0e6e1;
+  border-radius: 13px;
+
+  background-color: white;
+  box-shadow: 0 3px 12px rgba(23, 60, 39, 0.04);
+}
+
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+
+  padding: 18px 20px 20px;
+}
+
+/* Listing card */
+
+.listing-card {
+  overflow: hidden;
+
+  border: 1px solid #e6ebe7;
+  border-radius: 10px;
+
+  background-color: white;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.listing-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 15px rgba(23, 60, 39, 0.08);
+}
+
+/* Listing image */
+
+.listing-image {
+  position: relative;
+
+  display: grid;
+  height: 100px;
+  place-items: center;
+
+  background: linear-gradient(135deg, #edf1e9, #dfe8dc);
+}
+
+.listing-image > span {
+  font-size: 36px;
+}
+
+.listing-options-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  padding: 4px 7px;
+  border: none;
+  border-radius: 5px;
+
+  color: #63746b;
+  background-color: rgba(255, 255, 255, 0.85);
+
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.listing-options-button:hover {
+  color: #224a39;
+  background-color: white;
+}
+
+/* Listing information */
+
+.listing-information {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+}
+
+.listing-information strong {
+  color: #193d31;
+  font-size: 12px;
+}
+
+.item-condition {
+  color: #819088;
+  font-size: 10px;
+}
+
+/* Availability statuses */
+
+.availability-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.availability-status.available {
+  color: #25714f;
+}
+
+.availability-status.requested {
+  color: #b07019;
+}
+
+.availability-status.on-loan {
+  color: #6555a2;
+}
+
+/* Return reminder */
+
+.return-reminder {
+  display: flex;
+  align-items: center;
+  align-self: start;
+  gap: 13px;
+
+  padding: 20px;
+  border: 1px solid #f0d6a5;
+  border-radius: 13px;
+
+  background-color: #fff8e8;
+}
+
+.reminder-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  place-items: center;
+
+  border-radius: 50%;
+  color: #9c6a18;
+  background-color: #ffe9b8;
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.reminder-information {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.reminder-information small {
+  color: #b1771c;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.reminder-information strong {
+  color: #423a29;
+  font-size: 13px;
+}
+
+.reminder-information p {
+  margin: 0;
+  color: #6e756f;
+  font-size: 11px;
+}
+
+.reminder-information p b {
+  color: #9b6515;
+}
+
+.view-loan-button {
+  flex-shrink: 0;
+  padding: 7px;
+
+  border: none;
+  color: #8e651f;
+  background-color: transparent;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.view-loan-button:hover {
+  text-decoration: underline;
+}
+
+/* Request buttons */
+
+.request-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.request-buttons button {
+  padding: 8px 13px;
+  border-radius: 7px;
+
+  font-size: 11px;
+  font-weight: 700;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.decline-button {
+  border: 1px solid #dfe5e1;
+  color: #5f7168;
+  background-color: white;
+}
+
+.decline-button:hover {
+  border-color: #e1b6b2;
+  color: #a3423a;
+  background-color: #fff5f4;
+}
+
+.approve-button {
+  border: 1px solid #236c4d;
+  color: white;
+  background-color: #236c4d;
+}
+
+.approve-button:hover {
+  border-color: #174f37;
+  background-color: #174f37;
+}
+
+/* Request confirmation notice */
+
+.request-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+  padding: 13px 16px;
+
+  border: 1px solid #b8dcc8;
+  border-radius: 10px;
+
+  color: #185d3d;
+  background-color: #eaf8ef;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.request-notice button {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+
+  border: none;
+  border-radius: 50%;
+
+  color: #185d3d;
+  background-color: transparent;
+
+  font-size: 20px;
+  line-height: 1;
+}
+
+.request-notice button:hover {
+  background-color: #d5eedf;
+}
+
+/* Empty requests state */
+
+.requests-empty-state {
+  display: flex;
+  min-height: 130px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  padding: 25px;
+  color: #62776d;
+  text-align: left;
+}
+
+.empty-state-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+
+  border-radius: 50%;
+  color: #1f704e;
+  background-color: #dff2e7;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.requests-empty-state div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.requests-empty-state strong {
+  color: #24483a;
+  font-size: 13px;
+}
+
+.requests-empty-state p {
+  margin: 0;
+  font-size: 11px;
+}
+
+/* Add item button */
+
+.primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+  text-decoration: none;
+
+  color: white;
+  background-color: #176646;
+  box-shadow: 0 6px 14px rgba(23, 102, 70, 0.17);
+
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.primary-button:hover {
+  background-color: #105338;
+  transform: translateY(-1px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+.button-icon {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+
+/* Temporary styles for the dashboard page */
+
+.page-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.page-content h1 {
+  margin: 0 0 8px;
+  color: #193d31;
+  font-size: 30px;
+}
+
+.page-content p {
+  margin: 0;
+  color: #75867e;
+  font-size: 14px;
+}
+
+.request-notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  color: #166534;
+  background-color: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+}
+
+.requests-empty-state.error {
+  color: #b91c1c;
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.loans-empty-state {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1.25rem;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.loans-empty-state p {
+  margin: 0;
+}
+
+.loans-empty-state.error {
+  color: #991b1b;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.loan-status.on-track {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.loan-status.due-soon {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.loan-status.overdue {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.return-reminder {
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.return-reminder.on-track {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.return-reminder.due-soon {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+.return-reminder.overdue {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.return-reminder.empty {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.reminder-due-status {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #ffffff;
+  border-radius: 999px;
+}
+
+.return-reminder.due-soon
+  .reminder-due-status {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.return-reminder.overdue
+  .reminder-due-status {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.return-reminder.on-track
+  .reminder-due-status {
+  color: #166534;
+  background: #dcfce7;
+}
+
+/* Basic responsiveness */
+
+@media (max-width: 800px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .dashboard-main {
+    width: calc(100% - 200px);
+    margin-left: 200px;
+  }
+
+  .top-navigation {
+    padding: 0 20px;
+  }
+
+  .profile-details,
+  .profile-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+   .dashboard-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-content {
+    padding: 28px 20px 40px;
+  }
+  .panel-heading {
+    align-items: flex-start;
+  }
+   .request-buttons {
+    width: 100%;
+    padding-left: 56px;
+  }
+
+  .welcome-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .welcome-message h1 {
+    font-size: 26px;
+  }
+    .loan-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .loan-status {
+    margin-left: 60px;
+  }
+
+  .loan-options-button {
+    margin-left: auto;
+  }
+  .listings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .return-reminder {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .view-loan-button {
+    margin-left: 53px;
+  }
+}
+
+@media (max-width: 500px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card {
+    min-height: 86px;
+  }
+
+  .primary-button {
+    width: 100%;
+  }
+  .panel-heading {
+    gap: 10px;
+    padding: 16px;
+  }
+   .panel-heading p {
+    display: none;
+  }
+  .request-card {
+    padding: 16px;
+  }
+
+  .request-buttons {
+    padding-left: 0;
+  }
+
+  .request-buttons button {
+    flex: 1;
+  }
+  .loan-card {
+    padding: 16px;
+  }
+
+  .loan-information {
+    min-width: 150px;
+  }
+
+  .loan-status {
+    margin-left: 60px;
+  }
+   .listings-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .listing-image {
+    height: 120px;
+  }
+
+  .return-reminder {
+    padding: 16px;
+  }
+
+  .view-loan-button {
+    margin-left: 53px;
+  }
+}
