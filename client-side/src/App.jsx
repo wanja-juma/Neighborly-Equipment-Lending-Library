@@ -1,9 +1,12 @@
+import AuthPage from './components/AuthPage.jsx';
+import LandingPage from './components/LandingPage';
+import BrowseTools from './components/BrowseTools'
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import { Navigate, Route, Routes } from "react-router-dom";
-import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
 import LandingPage from "./components/LandingPage";
-import Navbar from "./components/Navbar";
 import BrowseItems from "./pages/BrowseItems";
 import DamageReports from "./pages/DamageReports";
 import Loans from "./pages/Loans";
@@ -15,12 +18,16 @@ import RequestsProvider from "./context/RequestsProvider";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 import EditItem from "./pages/EditItem";
 import "./App.css";
-import Footer from './components/Footer';
-
-import './App.css';
 
 function App() {
   return (
+    <div>
+      <Navbar />
+      <LandingPage />
+      <BrowseTools />
+      <AuthPage />
+      <Footer />
+    </div>
     <ItemsProvider>
       <RequestsProvider>
         <DamageReportsProvider>
