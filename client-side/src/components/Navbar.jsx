@@ -16,7 +16,7 @@ function Navbar() {
           Home
         </Link>
 
-        <Link to="/tools">
+        <Link to="/items">
           <Wrench size={18} />
           Browse Tools
         </Link>
@@ -33,12 +33,12 @@ function Navbar() {
       </div>
 
       <div className="navbar__actions">
-        <Link to="/login" className="navbar__login">
+        <Link to="/auth" className="navbar__login">
           <LogIn size={18} />
           Login
         </Link>
 
-        <Link to="/register" className="navbar__register">
+        <Link to="/auth" className="navbar__register">
           <UserPlus size={18} />
           Register
         </Link>
