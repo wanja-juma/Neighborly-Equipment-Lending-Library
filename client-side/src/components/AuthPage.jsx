@@ -1,24 +1,25 @@
 import { useState } from 'react'
 import ToolsPanel from './ToolsPanel.jsx'
+import { registerUser, loginUser } from '../mockAuth.js'
 import './AuthPage.css'
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 function AuthPage() {
   const [isRegister, setIsRegister] = useState(true)
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState(''); const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(''); const [success, setSuccess] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const update = (field) => (e) => setForm({ ...form, [field]: e.target.value })
   async function handleSubmit(e) {
     e.preventDefault()
     if (isRegister && (!form.firstName || !form.lastName)) return setError('Please enter your first and last name')
     if (!form.email.includes('@')) return setError('Please enter a valid email address')
     if (!form.password || (isRegister && form.password.length < 8)) return setError('Password must be at least 8 characters')
-    setError(''); setSubmitting(true)
+    setError(''); setSuccess(''); setSubmitting(true)
     try {
-      const res = await fetch(`${API}/api/auth/${isRegister ? 'register' : 'login'}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
-      if (!res.ok) setError('Something went wrong. Please try again.')
-    } catch { setError('Unable to reach the server. Please try again shortly.') }
+      const user = isRegister ? await registerUser(form) : await loginUser(form)
+      setSuccess(isRegister ? `Account created! Welcome, ${user.firstName}.` : `Welcome back, ${user.firstName}.`)
+    } catch (err) { setError(err.message) }
     setSubmitting(false)
   }
   return (
@@ -38,6 +39,7 @@ function AuthPage() {
             <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>{showPassword ? '🙈' : '👁️'}</button>
           </div></label>
           {error && <p className="server-error">{error}</p>}
+          {success && <p className="server-success">{success}</p>}
           <button type="submit" className="submit-button" disabled={submitting}>{submitting ? 'Please wait…' : isRegister ? 'Create account' : 'Sign in'}</button>
         </form>
         <p className="switch-mode">{isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
