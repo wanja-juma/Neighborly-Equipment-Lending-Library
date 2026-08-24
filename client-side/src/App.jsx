@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
 import About from "./components/About";
+import BrowseTools from "./components/BrowseTools";
 import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
@@ -49,6 +50,8 @@ function App() {
                 <Route path="/" element={<Home />} />
 
                 <Route path="/about" element={<About />} />
+
+                <Route path="/browse-tools" element={<BrowseTools />} />
 
                 <Route path="/auth" element={<AuthPage />} />
 
