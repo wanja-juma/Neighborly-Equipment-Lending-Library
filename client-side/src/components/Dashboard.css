@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
 :root {
   --navbar-height: 70px;
+  --sidebar-width: 210px;
 }
 * {
   box-sizing: border-box;
@@ -42,10 +43,12 @@ button {
   left: 0;
 
   display: flex;
-  width: 245px;
+  width: var(--sidebar-width);
   flex-direction: column;
 
-  padding: 28px 18px 22px;
+  padding: 22px 12px 18px;
+  overflow-y: auto;
+
   color: #d9e7df;
   background-color: #123f31;
   z-index: 100;
@@ -56,21 +59,22 @@ button {
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 9px;
 
-  margin: 0 10px 38px;
+  margin: 0 6px 26px;
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
 }
 
 .logo-icon {
   display: grid;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
   place-items: center;
 
-  border-radius: 10px 10px 18px;
+  border-radius: 9px 9px 16px;
   color: #123f31;
   background-color: #d9f264;
   font-weight: 700;
@@ -81,26 +85,27 @@ button {
 .sidebar-navigation {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .navigation-link {
   display: flex;
   width: 100%;
   align-items: center;
-  gap: 12px;
+  gap: 9px;
 
-  padding: 12px 14px;
+  padding: 10px 11px;
   border: none;
-  border-radius: 9px;
+  border-radius: 8px;
 
   color: #b9cec4;
   background-color: transparent;
   text-align: left;
-
   text-decoration: none;
-}
 
+  font-size: 14px;
+  white-space: nowrap;
+}
 .navigation-link:hover {
   color: white;
   background-color: #1d4b3b;
@@ -112,7 +117,8 @@ button {
 }
 
 .navigation-icon {
-  font-size: 16px;
+  flex-shrink: 0;
+  font-size: 15px;
 }
 
 .navigation-link.active .navigation-icon {
@@ -180,9 +186,11 @@ button {
 /* Main content area */
 
 .dashboard-main {
-  width: calc(100% - 245px);
-  min-height: calc(100vh - var(--navbar-height));
-  margin-left: 245px;
+  width: calc(100% - var(--sidebar-width));
+  min-height: calc(
+    100vh - var(--navbar-height)
+  );
+  margin-left: var(--sidebar-width);
 }
 
 .dashboard-panels {
@@ -1230,13 +1238,22 @@ button {
 /* Basic responsiveness */
 
 @media (max-width: 800px) {
-  .sidebar {
-    width: 200px;
+   :root {
+    --sidebar-width: 180px;
   }
 
-  .dashboard-main {
-    width: calc(100% - 200px);
-    margin-left: 200px;
+  .sidebar {
+    padding: 18px 9px;
+  }
+
+  .navigation-link {
+    gap: 7px;
+    padding: 9px;
+    font-size: 13px;
+  }
+
+  .community-card {
+    padding: 9px;
   }
 
   .top-navigation {
