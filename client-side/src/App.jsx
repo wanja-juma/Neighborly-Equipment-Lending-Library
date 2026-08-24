@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import AuthPage from "./components/AuthPage.jsx";
-import LandingPage from "./components/LandingPage";
+import About from "./components/About";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
@@ -29,7 +29,7 @@ function App() {
           <Navbar />
           <div className="app-content">
             <Routes>
-              <Route path="/" element={<LandingPage />} />
+              <Route path="/" element={<About />} />
               <Route path="/auth" element={<AuthPage />} />
               
               <Route element={<DashboardLayout />}>

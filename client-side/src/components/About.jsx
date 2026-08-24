@@ -1,8 +1,7 @@
-
-import  { useState } from 'react';
+import React, { useState } from 'react';
 import heroPhoto from '../assets/hero-photo.jpg';
-import './LandingPage1.css';
-import './LandingPage.css';
+// import './LandingPage1.css';
+import './About.css';
 import { 
   House, 
   Calendar, 
@@ -15,25 +14,46 @@ import {
   ChevronDown,
   DollarSign,
   Users,
-  Leaf
+  Leaf,
+  Star,
+  Quote
 } from 'lucide-react';
 
 export default function LandingPage1() {
   const [activeTab, setActiveTab] = useState('borrow');
   const [faqOpen, setFaqOpen] = useState(null);
- 
+  const [contactSubmitted, setContactSubmitted] = useState(false);
 
-  
   const toggleFaq = (index) => {
     setFaqOpen(faqOpen === index ? null : index);
   };
 
-
-  // const handleContactSubmit = (e) => {
-  //   e.preventDefault();
-  //   setContactSubmitted(true);
-  //   setTimeout(() => setContactSubmitted(false), 4000);
-  // };
+  const testimonials = [
+    {
+      name: "David K.",
+      role: "Homeowner in Kilimani",
+      image: "DK",
+      bgColor: "#1E5E3D",
+      rating: 5,
+      text: "Saved over KSh 15,000 borrowing a pressure washer and lawn mower instead of buying. Pickup took 5 minutes!"
+    },
+    {
+      name: "Amina M.",
+      role: "Tool Owner in Westlands",
+      image: "AM",
+      bgColor: "#B5432B",
+      rating: 5,
+      text: "My power tools were sitting in the garage gathering dust. Now I cover my weekly groceries just sharing them."
+    },
+    {
+      name: "Sammy O.",
+      role: "DIY Enthusiast in Lavington",
+      image: "SO",
+      bgColor: "#8B8A84",
+      rating: 5,
+      text: "Great community! The identity check gives total peace of mind when giving out expensive drills and saws."
+    }
+  ];
 
   return (
     <>
@@ -239,6 +259,41 @@ export default function LandingPage1() {
                 <h4 className="font-bold text-base">Reduce Waste</h4>
                 <p className="banner-desc">Promote sustainable eco-friendly living through shared usage.</p>
               </div>
+            </div>
+          </section>
+
+          
+          <section className="section">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-slate-900">What Our Neighbors Say</h2>
+              <p className="text-slate-600 text-sm mt-1">Real stories from community members near you.</p>
+            </div>
+
+            <div className="grid">
+              {testimonials.map((item, index) => (
+                <div key={index} className="card" style={{ textAlign: 'left' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {[...Array(item.rating)].map((_, i) => (
+                        <Star key={i} size={16} fill="#EAB308" color="#EAB308" />
+                      ))}
+                    </div>
+                    <Quote size={20} className="text-slate-300" />
+                  </div>
+                  <p className="card-desc" style={{ fontStyle: 'italic', marginBottom: '16px' }}>
+                    "{item.text}"
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span className="home__avatar" style={{ backgroundColor: item.bgColor }}>
+                      {item.image}
+                    </span>
+                    <div>
+                      <h4 className="font-bold text-sm text-slate-900">{item.name}</h4>
+                      <p className="text-xs text-slate-500">{item.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
