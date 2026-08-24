@@ -1,6 +1,7 @@
+
 import { House, Calendar, Plus, Sparkles } from 'lucide-react';
 import heroPhoto from '../assets/hero-photo.jpg';
-import './LandingPage1.css';
+import './Home.css';
 
 function LandingPage() {
   return (
@@ -56,7 +57,7 @@ function LandingPage() {
         <div className="home__right">
           <img
             src={heroPhoto}
-            alt="A wall unit with tools and a hand reaching out to pick one , ready to be borrowed"
+            alt="A toolbox full of hand tools next to a lawnmower, ready to be borrowed"
             className="home__photo"
           />
         </div>
@@ -87,4 +88,4 @@ function LandingPage() {
   );
 }
 
-export default LandingPage1;
+export default LandingPage;

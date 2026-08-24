@@ -148,6 +148,16 @@
   margin: 0;
 }
 
+.server-success {
+  color: #2f7a4d;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(47, 122, 77, 0.08);
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin: 0;
+}
+
 .submit-button {
   margin-top: 6px;
   padding: 15px;
