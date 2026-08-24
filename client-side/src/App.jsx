@@ -47,11 +47,33 @@ function App() {
 
             <div className="app-content">
               <Routes>
-                <Route path="/" element={<Home />} />
 
-                <Route path="/about" element={<About />} />
+                              {/* Landing page */}
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <Home />
+                      <About />
+                    </>
+                  }
+                />
 
+                {/* About page */}
+                <Route
+                  path="/about"
+                  element={
+                    <>
+                      <Home />
+                      <About />
+                    </>
+                  }
+                />
+
+                {/* Browse tools */}
                 <Route path="/browse-tools" element={<BrowseTools />} />
+
+                {/* Authentication */}
 
                 <Route path="/auth" element={<AuthPage />} />
 
