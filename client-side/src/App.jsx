@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 
 import AuthPage from "./components/AuthPage.jsx";
-import LandingPage1 from "./components/LandingPage1";
+import Home from "./components/Home.jsx";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
@@ -87,7 +87,7 @@ function App() {
                 {/* Landing page */}
                 <Route
                   path="/"
-                  element={<LandingPage1 />}
+                  element={<Home />}
                 />
 
                 {/* Authentication */}
