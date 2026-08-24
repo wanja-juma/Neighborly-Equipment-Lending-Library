@@ -1,3 +1,4 @@
+
 import  { useState } from 'react';
 import heroPhoto from '../assets/hero-photo.jpg';
 import './LandingPage1.css';
@@ -20,6 +21,8 @@ import {
 export default function LandingPage1() {
   const [activeTab, setActiveTab] = useState('borrow');
   const [faqOpen, setFaqOpen] = useState(null);
+ 
+
   
   const toggleFaq = (index) => {
     setFaqOpen(faqOpen === index ? null : index);
