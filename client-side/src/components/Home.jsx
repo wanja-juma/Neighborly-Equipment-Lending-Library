@@ -33,10 +33,11 @@ function LandingPage() {
               <Calendar size={18} />
               Browse Tools
             </Link>
-            <button type="button" className="home__btn home__btn--outline">
+
+          <Link to="/listings" className="home__btn home__btn--outline">
               <Plus size={18} />
               List Your Tool
-            </button>
+            </Link>  
           </div>
 
           <div className="home__social-proof">
