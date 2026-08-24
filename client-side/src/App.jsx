@@ -1,3 +1,4 @@
+
 import AuthPage from "./components/AuthPage.jsx";
 import LandingPage1 from "./components/LandingPage1";
 import LandingPage from "./components/LandingPage";
@@ -71,6 +72,7 @@ function App() {
         </DamageReportsProvider>
       </RequestProvider>
     </ItemsProvider>
+
   );
 }
 
