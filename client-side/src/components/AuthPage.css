@@ -238,7 +238,6 @@
   );
 }
 
-/* ---------- responsive ---------- */
 
 @media (max-width: 900px) {
   .auth-card {
