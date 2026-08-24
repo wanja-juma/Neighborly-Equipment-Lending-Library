@@ -16,7 +16,7 @@ function PaymentBar({ itemName = 'this tool', dailyRate = 5 }) {
   if (submitted) {
     return (
       <div className="payment-bar payment-success">
-        <p>Payment of ${total} confirmed for {itemName}. Enjoy your borrow!</p>
+        <p>Payment of Ksh{total} confirmed for {itemName}. Enjoy your borrow!</p>
       </div>
     );
   }
