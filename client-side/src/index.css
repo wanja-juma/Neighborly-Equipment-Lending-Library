@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-
+/*
 container {
   min-height: 100vh;
   background-color: #f8fafc;
@@ -273,8 +272,6 @@ container {
   border-top: 1px solid #f1f5f9;
   padding-top: 0.75rem;
 }
-=======
->>>>>>> 86d41b190c4d5b13b14a6414b1ed5d232d40b730
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -379,8 +376,6 @@ code,
   border-radius: 4px;
   color: var(--text-h);
 }
-<<<<<<< HEAD
-=======
 
 code {
   font-size: 15px;
@@ -388,4 +383,4 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
->>>>>>> 86d41b190c4d5b13b14a6414b1ed5d232d40b730
+*/
