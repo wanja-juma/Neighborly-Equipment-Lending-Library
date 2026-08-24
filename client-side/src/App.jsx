@@ -31,7 +31,6 @@ function App() {
     "/requests",
     "/loans",
     "/damage-reports",
-    
   ];
 
   const isDashboardRoute = dashboardRoutePrefixes.some(
@@ -49,11 +48,27 @@ function App() {
             <div className="app-content">
               <Routes>
                 {/* Landing page */}
-                <Route path="/" element={<Home />} />
-                
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <Home />
+                      <About />
+                    </>
+                  }
+                />
+
                 {/* About page */}
-                <Route path="/about" element={<About />} />
-                
+                <Route
+                  path="/about"
+                  element={
+                    <>
+                      <Home />
+                      <About />
+                    </>
+                  }
+                />
+
                 {/* Authentication */}
                 <Route path="/auth" element={<AuthPage />} />
 
