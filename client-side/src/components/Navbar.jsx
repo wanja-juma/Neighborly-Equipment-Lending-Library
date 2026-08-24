@@ -1,8 +1,24 @@
-import { House, Wrench, Info, LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { House, Wrench, Info, LayoutDashboard, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getLoggedInUser, logoutUser } from '../mockAuth.js';
 import './Navbar.css';
 
 function Navbar() {
+  const [user, setUser] = useState(getLoggedInUser());
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    // Added: remove the logged-in user from localStorage
+    logoutUser();
+
+    // Added: update the Navbar immediately after logout
+    setUser(null);
+
+    // Added: return the user to the home page
+    navigate('/');
+  }
+
   return (
     <nav className="navbar">
       <div className="navbar__logo">
@@ -24,7 +40,7 @@ function Navbar() {
         <Link to="/browse-tools">
           <Wrench size={18} />
           Browse Tools
-        </Link>  
+        </Link>
 
         <Link to="/dashboard">
           <LayoutDashboard size={18} />
@@ -33,15 +49,30 @@ function Navbar() {
       </div>
 
       <div className="navbar__actions">
-        <Link to="/auth" className="navbar__login">
-          <LogIn size={18} />
-          Login
-        </Link>
+        {!user ? (
+          <>
+            {/* Added: Login/Register only appear when nobody is logged in */}
+            <Link to="/auth" className="navbar__login">
+              <LogIn size={18} />
+              Login
+            </Link>
 
-        <Link to="/auth" className="navbar__register">
-          <UserPlus size={18} />
-          Register
-        </Link>
+            <Link to="/auth" className="navbar__register">
+              <UserPlus size={18} />
+              Register
+            </Link>
+          </>
+        ) : (
+          /* Added: Logout replaces Login/Register after authentication */
+          <button
+            type="button"
+            className="navbar__login"
+            onClick={handleLogout}
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );
