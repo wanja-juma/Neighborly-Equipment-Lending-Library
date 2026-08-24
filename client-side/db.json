@@ -148,6 +148,19 @@
       "availability": "Available",
       "statusColor": "available",
       "id": "L4NMspq4Z5Q"
+    },
+    {
+      "name": "Pipe-Cutter",
+      "category": "Hand Tools",
+      "description": "Strong tool with teeth to grab round metal pipes",
+      "condition": "Excellent condition",
+      "icon": "🎨",
+      "ownerId": "1",
+      "owner": "Wanja Juma",
+      "location": "Greenview Estate",
+      "availability": "Available",
+      "statusColor": "available",
+      "id": "17QXyCWQ7uo"
     }
   ],
   "borrowingRequests": [

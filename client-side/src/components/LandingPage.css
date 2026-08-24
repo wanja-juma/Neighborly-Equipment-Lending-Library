@@ -3,12 +3,13 @@
   background-color: #FBF6ED;
   color: #1E5E3D;
   font-family: inherit;
+  background-size: 100%;
 }
 
 .hero {
-  background: linear-gradient(to bottom, #FBF6ED 60%, #FBF6ED);
+  background: linear-gradient(to bottom, #f9f6f2 100%, #edefe9);
   padding: 3rem 1rem 2.5rem;
-  max-width: 64rem;
+  width: 64rem;
   margin: 0 auto;
   text-align: center;
 }
