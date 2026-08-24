@@ -1,17 +1,11 @@
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
-
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import AuthPage from "./components/AuthPage.jsx";
-import LandingPage1 from "./components/LandingPage1";
+import About from "./components/About";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
-
+import Home from "./components/Home";
 import BrowseItems from "./pages/BrowseItems";
 import DamageReports from "./pages/DamageReports";
 import Loans from "./pages/Loans";
@@ -40,14 +34,11 @@ function App() {
     
   ];
 
-  const isDashboardRoute =
-    dashboardRoutePrefixes.some(
-      (routePrefix) =>
-        location.pathname === routePrefix ||
-        location.pathname.startsWith(
-          `${routePrefix}/`
-        )
-    );
+  const isDashboardRoute = dashboardRoutePrefixes.some(
+    (routePrefix) =>
+      location.pathname === routePrefix ||
+      location.pathname.startsWith(`${routePrefix}/`)
+  );
 
   return (
     <ItemsProvider>
@@ -55,84 +46,38 @@ function App() {
         <LoansProvider>
           <DamageReportsProvider>
             <Navbar />
-
             <div className="app-content">
               <Routes>
                 {/* Landing page */}
-                <Route
-                  path="/"
-                  element={<LandingPage1 />}
-                />
-
+                <Route path="/" element={<Home />} />
+                
+                {/* About page */}
+                <Route path="/about" element={<About />} />
+                
                 {/* Authentication */}
-                <Route
-                  path="/auth"
-                  element={<AuthPage />}
-                />
+                <Route path="/auth" element={<AuthPage />} />
 
                 {/* Dashboard pages */}
-                <Route
-                  element={<DashboardLayout />}
-                >
-                  <Route
-                    path="/dashboard"
-                    element={<Dashboard />}
-                  />
-
-                  <Route
-                    path="/items"
-                    element={<BrowseItems />}
-                  />
-
-                  <Route
-                    path="/items/new"
-                    element={<AddItem />}
-                  />
-
-                  <Route
-                    path="/listings"
-                    element={<MyListings />}
-                  />
-
-                  <Route
-                    path="/listings/:itemId/edit"
-                    element={<EditItem />}
-                  />
-
-                  <Route
-                    path="/requests"
-                    element={<Requests />}
-                  />
-
-                  <Route
-                    path="/loans"
-                    element={<Loans />}
-                  />
-
-                  <Route
-                    path="/damage-reports"
-                    element={<DamageReports />}
-                  />
+                <Route element={<DashboardLayout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/items" element={<BrowseItems />} />
+                  <Route path="/items/new" element={<AddItem />} />
+                  <Route path="/listings" element={<MyListings />} />
+                  <Route path="/listings/:itemId/edit" element={<EditItem />} />
+                  <Route path="/requests" element={<Requests />} />
+                  <Route path="/loans" element={<Loans />} />
+                  <Route path="/damage-reports" element={<DamageReports />} />
                 </Route>
 
-                <Route
-                  path="*"
-                  element={
-                    <Navigate
-                      to="/"
-                      replace
-                    />
-                  }
-                />
+                {/* 404 - Not Found */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
-
             {!isDashboardRoute && <Footer />}
           </DamageReportsProvider>
         </LoansProvider>
       </RequestProvider>
     </ItemsProvider>
-
   );
 }
 
