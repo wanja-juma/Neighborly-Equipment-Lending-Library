@@ -1,6 +1,5 @@
 import  { useState } from 'react';
 import heroPhoto from '../assets/hero-photo.jpg';
-import './LandingPage1.css';
 import './LandingPage.css';
 import { 
   House, 

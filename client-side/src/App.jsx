@@ -37,6 +37,7 @@ function App() {
     "/requests",
     "/loans",
     "/damage-reports",
+    
   ];
 
   const isDashboardRoute =
