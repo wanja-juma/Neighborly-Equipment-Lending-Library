@@ -16,15 +16,15 @@ function Navbar() {
           Home
         </Link>
 
-        <Link to="/items">
-          <Wrench size={18} />
-          Browse Tools
-        </Link>
-
         <Link to="/about">
           <Info size={18} />
           About
         </Link>
+
+        <Link to="/browse-tools">
+          <Wrench size={18} />
+          Browse Tools
+        </Link>  
 
         <Link to="/dashboard">
           <LayoutDashboard size={18} />
