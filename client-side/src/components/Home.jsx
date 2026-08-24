@@ -1,4 +1,4 @@
-LandingPage.jsx
+
 import { House, Calendar, Plus, Sparkles } from 'lucide-react';
 import heroPhoto from '../assets/hero-photo.jpg';
 import './Home.css';
