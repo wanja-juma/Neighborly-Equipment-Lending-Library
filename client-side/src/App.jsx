@@ -1,3 +1,7 @@
+import { Navigate, Route, Routes } from "react-router-dom";
+
+import AuthPage from "./components/AuthPage.jsx";
+import About from "./components/About";
 import {
   Navigate,
   Route,
@@ -49,36 +53,31 @@ function App() {
     );
 
   return (
-    <>
-      <ItemsProvider>
-        <RequestsProvider>
-          <DamageReportsProvider>
-            <Navbar />
-            <BrowseTools />
-            <div className="app-content">
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route element={<DashboardLayout />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/items" element={<BrowseItems />} />
-                  <Route path="/items/new" element={<AddItem />} />
-                  <Route path="/listings" element={<MyListings />} />
-                  <Route path="/listings/:itemId/edit" element={<EditItem />} />
-                  <Route path="/requests" element={<Requests />} />
-                  <Route path="/loans" element={<Loans />} />
-                  <Route path="/damage-reports" element={<DamageReports />} />
-                </Route>
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
-            <Footer />
-          </DamageReportsProvider>
-        </RequestsProvider>
-      </ItemsProvider>
-    </>
     <ItemsProvider>
       <RequestProvider>
+        <DamageReportsProvider>
+          <Navbar />
+          <div className="app-content">
+            <Routes>
+              <Route path="/" element={<About />} />
+              <Route path="/auth" element={<AuthPage />} />
+              
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/items" element={<BrowseItems />} />
+                <Route path="/items/new" element={<AddItem />} />
+                <Route path="/listings" element={<MyListings />} />
+                <Route path="/listings/:itemId/edit" element={<EditItem />} />
+                <Route path="/requests" element={<Requests />} />
+                <Route path="/loans" element={<Loans />} />
+                <Route path="/damage-reports" element={<DamageReports />} />
+              </Route>
+
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+          <Footer />
+        </DamageReportsProvider>
         <LoansProvider>
           <DamageReportsProvider>
             <Navbar />
@@ -159,7 +158,6 @@ function App() {
         </LoansProvider>
       </RequestProvider>
     </ItemsProvider>
-
   );
 }
 
