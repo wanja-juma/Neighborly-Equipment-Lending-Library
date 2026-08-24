@@ -1,5 +1,5 @@
-
 import { House, Calendar, Plus, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import heroPhoto from '../assets/hero-photo.jpg';
 import './Home.css';
 
@@ -29,14 +29,15 @@ function LandingPage() {
           </h1>
 
           <div className="home__actions">
-            <button type="button" className="home__btn home__btn--filled">
+            <Link to="/browse-tools" className="home__btn home__btn--filled">
               <Calendar size={18} />
               Browse Tools
-            </button>
-            <button type="button" className="home__btn home__btn--outline">
+            </Link>
+
+          <Link to="/listings" className="home__btn home__btn--outline">
               <Plus size={18} />
               List Your Tool
-            </button>
+            </Link>  
           </div>
 
           <div className="home__social-proof">

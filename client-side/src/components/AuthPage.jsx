@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ToolsPanel from './ToolsPanel.jsx'
-import { registerUser, loginUser } from '../mockAuth.js'
+import { registerUser, loginUser, setLoggedIn } from '../mockAuth.js'
 import './AuthPage.css'
 
 function AuthPage() {
@@ -18,6 +18,10 @@ function AuthPage() {
     setError(''); setSuccess(''); setSubmitting(true)
     try {
       const user = isRegister ? await registerUser(form) : await loginUser(form)
+
+      // Needed to add this to save the authenticated user so the Navbar can show Logout
+      setLoggedIn(user)
+
       setSuccess(isRegister ? `Account created! Welcome, ${user.firstName}.` : `Welcome back, ${user.firstName}.`)
     } catch (err) { setError(err.message) }
     setSubmitting(false)
