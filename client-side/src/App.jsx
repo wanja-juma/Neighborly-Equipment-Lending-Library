@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
@@ -24,6 +25,23 @@ import "./App.css";
 
 function App() {
   const location = useLocation();
+
+  useEffect(() => { // # this makes the page scroll to the about section when the URL has #about in it
+  if (location.hash) {
+    const element = document.getElementById(
+      location.hash.substring(1)
+    );
+
+    if (element) {
+      setTimeout(() => {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 0);
+    }
+  }
+}, [location]);
 
   const dashboardRoutePrefixes = [
     "/dashboard",

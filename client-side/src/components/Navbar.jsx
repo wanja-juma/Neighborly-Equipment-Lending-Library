@@ -54,7 +54,7 @@ function Navbar() {
           Home
         </Link>
 
-        <Link to="/about">
+        <Link to="/#about">
           <Info size={18} />
           About
         </Link>
