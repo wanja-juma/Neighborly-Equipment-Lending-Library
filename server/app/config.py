@@ -1,17 +1,16 @@
 import os
 
 
+import os
+
+
 class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL",
-        "sqlite:///neighborly.db",
+        "DATABASE_URL"
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     JWT_SECRET_KEY = os.getenv(
-        "JWT_SECRET_KEY",
-        "development-secret-key",
+        "JWT_SECRET_KEY"
     )
-
-    JSON_SORT_KEYS = False
