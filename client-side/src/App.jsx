@@ -18,6 +18,8 @@ import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider";
 import DamageReportsProvider from "./context/DamageReportsProvider";
+import AuthProvider from "./context/AuthProvider.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import "./App.css";
 
 function App() {
@@ -39,6 +41,7 @@ function App() {
   );
 
   return (
+    <AuthProvider>
     <ItemsProvider>
       <RequestsProvider>
         <LoansProvider>
@@ -77,7 +80,13 @@ function App() {
 
                 <Route path="/auth" element={<AuthPage />} />
 
-                <Route element={<DashboardLayout />}>
+                <Route
+  element={
+    <ProtectedRoute>
+      <DashboardLayout />
+    </ProtectedRoute>
+  }
+>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/items" element={<BrowseItems />} />
                   <Route path="/items/new" element={<AddItem />} />
@@ -103,6 +112,7 @@ function App() {
         </LoansProvider>
       </RequestsProvider>
     </ItemsProvider>
+    </AuthProvider>
   );
 }
 

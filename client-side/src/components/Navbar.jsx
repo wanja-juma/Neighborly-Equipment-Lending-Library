@@ -1,30 +1,52 @@
-import { useState } from 'react';
-import { House, Wrench, Info, LayoutDashboard, LogIn, UserPlus, LogOut } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { getLoggedInUser, logoutUser } from '../mockAuth.js';
-import './Navbar.css';
+import {
+  House,
+  Wrench,
+  Info,
+  LayoutDashboard,
+  LogIn,
+  UserPlus,
+  LogOut,
+} from "lucide-react";
+import {
+  Link,
+  useNavigate,
+} from "react-router-dom";
+import useAuth from "../hooks/useAuth.js";
+import "./Navbar.css";
 
 function Navbar() {
-  const [user, setUser] = useState(getLoggedInUser());
   const navigate = useNavigate();
 
-  function handleLogout() {
-    // Added: remove the logged-in user from localStorage
-    logoutUser();
+  const {
+    currentUser,
+    logout,
+  } = useAuth();
 
-    // Added: update the Navbar immediately after logout
-    setUser(null);
+  const handleLogout = () => {
+    logout();
 
-    // Added: return the user to the home page
-    navigate('/');
-  }
+    navigate("/", {
+      replace: true,
+    });
+  };
+
+  const userInitials = currentUser?.name
+    ?.split(" ")
+    .filter(Boolean)
+    .map((name) => name[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <nav className="navbar">
-      <div className="navbar__logo">
+      <Link
+        className="navbar__logo"
+        to="/"
+      >
         <House size={26} />
         <span>Neighborly</span>
-      </div>
+      </Link>
 
       <div className="navbar__links">
         <Link to="/">
@@ -42,36 +64,56 @@ function Navbar() {
           Browse Tools
         </Link>
 
-        <Link to="/dashboard">
-          <LayoutDashboard size={18} />
-          Dashboard
-        </Link>
+       <Link to="/dashboard">
+  <LayoutDashboard size={18} />
+  Dashboard
+</Link>
       </div>
 
       <div className="navbar__actions">
-        {!user ? (
-          <>
-            {/* Added: Login/Register only appear when nobody is logged in */}
-            <Link to="/auth" className="navbar__login">
+        {currentUser ? (
+          <div className="navbar-user">
+            <span className="navbar-user-avatar">
+              {userInitials || "U"}
+            </span>
+
+            <div className="navbar-user-details">
+              <strong>
+                {currentUser.name}
+              </strong>
+
+              <small>
+                {currentUser.role || "Member"}
+              </small>
+            </div>
+
+            <button
+              className="navbar-logout-button"
+              type="button"
+              onClick={handleLogout}
+            >
+              <LogOut size={18} />
+              Log Out
+            </button>
+          </div>
+        ) : (
+          <div className="navbar-auth-links">
+            <Link
+              className="navbar__login"
+              to="/auth?mode=login"
+            >
               <LogIn size={18} />
               Login
             </Link>
 
-            <Link to="/auth" className="navbar__register">
+            <Link
+              className="navbar__register"
+              to="/auth?mode=register"
+            >
               <UserPlus size={18} />
               Register
             </Link>
-          </>
-        ) : (
-          /* Added: Logout replaces Login/Register after authentication */
-          <button
-            type="button"
-            className="navbar__login"
-            onClick={handleLogout}
-          >
-            <LogOut size={18} />
-            Logout
-          </button>
+          </div>
         )}
       </div>
     </nav>
