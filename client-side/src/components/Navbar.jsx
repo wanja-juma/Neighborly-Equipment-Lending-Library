@@ -49,10 +49,14 @@ function Navbar() {
       </Link>
 
       <div className="navbar__links">
-        <Link to="/">
-          <House size={18} />
-          Home
-        </Link>
+
+      <Link // this makes the home navbar link scroll to the top of the page when clicked (made hand in hand with the about feature).
+        to="/"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        <House size={18} />
+        Home
+      </Link>
 
         <Link to="/#about">
           <Info size={18} />
