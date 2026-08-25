@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from sqlalchemy.orm import validates
 
 from werkzeug.security import (
     check_password_hash,
@@ -100,6 +101,102 @@ class User(db.Model):
             self.password_hash,
             plain_password,
         )
+
+    @validates("name")
+def validate_name(self, key, value):
+    if not value or not value.strip():
+        raise ValueError(
+            "Name is required."
+        )
+
+    return value.strip()
+
+
+@validates("address")
+def validate_address(self, key, value):
+    if not value or not value.strip():
+        raise ValueError(
+            "Address is required."
+        )
+
+    return value.strip()
+
+
+@validates("email")
+def validate_email(self, key, value):
+    if not value:
+        raise ValueError(
+            "Email is required."
+        )
+
+    normalized_email = (
+        value.strip().lower()
+    )
+
+    if (
+        "@" not in normalized_email
+        or "." not in normalized_email
+        .split("@")[-1]
+    ):
+        raise ValueError(
+            "A valid email is required."
+        )
+
+    return normalized_email
+
+
+@validates("phone_number")
+def validate_phone_number(
+    self,
+    key,
+    value,
+):
+    if not value or not value.strip():
+        raise ValueError(
+            "Phone number is required."
+        )
+
+    normalized_phone = (
+        value.strip()
+        .replace(" ", "")
+        .replace("-", "")
+    )
+
+    digits = normalized_phone.lstrip("+")
+
+    if not digits.isdigit():
+        raise ValueError(
+            "Phone number contains invalid "
+            "characters."
+        )
+
+    if not 9 <= len(digits) <= 15:
+        raise ValueError(
+            "Phone number must contain "
+            "between 9 and 15 digits."
+        )
+
+    return normalized_phone
+
+def to_dict(self):
+    return {
+        "id": self.id,
+        "name": self.name,
+        "address": self.address,
+        "phone_number": self.phone_number,
+        "email": self.email,
+        "created_at": (
+            self.created_at.isoformat()
+            if self.created_at
+            else None
+        ),
+        "updated_at": (
+            self.updated_at.isoformat()
+            if self.updated_at
+            else None
+        ),
+    }
+
 
     def __repr__(self):
         return (
