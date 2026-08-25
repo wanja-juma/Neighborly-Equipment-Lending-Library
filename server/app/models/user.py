@@ -1,5 +1,10 @@
 from datetime import datetime, timezone
 
+from werkzeug.security import (
+    check_password_hash,
+    generate_password_hash,
+)
+
 from app.extensions import db
 
 
@@ -58,6 +63,43 @@ class User(db.Model):
             timezone.utc
         ),
     )
+
+    @property
+    def password(self):
+        raise AttributeError(
+            "Password cannot be read."
+        )
+
+    @password.setter
+    def password(self, plain_password):
+        self.set_password(plain_password)
+
+    def set_password(self, plain_password):
+        if not plain_password:
+            raise ValueError(
+                "Password is required."
+            )
+
+        if len(plain_password) < 8:
+            raise ValueError(
+                "Password must contain at least "
+                "8 characters."
+            )
+
+        self.password_hash = (
+            generate_password_hash(
+                plain_password
+            )
+        )
+
+    def check_password(self, plain_password):
+        if not self.password_hash:
+            return False
+
+        return check_password_hash(
+            self.password_hash,
+            plain_password,
+        )
 
     def __repr__(self):
         return (
