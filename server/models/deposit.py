@@ -1,3 +1,7 @@
+from extentions import db
+
+VALID_STATUSES = ('held', 'refunded', 'forfeited')
+
 class Deposit(db.Model):
     __tablename__ = 'deposits'
  

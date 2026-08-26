@@ -18,6 +18,6 @@ class Membership(db.Model):
     user = db.relationship('User', back_populates='memberships')
 
 
-VALID_STATUSES = ('held', 'refunded', 'forfeited')
+
  
  
