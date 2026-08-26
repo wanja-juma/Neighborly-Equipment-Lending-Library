@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BrowseTools from './components/BrowseTools';
 import ItemDetail from './components/ItemDetail';
+import PaymentBar from './components/PaymentBar';
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<><HowItWorks /><AuthPage /></>} />
         <Route path="/tools" element={<BrowseTools />} />
         <Route path="/tools/:id" element={<ItemDetail />} />
+        <Route path="/payment/:id" element={<PaymentBar />} />
       </Routes>
       <Footer />
     </>
