@@ -85,3 +85,43 @@ def create_item():
     db.session.commit()
 
     return jsonify({"item": _serialize(item)}), 201
+
+
+@items_bp.patch("/<int:item_id>")
+def update_item(item_id):
+    item = Item.query.get(item_id)
+    if item is None:
+        return jsonify({"message": "Item not found"}), 404
+
+    data = request.get_json(silent=True) or {}
+
+    if "name" in data:
+        name = (data.get("name") or "").strip()
+        if not name:
+            return jsonify({"message": "name cannot be empty"}), 400
+        item.name = name
+
+    if "ownerId" in data:
+        owner_id = data.get("ownerId")
+        if not isinstance(owner_id, int) or isinstance(owner_id, bool):
+            return jsonify({"message": "ownerId must be an integer"}), 400
+        item.owner_id = owner_id
+
+    if "description" in data:
+        item.description = data.get("description")
+
+    if "categoryId" in data:
+        item.category_id = data.get("categoryId")
+
+    if "condition" in data:
+        item.condition = data.get("condition")
+
+    if "status" in data:
+        status = (data.get("status") or "").strip()
+        if not status:
+            return jsonify({"message": "status cannot be empty"}), 400
+        item.status = status
+
+    db.session.commit()
+
+    return jsonify({"item": _serialize(item)})
