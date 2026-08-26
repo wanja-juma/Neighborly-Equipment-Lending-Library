@@ -72,3 +72,25 @@ def login():
         ),
         501,
     )
+
+
+@auth_bp.get("/me")
+def me():
+    auth_header = request.headers.get("Authorization", "")
+
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"message": "Missing or invalid Authorization header"}), 401
+
+    token = auth_header.removeprefix("Bearer ").strip()
+    if not token:
+        return jsonify({"message": "Missing or invalid Authorization header"}), 401
+    
+    return (
+        jsonify(
+            {
+                "message": "Authorization header present, but token verification isn't "
+                "implemented yet so the current user can't be resolved.",
+            }
+        ),
+        501,
+    )
