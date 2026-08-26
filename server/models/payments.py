@@ -2,8 +2,8 @@ from extentions import db
 
 VALID_STATUSES = ('held', 'refunded', 'forfeited')
 
-class Deposit(db.Model):
-    __tablename__ = 'deposits'
+class payments(db.Model):
+    __tablename__ = 'payments'
  
  
     id = db.Column(db.Integer, primary_key=True)
@@ -15,4 +15,4 @@ class Deposit(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())   
 
-    loan = db.relationship('Loan', back_populates='deposit')
+    loan = db.relationship('Loan', back_populates='paymeants')
