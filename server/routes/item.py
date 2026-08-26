@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 
+from extensions import db
 from models.item import Item
 
 items_bp = Blueprint("items", __name__, url_prefix="/api/items")
@@ -48,3 +49,39 @@ def get_item(item_id):
         return jsonify({"message": "Item not found"}), 404
 
     return jsonify({"item": _serialize(item)})
+
+
+@items_bp.post("")
+def create_item():
+    data = request.get_json(silent=True) or {}
+
+    name = (data.get("name") or "").strip()
+    owner_id = data.get("ownerId")
+
+    missing = []
+    if not name:
+        missing.append("name")
+    if owner_id is None:
+        missing.append("ownerId")
+    if missing:
+        return (
+            jsonify({"message": f"Missing required field(s): {', '.join(missing)}"}),
+            400,
+        )
+
+    if not isinstance(owner_id, int) or isinstance(owner_id, bool):
+        return jsonify({"message": "ownerId must be an integer"}), 400
+
+    item = Item(
+        name=name,
+        owner_id=owner_id,
+        description=data.get("description"),
+        category_id=data.get("categoryId"),
+        condition=data.get("condition"),
+        status=data.get("status") or "Available",
+    )
+
+    db.session.add(item)
+    db.session.commit()
+
+    return jsonify({"item": _serialize(item)}), 201
