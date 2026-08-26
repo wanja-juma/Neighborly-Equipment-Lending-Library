@@ -1,0 +1,302 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Wanja Juma",
+      "email": "wanja@example.com",
+      "community": "Greenview Estate"
+    },
+    {
+      "id": "2",
+      "name": "David Kimani",
+      "email": "david@example.com",
+      "community": "Greenview Estate"
+    },
+    {
+      "id": "3",
+      "name": "Mary Njeri",
+      "email": "mary@example.com",
+      "community": "Greenview Estate"
+    },
+    {
+      "id": "4",
+      "name": "Peter Otieno",
+      "email": "peter@example.com",
+      "community": "Greenview Estate"
+    },
+    {
+      "id": "5",
+      "name": "Grace Wambui",
+      "email": "grace@example.com",
+      "community": "Greenview Estate"
+    }
+  ],
+  "items": [
+    {
+      "id": "1",
+      "name": "Electric Drill",
+      "category": "Power Tools",
+      "description": "Corded electric drill suitable for household projects.",
+      "condition": "Good condition",
+      "availability": "Available",
+      "statusColor": "available",
+      "icon": "🔩",
+      "ownerId": "1",
+      "owner": "Wanja Juma",
+      "location": "Greenview Estate"
+    },
+    {
+      "id": "2",
+      "name": "Garden Mower",
+      "category": "Garden Equipment",
+      "description": "Electric lawn mower suitable for medium-sized gardens.",
+      "condition": "Excellent condition",
+      "availability": "Requested",
+      "statusColor": "requested",
+      "icon": "🌿",
+      "ownerId": "1",
+      "owner": "Wanja Juma",
+      "location": "Greenview Estate"
+    },
+    {
+      "id": "3",
+      "name": "Circular Saw",
+      "category": "Power Tools",
+      "description": "Circular saw with an adjustable cutting depth.",
+      "condition": "Good condition",
+      "availability": "On Loan",
+      "statusColor": "on-loan",
+      "icon": "🪚",
+      "ownerId": "1",
+      "owner": "Wanja Juma",
+      "location": "Greenview Estate"
+    },
+    {
+      "id": "4",
+      "name": "Extension Ladder",
+      "category": "Ladders",
+      "description": "Strong aluminium ladder for indoor and outdoor work.",
+      "condition": "Good condition",
+      "availability": "Available",
+      "statusColor": "available",
+      "icon": "🪜",
+      "ownerId": "2",
+      "owner": "David Kimani",
+      "location": "Greenview Estate"
+    },
+    {
+      "id": "5",
+      "name": "Pressure Washer",
+      "category": "Cleaning Equipment",
+      "description": "High-pressure washer for vehicles and outdoor surfaces.",
+      "condition": "Excellent condition",
+      "availability": "Available",
+      "statusColor": "available",
+      "icon": "💦",
+      "ownerId": "3",
+      "owner": "Mary Njeri",
+      "location": "Greenview Estate"
+    },
+    {
+      "id": "6",
+      "name": "Socket Wrench Set",
+      "category": "Hand Tools",
+      "description": "Complete socket wrench set with multiple socket sizes.",
+      "condition": "Good condition",
+      "availability": "Available",
+      "statusColor": "available",
+      "icon": "🔧",
+      "ownerId": "3",
+      "owner": "Mary Njeri",
+      "location": "Greenview Estate"
+    },
+    {
+      "id": "7",
+      "name": "Wheelbarrow",
+      "category": "Garden Equipment",
+      "description": "Heavy-duty wheelbarrow for gardening and construction.",
+      "condition": "Fair condition",
+      "availability": "Available",
+      "statusColor": "available",
+      "icon": "🛒",
+      "ownerId": "4",
+      "owner": "Peter Otieno",
+      "location": "Greenview Estate"
+    },
+    {
+      "id": "8",
+      "name": "Tool Box",
+      "category": "Hand Tools",
+      "description": "Portable tool box containing common household tools.",
+      "condition": "Good condition",
+      "availability": "On Loan",
+      "statusColor": "on-loan",
+      "icon": "🧰",
+      "ownerId": "5",
+      "owner": "Grace Wambui",
+      "location": "Greenview Estate"
+    },
+    {
+      "name": "Vacuum Cleaner",
+      "category": "Cleaning Equipment",
+      "description": "A powerful and efficient vacuum cleaner designed to remove dust, dirt and debris from floors and carpets. It is easy to use and helps keep your home clean and fresh.",
+      "condition": "Good condition",
+      "icon": "💦",
+      "ownerId": "1",
+      "owner": "Wanja Juma",
+      "location": "Greenview Estate",
+      "availability": "Available",
+      "statusColor": "available",
+      "id": "L4NMspq4Z5Q"
+    },
+    {
+      "name": "Pipe-Cutter",
+      "category": "Hand Tools",
+      "description": "Strong tool with teeth to grab round metal pipes",
+      "condition": "Excellent condition",
+      "icon": "🎨",
+      "ownerId": "1",
+      "owner": "Wanja Juma",
+      "location": "Greenview Estate",
+      "availability": "Available",
+      "statusColor": "available",
+      "id": "17QXyCWQ7uo"
+    }
+  ],
+  "borrowingRequests": [
+    {
+      "id": "1",
+      "itemId": "1",
+      "itemName": "Electric Drill",
+      "itemIcon": "🔩",
+      "ownerId": "1",
+      "ownerName": "Wanja Juma",
+      "borrowerId": "2",
+      "borrowerName": "Frank Kamau",
+      "startDate": "2026-08-25",
+      "endDate": "2026-08-27",
+      "status": "Approved",
+      "createdAt": "2026-08-22T08:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "itemId": "4",
+      "itemName": "Extension Ladder",
+      "itemIcon": "🪜",
+      "ownerId": "2",
+      "ownerName": "David Kimani",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-28",
+      "endDate": "2026-08-30",
+      "status": "Approved",
+      "createdAt": "2026-08-22T09:00:00.000Z"
+    },
+    {
+      "itemId": "5",
+      "itemName": "Pressure Washer",
+      "itemIcon": "💦",
+      "ownerId": "3",
+      "ownerName": "Mary Njeri",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-23",
+      "endDate": "2026-08-26",
+      "status": "Declined",
+      "createdAt": "2026-08-22T11:34:43.916Z",
+      "id": "oh9_fFSimpw"
+    },
+    {
+      "itemId": "7",
+      "itemName": "Wheelbarrow",
+      "itemIcon": "🛒",
+      "ownerId": "4",
+      "ownerName": "Peter Otieno",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-26",
+      "status": "Cancelled",
+      "createdAt": "2026-08-22T11:35:51.900Z",
+      "id": "oy5pGtYBIuE"
+    },
+    {
+      "itemId": "4",
+      "itemName": "Extension Ladder",
+      "itemIcon": "🪜",
+      "ownerId": "2",
+      "ownerName": "David Kimani",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-25",
+      "endDate": "2026-08-28",
+      "status": "Approved",
+      "createdAt": "2026-08-22T14:00:42.436Z",
+      "id": "U3KPbXwYCPc"
+    },
+    {
+      "itemId": "6",
+      "itemName": "Socket Wrench Set",
+      "itemIcon": "🔧",
+      "ownerId": "3",
+      "ownerName": "Mary Njeri",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-26",
+      "endDate": "2026-08-29",
+      "status": "Pending",
+      "createdAt": "2026-08-22T19:50:30.454Z",
+      "id": "4vdYR1kRpvI"
+    },
+    {
+      "itemId": "4",
+      "itemName": "Extension Ladder",
+      "itemIcon": "🪜",
+      "ownerId": "2",
+      "ownerName": "David Kimani",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-26",
+      "endDate": "2026-08-28",
+      "status": "Pending",
+      "createdAt": "2026-08-24T04:16:27.730Z",
+      "id": "mONuvYWYX60"
+    }
+  ],
+  "loans": [
+    {
+      "id": "1",
+      "itemId": "6",
+      "itemName": "Socket Wrench Set",
+      "itemIcon": "🔧",
+      "ownerId": "3",
+      "ownerName": "Mary Njeri",
+      "borrowerId": "1",
+      "borrowerName": "Wanja Juma",
+      "startDate": "2026-08-18",
+      "dueDate": "2026-08-23",
+      "returnedDate": null,
+      "status": "Returned",
+      "deposit": 1000,
+      "returnedAt": "2026-08-22T19:03:40.866Z"
+    },
+    {
+      "id": "2",
+      "itemId": "3",
+      "itemName": "Circular Saw",
+      "itemIcon": "🪚",
+      "ownerId": "1",
+      "ownerName": "Wanja Juma",
+      "borrowerId": "2",
+      "borrowerName": "David Kimani",
+      "startDate": "2026-08-20",
+      "dueDate": "2026-08-25",
+      "returnedDate": null,
+      "status": "Returned",
+      "deposit": 1500,
+      "returnedAt": "2026-08-22T19:04:10.786Z"
+    }
+  ],
+  "damageReports": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}

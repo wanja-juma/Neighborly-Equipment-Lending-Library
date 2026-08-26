@@ -1,43 +1,63 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
+import './About.css';
 import { 
-  Search, 
   Calendar, 
+  Search, 
   Handshake, 
   PlusCircle, 
   ShieldCheck,
   ChevronDown,
   DollarSign,
   Users,
-  Leaf
+  Leaf,
+  Star,
+  Quote
 } from 'lucide-react';
 
-export default function HowItWorks() {
+export default function LandingPage1() {
   const [activeTab, setActiveTab] = useState('borrow');
   const [faqOpen, setFaqOpen] = useState(null);
-  const [contactSubmitted, setContactSubmitted] = useState(false);
 
   const toggleFaq = (index) => {
     setFaqOpen(faqOpen === index ? null : index);
   };
 
-  const handleContactSubmit = (e) => {
-    e.preventDefault();
-    setContactSubmitted(true);
-    setTimeout(() => setContactSubmitted(false), 4000);
-  };
+  const testimonials = [
+    {
+      name: "David K.",
+      role: "Homeowner in Kilimani",
+      image: "DK",
+      bgColor: "#1E5E3D",
+      rating: 5,
+      text: "Saved over KSh 15,000 borrowing a pressure washer and lawn mower instead of buying. Pickup took 5 minutes!"
+    },
+    {
+      name: "Amina M.",
+      role: "Tool Owner in Westlands",
+      image: "AM",
+      bgColor: "#B5432B",
+      rating: 5,
+      text: "My power tools were sitting in the garage gathering dust. Now I cover my weekly groceries just sharing them."
+    },
+    {
+      name: "Sammy O.",
+      role: "DIY Enthusiast in Lavington",
+      image: "SO",
+      bgColor: "#8B8A84",
+      rating: 5,
+      text: "Great community! The identity check gives total peace of mind when giving out expensive drills and saws."
+    }
+  ];
 
   return (
-    <div className="container">
-      
-      
+    <div className="container" id="about">
       <section className="hero">
-        
         <h1 className="title">
           How <span className="brand-color">Neighborly</span> Works
         </h1>
         <p className="subtitle">
-          Neighbourly is a website used to hire tools and equipments where one
-          borrow tools you need for quick fixes, or share your own equipment to earn extra income and support your local community.
+          Neighbourly is a website used to hire tools and equipment where one
+          can borrow tools you need for quick fixes, or share your own equipment to earn extra income and support your local community.
         </p>
 
         <div className="tab-wrapper">
@@ -58,7 +78,6 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      
       <section className="section">
         {activeTab === 'borrow' ? (
           <div className="grid">
@@ -133,7 +152,6 @@ export default function HowItWorks() {
         )}
       </section>
 
-
       <section className="section">
         <div className="banner">
           <div className="banner-item">
@@ -159,7 +177,40 @@ export default function HowItWorks() {
         </div>
       </section>
 
-      
+      <section className="section">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-slate-900">What Our Neighbors Say</h2>
+          <p className="text-slate-600 text-sm mt-1">Real stories from community members near you.</p>
+        </div>
+
+        <div className="grid">
+          {testimonials.map((item, index) => (
+            <div key={index} className="card" style={{ textAlign: 'left' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {[...Array(item.rating)].map((_, i) => (
+                    <Star key={i} size={16} fill="#EAB308" color="#EAB308" />
+                  ))}
+                </div>
+                <Quote size={20} className="text-slate-300" />
+              </div>
+              <p className="card-desc" style={{ fontStyle: 'italic', marginBottom: '16px' }}>
+                "{item.text}"
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="home__avatar" style={{ backgroundColor: item.bgColor }}>
+                  {item.image}
+                </span>
+                <div>
+                  <h4 className="font-bold text-sm text-slate-900">{item.name}</h4>
+                  <p className="text-xs text-slate-500">{item.role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="faq-section">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-slate-900">Frequently Asked Questions</h2>
@@ -198,7 +249,6 @@ export default function HowItWorks() {
           ))}
         </div>
       </section>
-
     </div>
   );
 }
