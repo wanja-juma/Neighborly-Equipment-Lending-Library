@@ -46,3 +46,29 @@ def register():
         ),
         501,
     )
+
+
+@auth_bp.post("/login")
+def login():
+    data = request.get_json(silent=True) or {}
+
+    missing = [field for field in ("email", "password") if not data.get(field)]
+    if missing:
+        return (
+            jsonify({"message": f"Missing required field(s): {', '.join(missing)}"}),
+            400,
+        )
+
+    email = data["email"].strip().lower()
+
+
+    return (
+        jsonify(
+            {
+                "message": "Validation passed, but the User model isn't implemented yet "
+                "so login can't be verified.",
+                "received": {"email": email},
+            }
+        ),
+        501,
+    )
