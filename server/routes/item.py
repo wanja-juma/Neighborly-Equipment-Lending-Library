@@ -137,3 +137,19 @@ def delete_item(item_id):
     db.session.commit()
 
     return jsonify({"message": "Item deleted", "id": item_id})
+
+
+# "My listings" lives under /users, not /items, so it gets its own blueprint.
+# Whoever wires up the Flask app needs to register this alongside items_bp.
+users_bp = Blueprint("users_items", __name__, url_prefix="/api/users")
+
+
+@users_bp.get("/<int:user_id>/items")
+def get_user_items(user_id):
+    items = (
+        Item.query.filter(Item.owner_id == user_id)
+        .order_by(Item.created_at.desc())
+        .all()
+    )
+
+    return jsonify({"items": [_serialize(item) for item in items]})
