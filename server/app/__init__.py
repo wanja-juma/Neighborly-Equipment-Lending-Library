@@ -17,6 +17,11 @@ def create_app(config_class=Config):
 
     ma.init_app(app)
 
+    from routes import profile_bp, user_bp
+
+    app.register_blueprint(user_bp)
+    app.register_blueprint(profile_bp)
+
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
