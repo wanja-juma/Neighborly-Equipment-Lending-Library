@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from sqlalchemy.orm import validates
 
 from werkzeug.security import (
     check_password_hash,
@@ -47,6 +48,25 @@ class User(db.Model):
         uselist=False,
         cascade="all, delete-orphan",
     )
+
+    @validates("email")
+    def validate_email(self, key, value):
+        if not value or not value.strip():
+            raise ValueError(
+                "Email is required."
+            )
+
+        normalized_email = value.strip().lower()
+
+        if (
+            "@" not in normalized_email
+            or "." not in normalized_email.split("@")[-1]
+        ):
+            raise ValueError(
+                "A valid email is required."
+            )
+
+        return normalized_email
 
     @property
     def password(self):
