@@ -125,3 +125,15 @@ def update_item(item_id):
     db.session.commit()
 
     return jsonify({"item": _serialize(item)})
+
+
+@items_bp.delete("/<int:item_id>")
+def delete_item(item_id):
+    item = Item.query.get(item_id)
+    if item is None:
+        return jsonify({"message": "Item not found"}), 404
+
+    db.session.delete(item)
+    db.session.commit()
+
+    return jsonify({"message": "Item deleted", "id": item_id})
