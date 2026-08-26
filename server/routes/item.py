@@ -38,3 +38,13 @@ def list_items():
     items = query.order_by(Item.created_at.desc()).all()
 
     return jsonify({"items": [_serialize(item) for item in items]})
+
+
+@items_bp.get("/<int:item_id>")
+def get_item(item_id):
+    item = Item.query.get(item_id)
+
+    if item is None:
+        return jsonify({"message": "Item not found"}), 404
+
+    return jsonify({"item": _serialize(item)})
