@@ -65,17 +65,56 @@ class User(db.Model):
         ),
     )
 
-    @property
-    def password(self):
+membership = db.relationship(
+    "Membership",
+    back_populates="user",
+    uselist=False,
+    cascade="all, delete-orphan",
+)
+
+items = db.relationship(
+    "Item",
+    back_populates="owner",
+)
+
+borrowing_requests = db.relationship(
+    "BorrowingRequest",
+    foreign_keys=(
+        "BorrowingRequest.borrower_id"
+    ),
+    back_populates="borrower",
+)
+borrowed_loans = db.relationship(
+        "Loan",
+        foreign_keys="Loan.borrower_id",
+        back_populates="borrower",
+    )
+
+lent_loans = db.relationship(
+        "Loan",
+        foreign_keys="Loan.owner_id",
+        back_populates="owner",
+    )
+
+damage_reports = db.relationship(
+    "DamageReport",
+    foreign_keys=(
+        "DamageReport.reported_by_id"
+    ),
+    back_populates="reported_by",
+)
+
+@property
+def password(self):
         raise AttributeError(
             "Password cannot be read."
         )
 
-    @password.setter
-    def password(self, plain_password):
+@password.setter
+def password(self, plain_password):
         self.set_password(plain_password)
 
-    def set_password(self, plain_password):
+def set_password(self, plain_password):
         if not plain_password:
             raise ValueError(
                 "Password is required."
@@ -93,7 +132,7 @@ class User(db.Model):
             )
         )
 
-    def check_password(self, plain_password):
+def check_password(self, plain_password):
         if not self.password_hash:
             return False
 
@@ -102,7 +141,7 @@ class User(db.Model):
             plain_password,
         )
 
-    @validates("name")
+@validates("name")
 def validate_name(self, key, value):
     if not value or not value.strip():
         raise ValueError(
@@ -198,7 +237,7 @@ def to_dict(self):
     }
 
 
-    def __repr__(self):
+def __repr__(self):
         return (
             f"<User {self.id}: "
             f"{self.email}>"
