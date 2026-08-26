@@ -30,7 +30,7 @@ def create_app(config_class=Config):
 
     # Import models after creating the app
     
-    from app.models import User  # noqa: F401
+    from models import User  
 
     @app.get("/api/health")
     def health_check():
