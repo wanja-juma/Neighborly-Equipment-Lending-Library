@@ -33,3 +33,5 @@ class Deposit(db.Model, SerializerMixin):
     refunded_at = db.Column(db.DateTime) 
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())   
+
+    loan = db.relationship('Loan', back_populates='deposit')
