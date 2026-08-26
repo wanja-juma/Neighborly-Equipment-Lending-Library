@@ -1,12 +1,12 @@
 const pool = require('../db/pool');
 
 // Create a new borrowing request
-async function createBorrowingRequest({ itemId, ownerId, borrowerId, startDate, endDate }) {
+async function createBorrowingRequest({ itemId, borrowerId, ownerId, status, message, notification }) {
   const result = await pool.query(
-    `INSERT INTO borrowing_requests (item_id, owner_id, borrower_id, start_date, end_date)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO borrowing_requests (item_id, borrower_id, owner_id, status, message, notification)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *`,
-    [itemId, ownerId, borrowerId, startDate, endDate]
+    [itemId, borrowerId, ownerId, status, message, notification]
   );
   return result.rows[0];
 }
@@ -36,6 +36,7 @@ async function updateBorrowingRequestStatus(id, status) {
 async function deleteBorrowingRequest(id) {
   await pool.query(`DELETE FROM borrowing_requests WHERE id = $1`, [id]);
 }
+
 module.exports = {
   createBorrowingRequest,
   getAllBorrowingRequests,
