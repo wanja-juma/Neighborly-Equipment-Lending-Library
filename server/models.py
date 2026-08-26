@@ -14,3 +14,5 @@ class Membership(db.Model):
     end_date = db.Column(db.Date)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
+
+    user = db.relationship('User', back_populates='memberships')
