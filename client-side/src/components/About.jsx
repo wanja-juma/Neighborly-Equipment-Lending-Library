@@ -50,7 +50,7 @@ export default function LandingPage1() {
   ];
 
   return (
-    <div className="container">
+    <div className="container" id="about">
       <section className="hero">
         <h1 className="title">
           How <span className="brand-color">Neighborly</span> Works
