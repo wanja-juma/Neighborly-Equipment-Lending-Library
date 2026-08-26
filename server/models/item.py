@@ -22,5 +22,4 @@ class Item(db.Model):
 
     owner = db.relationship("User", backref="items")
 
-    def __repr__(self):
-        return f"<Item {self.id} {self.name!r}>"
+  
