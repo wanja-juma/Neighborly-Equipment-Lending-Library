@@ -21,7 +21,7 @@
   width: 100%;
   max-width: 1180px;
   display: grid;
-  grid-template-columns: minmax(360px, 540px) 1fr;
+  grid-template-columns: minmax(360px, 600px) 1fr;
   background: var(--cream);
   border-radius: 28px;
   overflow: hidden;
