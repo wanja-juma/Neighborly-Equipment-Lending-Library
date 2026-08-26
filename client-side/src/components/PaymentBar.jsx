@@ -45,7 +45,7 @@ function PaymentBar({ itemName = 'this tool', dailyRate = 5 }) {
       </label>
 
       <div className="payment-total">
-        Total: <strong>${total}</strong>
+        Total: <strong>Ksh{total}</strong>
       </div>
 
       <button type="submit">Pay Now</button>
