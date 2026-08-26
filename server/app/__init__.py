@@ -1,5 +1,6 @@
 from flask import Flask
 from models import Profile, User  
+from routes import profile_bp, user_bp
 
 from app.config import Config
 from app.extensions import (
