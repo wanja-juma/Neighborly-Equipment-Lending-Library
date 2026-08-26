@@ -1,12 +1,25 @@
 import { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import tools from '../data/tools';
 import './PaymentBar.css';
 
-function PaymentBar({ itemName = 'this tool', dailyRate = 5 }) {
+function PaymentBar() {
+  const { id } = useParams();
+  const tool = tools.find((t) => t.id === id);
   const [duration, setDuration] = useState(1);
   const [method, setMethod] = useState('mpesa');
   const [submitted, setSubmitted] = useState(false);
 
-  const total = duration * dailyRate;
+  if (!tool) {
+    return (
+      <div className="payment-bar">
+        <p>Tool not found.</p>
+        <Link to="/tools">Back to Browse Tools</Link>
+      </div>
+    );
+  }
+
+  const total = duration * tool.dailyRate;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,14 +29,14 @@ function PaymentBar({ itemName = 'this tool', dailyRate = 5 }) {
   if (submitted) {
     return (
       <div className="payment-bar payment-success">
-        <p>Payment of Ksh{total} confirmed for {itemName}. Enjoy your borrow!</p>
+        <p>Payment of Ksh{total} confirmed for {tool.name}. Enjoy your borrow!</p>
       </div>
     );
   }
 
   return (
     <form className="payment-bar" onSubmit={handleSubmit}>
-      <h3>Borrow {itemName}</h3>
+      <h3>Borrow {tool.name}</h3>
 
       <label>
         Duration (days)
