@@ -94,3 +94,26 @@ def me():
         ),
         501,
     )
+
+
+@auth_bp.post("/logout")
+def logout():
+    auth_header = request.headers.get("Authorization", "")
+
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"message": "Missing or invalid Authorization header"}), 401
+
+    token = auth_header.removeprefix("Bearer ").strip()
+    if not token:
+        return jsonify({"message": "Missing or invalid Authorization header"}), 401
+
+
+    return (
+        jsonify(
+            {
+                "message": "Authorization header present, but token revocation isn't "
+                "implemented yet so nothing was actually invalidated.",
+            }
+        ),
+        501,
+    )
