@@ -23,3 +23,9 @@ def create_request():
     db.session.add(new_request)
     db.session.commit()
     return jsonify(new_request.to_dict()), 201
+
+
+@borrowing_requests_bp.route("", methods=["GET"])
+def list_requests():
+    requests = BorrowingRequest.query.order_by(BorrowingRequest.created_at.desc()).all()
+    return jsonify([r.to_dict() for r in requests]), 200
