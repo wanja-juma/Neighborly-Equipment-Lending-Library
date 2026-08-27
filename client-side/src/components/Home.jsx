@@ -36,7 +36,7 @@ function LandingPage() {
             <button type="button" className="home__btn home__btn--outline">
               <Plus size={18} />
               List Your Tool
-            </button>
+            </button>gi
           </div>
 
           <div className="home__social-proof">

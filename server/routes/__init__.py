@@ -7,4 +7,6 @@ __all__ = [
     "auth_bp",
     "profile_bp",
     "user_bp",
+    "user_bp",
+    "profile_bp",
 ]

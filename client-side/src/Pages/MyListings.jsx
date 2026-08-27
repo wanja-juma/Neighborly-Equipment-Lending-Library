@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import useItems from "../hooks/useItems";
+
 import "./Items.css";
 
 const CURRENT_USER_ID = "1";
@@ -216,33 +217,20 @@ function MyListings() {
                     </div>
 
                     <div className="listing-actions">
-                      <Link
-  className="edit-item-button"
-  to={`/listings/${item.id}/edit`}
->
-  Edit Listing
-</Link>
+  <Link
+    className="change-availability-button"
+    to={`/listings/${item.id}/availability`}
+  >
+    Change Availability
+  </Link>
 
-                      <button
-                        className="availability-button"
-                        type="button"
-                      >
-                        Change Availability
-                      </button>
-
-                      <button
-                        className="delete-item-button"
-                        type="button"
-                        disabled={isDeleting}
-                        onClick={() =>
-                          handleDeleteItem(item)
-                        }
-                      >
-                        {isDeleting
-                          ? "Deleting..."
-                          : "Delete"}
-                      </button>
-                    </div>
+  <Link
+    className="edit-listing-button"
+    to={`/listings/${item.id}/edit`}
+  >
+    Edit Listing
+  </Link>
+</div>
                   </div>
                 </article>
               );
