@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
 from app.extensions import db
-from models import BorrowingRequest
+from models import BorrowingRequest, Item, User
 from schemas import BorrowingRequestSchema
 
 borrowing_requests_bp = Blueprint(
@@ -19,22 +20,30 @@ VALID_STATUSES = {"pending", "approved", "rejected", "returned", "cancelled"}
 @borrowing_requests_bp.post("")
 @jwt_required()
 def create_request():
-    data = request.get_json()
+    json_data = request.get_json()
+    if not json_data:
+        return jsonify({"error": "No input data provided"}), 400
 
-    required = ["item_id", "borrower_id"]
-    missing = [f for f in required if f not in data]
-    if missing:
-        return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
+    try:
+        data = borrowing_request_schema.load(json_data, partial=("status",))
+    except ValidationError as err:
+        return jsonify({"errors": err.messages}), 400
 
-    new_request = BorrowingRequest(
-        item_id=data["item_id"],
-        borrower_id=data["borrower_id"],
-        status="pending",
-        notification=data.get("notification"),
-    )
-    db.session.add(new_request)
+    item = db.session.get(Item, data.item_id)
+    if item is None:
+        return jsonify({"error": "Item not found."}), 404
+
+    borrower = db.session.get(User, data.borrower_id)
+    if borrower is None:
+        return jsonify({"error": "Borrower not found."}), 404
+
+    if item.owner_id == data.borrower_id:
+        return jsonify({"error": "You cannot borrow your own item."}), 400
+
+    data.status = "pending"
+    db.session.add(data)
     db.session.commit()
-    return jsonify({"borrowing_request": borrowing_request_schema.dump(new_request)}), 201
+    return jsonify({"borrowing_request": borrowing_request_schema.dump(data)}), 201
 
 
 @borrowing_requests_bp.get("")
@@ -70,8 +79,11 @@ def update_status(request_id):
     if br is None:
         return jsonify({"error": "Borrowing request not found."}), 404
 
-    data = request.get_json()
-    new_status = data.get("status")
+    json_data = request.get_json()
+    if not json_data or "status" not in json_data:
+        return jsonify({"error": "Missing 'status' field."}), 400
+
+    new_status = json_data["status"]
     if new_status not in VALID_STATUSES:
         return jsonify({"error": f"Invalid status. Must be one of {sorted(VALID_STATUSES)}"}), 400
 
