@@ -39,3 +39,11 @@ def list_requests():
 
     requests = query.order_by(BorrowingRequest.created_at.desc()).all()
     return jsonify([r.to_dict() for r in requests]), 200
+
+
+@borrowing_requests_bp.route("/<int:request_id>", methods=["GET"])
+def get_request(request_id):
+    br = BorrowingRequest.query.get(request_id)
+    if not br:
+        return jsonify({"error": "Borrowing request not found"}), 404
+    return jsonify(br.to_dict()), 200
