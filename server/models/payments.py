@@ -1,8 +1,8 @@
-from extentions import db
+from app.extensions import db
 
 VALID_STATUSES = ('held', 'refunded', 'forfeited')
 
-class payments(db.Model):
+class Payment(db.Model):
     __tablename__ = 'payments'
  
  

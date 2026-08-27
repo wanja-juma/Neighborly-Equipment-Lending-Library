@@ -1,7 +1,7 @@
 [[source]]
+name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-name = "pypi"
 
 [packages]
 alembic = "==1.19.1"
@@ -25,12 +25,16 @@ sqlalchemy = "==2.0.52"
 typing-extensions = "==4.16.0"
 werkzeug = "==3.1.8"
 flask = "*"
-flask-sqlalchemy = "*"
-flask-migrate = "*"
+flask-cors = "*"
+flask-jwt-extended = "*"
 flask-marshmallow = "*"
+flask-migrate = "*"
+flask-sqlalchemy = "*"
 marshmallow-sqlalchemy = "*"
+python-dotenv = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.12"
