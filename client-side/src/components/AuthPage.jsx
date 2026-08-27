@@ -17,11 +17,128 @@ function AuthPage() {
     if (!form.password || (isRegister && form.password.length < 8)) return setError('Password must be at least 8 characters')
     setError(''); setSuccess(''); setSubmitting(true)
     try {
+<<<<<<< Updated upstream
       const user = isRegister ? await registerUser(form) : await loginUser(form)
       setSuccess(isRegister ? `Account created! Welcome, ${user.firstName}.` : `Welcome back, ${user.firstName}.`)
     } catch (err) { setError(err.message) }
     setSubmitting(false)
   }
+=======
+      const response = isRegister
+        ? await registerUser(form)
+        : await loginUser(form);
+
+      /*
+       * Supports both response structures:
+       *
+       * {
+       *   access_token: "...",
+       *   user: {...}
+       * }
+       *
+       * and the existing mock response:
+       *
+       * {
+       *   accessToken: "...",
+       *   firstName: "..."
+       * }
+       */
+      const userData =
+        response.user || response;
+
+      const accessToken =
+        response.access_token ||
+        response.accessToken ||
+        userData.access_token ||
+        userData.accessToken ||
+        null;
+
+      const firstName =
+        userData.profile?.first_name ||
+        userData.firstName ||
+        form.firstName;
+
+      const lastName =
+        userData.profile?.last_name ||
+        userData.lastName ||
+        form.lastName;
+
+      const fullName = [
+        firstName,
+        lastName,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      const authenticatedUser = {
+        id: String(userData.id || ""),
+        firstName,
+        lastName,
+        name:
+          userData.name ||
+          fullName ||
+          userData.email ||
+          form.email,
+        email:
+          userData.email || form.email,
+        role: userData.role || "Member",
+        profile: userData.profile || null,
+      };
+
+      if (!accessToken) {
+        throw new Error(
+          "Authentication succeeded, but no access token was returned."
+        );
+      }
+
+      // Save the token for protected API requests.
+      localStorage.setItem(
+        "access_token",
+        accessToken
+      );
+
+      // Update the shared authentication state.
+      login(
+        authenticatedUser,
+        accessToken
+      );
+
+      setSuccess(
+        isRegister
+          ? `Account created! Welcome, ${authenticatedUser.firstName}.`
+          : `Welcome back, ${authenticatedUser.firstName}.`
+      );
+
+      navigate("/dashboard", {
+        replace: true,
+      });
+    } catch (err) {
+      setError(
+        err.message ||
+          "Authentication failed. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleModeChange = () => {
+    setIsRegister(
+      (currentMode) => !currentMode
+    );
+
+    setError("");
+    setSuccess("");
+
+    setForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    });
+  };
+
+>>>>>>> Stashed changes
   return (
     <div className="auth-page"><div className="auth-card">
       <section className="auth-form-panel">

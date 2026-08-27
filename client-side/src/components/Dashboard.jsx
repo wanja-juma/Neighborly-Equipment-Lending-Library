@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useItems from "../hooks/useItems";
 import useRequests from "../hooks/useRequests";
@@ -6,7 +6,9 @@ import useLoans from "../hooks/useLoans";
 import getLoanStatus from "../utils/getLoanStatus";
 import "./Dashboard.css";
 
-const CURRENT_USER_ID = "1";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5555/api";
 
 const summaryCards = [
   {
@@ -56,13 +58,65 @@ function Dashboard() {
   } = useLoans();
 
   const [notice, setNotice] = useState("");
+  const [currentUser, setCurrentUser] =
+    useState(null);
+  const [userLoading, setUserLoading] =
+    useState(true);
+  const [userError, setUserError] =
+    useState("");
+
+  const currentUserId = String(
+    currentUser?.id || ""
+  );
 
   // Current user's listings
   const myItems = items.filter(
     (item) =>
       String(item.ownerId) ===
-      CURRENT_USER_ID
+      currentUserId
   );
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const token = localStorage.getItem(
+        "access_token"
+      );
+
+      if (!token) {
+        setUserError("Please log in.");
+        setUserLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/auth/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ||
+              "Unable to load user information."
+          );
+        }
+
+        setCurrentUser(data.user);
+      } catch (error) {
+        setUserError(error.message);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   const recentListings = myItems.slice(0, 3);
 
@@ -86,14 +140,14 @@ function Dashboard() {
   const borrowedLoans = activeLoans.filter(
     (loan) =>
       String(loan.borrowerId) ===
-        CURRENT_USER_ID ||
+        currentUserId ||
       loan.loanType === "borrowed"
   );
 
   const lentLoans = activeLoans.filter(
     (loan) =>
       String(loan.ownerId) ===
-        CURRENT_USER_ID ||
+        currentUserId ||
       loan.loanType === "lent"
   );
 
@@ -240,6 +294,19 @@ const formatReminderDate = (dueDate) => {
     setNotice(result.message);
   };
 
+  const firstName =
+    currentUser?.profile?.first_name ||
+    "Neighbor";
+
+  const lastName =
+    currentUser?.profile?.last_name || "";
+
+  const fullName = `${firstName} ${lastName}`.trim();
+
+  const initials =
+    `${firstName.charAt(0)}${lastName.charAt(0)}`
+      .toUpperCase() || "N";
+
   return (
     <div className="neighborly-app">
       <main className="dashboard-main">
@@ -270,11 +337,11 @@ const formatReminderDate = (dueDate) => {
 
             <div className="profile">
               <span className="profile-avatar">
-                WJ
+                {initials}
               </span>
 
               <div className="profile-details">
-                <strong>Wanja Juma</strong>
+                <strong>{fullName}</strong>
                 <small>Member</small>
               </div>
 
@@ -311,7 +378,17 @@ const formatReminderDate = (dueDate) => {
                 {currentDate}
               </p>
 
-              <h1>Welcome back, Wanja!</h1>
+              <h1>
+                {userLoading
+                  ? "Welcome back"
+                  : `Welcome back, ${firstName}`}
+              </h1>
+
+              {userError && (
+                <p className="user-error" role="alert">
+                  {userError}
+                </p>
+              )}
 
               <p className="welcome-description">
                 Here is what is happening in your
@@ -537,7 +614,7 @@ const formatReminderDate = (dueDate) => {
 
                   const isBorrowed =
                     String(loan.borrowerId) ===
-                      CURRENT_USER_ID ||
+                      currentUserId ||
                     loan.loanType ===
                       "borrowed";
 
