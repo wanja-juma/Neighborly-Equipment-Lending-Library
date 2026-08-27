@@ -38,3 +38,6 @@ class BorrowingRequest(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    item = db.relationship("Item", backref="borrowing_requests")
+    borrower = db.relationship("User", backref="borrowing_requests")
