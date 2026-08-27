@@ -44,3 +44,15 @@ class BorrowingRequest(db.Model):
 
     def owner(self):
         return self.item.owner_id if self.item else None
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "item_id": self.item_id,
+            "borrower_id": self.borrower_id,
+            "owner_id": self.owner(),
+            "status": self.status,
+            "notification": self.notification,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }
