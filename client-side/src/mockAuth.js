@@ -27,3 +27,17 @@ export async function loginUser({ email, password }) {
   }
   return { firstName: user.firstName, lastName: user.lastName, email: user.email }
 }
+
+const LOGIN_KEY = 'neighborly_logged_in'
+
+export function setLoggedIn(user) {
+  localStorage.setItem(LOGIN_KEY, JSON.stringify(user))
+}
+
+export function getLoggedInUser() {
+  return JSON.parse(localStorage.getItem(LOGIN_KEY) || 'null')
+}
+
+export function logoutUser() {
+  localStorage.removeItem(LOGIN_KEY)
+}
