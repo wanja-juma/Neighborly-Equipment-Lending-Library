@@ -3,3 +3,17 @@ from extensions import db
 from models import BorrowingRequest
 
 borrowing_requests_bp = Blueprint("borrowing_requests", __name__, url_prefix="/borrowing-requests")
+
+
+@borrowing_requests_bp.route("", methods=["POST"])
+def create_request():
+    data = request.get_json()
+    new_request = BorrowingRequest(
+        item_id=data["item_id"],
+        borrower_id=data["borrower_id"],
+        status="pending",
+        notification=data.get("notification"),
+    )
+    db.session.add(new_request)
+    db.session.commit()
+    return jsonify(new_request.to_dict()), 201
