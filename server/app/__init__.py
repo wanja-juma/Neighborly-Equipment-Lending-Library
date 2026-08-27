@@ -16,6 +16,10 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    db.init_app(app)
+    migrate.init_app(app, db)
+    jwt.init_app(app)
+    ma.init_app(app)
     ma.init_app(app)
 
     from routes import profile_bp, user_bp
@@ -38,6 +42,21 @@ def create_app(config_class=Config):
         },
     )
 
+    # Import models so they're registered with SQLAlchemy before migrations run
+    from models import (
+        Item,
+        Loan,
+        Membership,
+        Payment,
+        Profile,
+        User,
+    )
+
+    # Register blueprints
+    from routes import profile_bp, user_bp
+
+    app.register_blueprint(user_bp)
+    app.register_blueprint(profile_bp)
     # Import models after creating the app
     
     from models import User  
@@ -46,6 +65,7 @@ def create_app(config_class=Config):
     def health_check():
         return {
             "status": "healthy",
+            "message": "Neighborly API is running.",
             "message": (
                 "Neighborly API is running."
             ),

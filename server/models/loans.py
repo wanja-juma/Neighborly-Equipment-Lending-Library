@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-
+from app.extensions import db
 db = SQLAlchemy()
 
 class Loan(db.Model):

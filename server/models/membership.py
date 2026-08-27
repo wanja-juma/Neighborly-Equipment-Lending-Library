@@ -1,4 +1,4 @@
-from extentions import db
+from app.extensions import db
 
 VALID_STATUSES = ('active', 'inactive', 'suspended')
  
