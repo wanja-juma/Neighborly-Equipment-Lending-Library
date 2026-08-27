@@ -1,22 +1,9 @@
-import { useEffect } from 'react';
+
 import { House, Calendar, Plus, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import heroPhoto from '../assets/hero-photo.jpg';
 import './Home.css';
 
-
 function LandingPage() {
-
-  useEffect(() => { // # this makes the page scroll to the about section when the URL has #about in it
-  if (window.location.hash === '#about') {
-    setTimeout(() => {
-      document.getElementById('about-section')?.scrollIntoView({
-        behavior: 'smooth',
-      });
-    }, 100);
-  }
-}, []);
-
   return (
     <>
       <section className="home">
@@ -42,15 +29,14 @@ function LandingPage() {
           </h1>
 
           <div className="home__actions">
-            <Link to="/browse-tools" className="home__btn home__btn--filled">
+            <button type="button" className="home__btn home__btn--filled">
               <Calendar size={18} />
               Browse Tools
-            </Link>
-
-          <Link to="/listings" className="home__btn home__btn--outline">
+            </button>
+            <button type="button" className="home__btn home__btn--outline">
               <Plus size={18} />
               List Your Tool
-            </Link>  
+            </button>gi
           </div>
 
           <div className="home__social-proof">
