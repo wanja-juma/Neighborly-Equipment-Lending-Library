@@ -4,6 +4,8 @@ from models import BorrowingRequest
 
 borrowing_requests_bp = Blueprint("borrowing_requests", __name__, url_prefix="/borrowing-requests")
 
+VALID_STATUSES = {"pending", "approved", "rejected", "returned", "cancelled"}
+
 
 @borrowing_requests_bp.route("", methods=["POST"])
 def create_request():
@@ -56,6 +58,10 @@ def update_status(request_id):
         return jsonify({"error": "Borrowing request not found"}), 404
 
     data = request.get_json()
-    br.status = data.get("status")
+    new_status = data.get("status")
+    if new_status not in VALID_STATUSES:
+        return jsonify({"error": f"Invalid status. Must be one of {sorted(VALID_STATUSES)}"}), 400
+
+    br.status = new_status
     db.session.commit()
     return jsonify(br.to_dict()), 200
