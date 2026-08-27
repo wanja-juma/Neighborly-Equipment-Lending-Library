@@ -80,12 +80,7 @@ export async function logoutUser() {
 
     await handleResponse(response);
   }
-<<<<<<< Updated upstream
-  return { firstName: user.firstName, lastName: user.lastName, email: user.email }
-}
-=======
 
   localStorage.removeItem("access_token");
   localStorage.removeItem("neighborlyUser");
 }
->>>>>>> Stashed changes
