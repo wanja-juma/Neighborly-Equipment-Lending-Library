@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from extensions import db
+from app.extensions import db
 
 
 class Item(db.Model):
@@ -21,7 +21,7 @@ class Item(db.Model):
     )
 
     owner = db.relationship("User", backref="items")
-    category = db.relationship("Category", backref="items")
+    # category = db.relationship("Category", backref="items")  # TEMP: Category model missing
 
     def __repr__(self):
         return f"<Item {self.id} {self.name!r}>"
