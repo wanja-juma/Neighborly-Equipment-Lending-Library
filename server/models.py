@@ -8,3 +8,7 @@ class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    category_id = db.Column(db.Integer)
+    condition = db.Column(db.String(50))
+    status = db.Column(db.String(50))
