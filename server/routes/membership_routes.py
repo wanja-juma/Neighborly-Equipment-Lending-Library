@@ -14,3 +14,16 @@ membership_bp = Blueprint(
  
 membership_schema = MembershipSchema()
 
+@membership_bp.get("/<int:membership_id>")
+@jwt_required()
+def get_membership(membership_id):
+    membership = db.session.get(Membership, membership_id)
+ 
+    if membership is None:
+        return jsonify({"error": "Membership not found."}), 404
+ 
+    current_user_id = int(get_jwt_identity())
+    if membership.user_id != current_user_id:
+        return jsonify({"error": "You are not authorized to view this membership."}), 403
+ 
+    return jsonify({"membership": membership_schema.dump(membership)}), 200
