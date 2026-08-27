@@ -47,3 +47,15 @@ def get_request(request_id):
     if not br:
         return jsonify({"error": "Borrowing request not found"}), 404
     return jsonify(br.to_dict()), 200
+
+
+@borrowing_requests_bp.route("/<int:request_id>/status", methods=["PATCH"])
+def update_status(request_id):
+    br = BorrowingRequest.query.get(request_id)
+    if not br:
+        return jsonify({"error": "Borrowing request not found"}), 404
+
+    data = request.get_json()
+    br.status = data.get("status")
+    db.session.commit()
+    return jsonify(br.to_dict()), 200
