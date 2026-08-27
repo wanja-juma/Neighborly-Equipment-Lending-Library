@@ -1,7 +1,8 @@
 from flask_marshmallow import Marshmallow
 from marshmallow import fields, validate
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from models import Loan
+from server.models.loans import Loan
+from server.schemas.borrowing_requests_schemas import BorrowingRequestSchema
 
 ma = Marshmallow()
 
@@ -11,7 +12,6 @@ class LoanSchema(SQLAlchemyAutoSchema):
         load_instance = True
         include_fk = True
 
-    # Explicit field definitions for strict serialization / deserialization
     status = fields.String(validate=validate.OneOf(["pending", "approved", "rejected", "returned"]))
     requested_at = fields.DateTime(format="%Y-%m-%dT%H:%M:%S", dump_only=True)
     approved_at = fields.DateTime(format="%Y-%m-%dT%H:%M:%S", allow_none=True)
@@ -19,6 +19,9 @@ class LoanSchema(SQLAlchemyAutoSchema):
     created_at = fields.DateTime(format="%Y-%m-%dT%H:%M:%S", dump_only=True)
     start_date = fields.Date(format="%Y-%m-%d", allow_none=True)
     due_date = fields.Date(format="%Y-%m-%d", allow_none=True)
+    
+    
+    borrowing_requests = fields.Nested(BorrowingRequestSchema, many=True, dump_only=True)
 
 loan_schema = LoanSchema()
 loans_schema = LoanSchema(many=True)
