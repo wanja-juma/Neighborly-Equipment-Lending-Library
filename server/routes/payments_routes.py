@@ -13,3 +13,15 @@ payment_bp = Blueprint(
 )
  
 payment_schema = PaymentSchema()
+
+
+def _is_authorized_for_loan(loan, user_id):
+    """Either the borrower or the item's owner may access a payment on this loan."""
+    if loan is None:
+        return False
+    if loan.borrower_id == user_id:
+        return True
+    if loan.item and loan.item.owner_id == user_id:
+        return True
+    return False
+    
