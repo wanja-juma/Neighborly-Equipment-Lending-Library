@@ -27,5 +27,15 @@ def create_request():
 
 @borrowing_requests_bp.route("", methods=["GET"])
 def list_requests():
-    requests = BorrowingRequest.query.order_by(BorrowingRequest.created_at.desc()).all()
+    query = BorrowingRequest.query
+
+    borrower_id = request.args.get("borrower_id")
+    if borrower_id:
+        query = query.filter_by(borrower_id=borrower_id)
+
+    item_id = request.args.get("item_id")
+    if item_id:
+        query = query.filter_by(item_id=item_id)
+
+    requests = query.order_by(BorrowingRequest.created_at.desc()).all()
     return jsonify([r.to_dict() for r in requests]), 200
