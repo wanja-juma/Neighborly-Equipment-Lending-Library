@@ -1,13 +1,23 @@
 from flask import Blueprint, request, jsonify
-from extensions import db
+from flask_jwt_extended import jwt_required
+from app.extensions import db
 from models import BorrowingRequest
+from schemas import BorrowingRequestSchema
 
-borrowing_requests_bp = Blueprint("borrowing_requests", __name__, url_prefix="/borrowing-requests")
+borrowing_requests_bp = Blueprint(
+    "borrowing_requests",
+    __name__,
+    url_prefix="/api/borrowing-requests",
+)
+
+borrowing_request_schema = BorrowingRequestSchema()
+borrowing_requests_schema = BorrowingRequestSchema(many=True)
 
 VALID_STATUSES = {"pending", "approved", "rejected", "returned", "cancelled"}
 
 
-@borrowing_requests_bp.route("", methods=["POST"])
+@borrowing_requests_bp.post("")
+@jwt_required()
 def create_request():
     data = request.get_json()
 
@@ -24,10 +34,11 @@ def create_request():
     )
     db.session.add(new_request)
     db.session.commit()
-    return jsonify(new_request.to_dict()), 201
+    return jsonify({"borrowing_request": borrowing_request_schema.dump(new_request)}), 201
 
 
-@borrowing_requests_bp.route("", methods=["GET"])
+@borrowing_requests_bp.get("")
+@jwt_required()
 def list_requests():
     query = BorrowingRequest.query
 
@@ -40,22 +51,24 @@ def list_requests():
         query = query.filter_by(item_id=item_id)
 
     requests = query.order_by(BorrowingRequest.created_at.desc()).all()
-    return jsonify([r.to_dict() for r in requests]), 200
+    return jsonify({"borrowing_requests": borrowing_requests_schema.dump(requests)}), 200
 
 
-@borrowing_requests_bp.route("/<int:request_id>", methods=["GET"])
+@borrowing_requests_bp.get("/<int:request_id>")
+@jwt_required()
 def get_request(request_id):
-    br = BorrowingRequest.query.get(request_id)
-    if not br:
-        return jsonify({"error": "Borrowing request not found"}), 404
-    return jsonify(br.to_dict()), 200
+    br = db.session.get(BorrowingRequest, request_id)
+    if br is None:
+        return jsonify({"error": "Borrowing request not found."}), 404
+    return jsonify({"borrowing_request": borrowing_request_schema.dump(br)}), 200
 
 
-@borrowing_requests_bp.route("/<int:request_id>/status", methods=["PATCH"])
+@borrowing_requests_bp.patch("/<int:request_id>/status")
+@jwt_required()
 def update_status(request_id):
-    br = BorrowingRequest.query.get(request_id)
-    if not br:
-        return jsonify({"error": "Borrowing request not found"}), 404
+    br = db.session.get(BorrowingRequest, request_id)
+    if br is None:
+        return jsonify({"error": "Borrowing request not found."}), 404
 
     data = request.get_json()
     new_status = data.get("status")
@@ -64,14 +77,15 @@ def update_status(request_id):
 
     br.status = new_status
     db.session.commit()
-    return jsonify(br.to_dict()), 200
+    return jsonify({"borrowing_request": borrowing_request_schema.dump(br)}), 200
 
 
-@borrowing_requests_bp.route("/<int:request_id>", methods=["DELETE"])
+@borrowing_requests_bp.delete("/<int:request_id>")
+@jwt_required()
 def delete_request(request_id):
-    br = BorrowingRequest.query.get(request_id)
-    if not br:
-        return jsonify({"error": "Borrowing request not found"}), 404
+    br = db.session.get(BorrowingRequest, request_id)
+    if br is None:
+        return jsonify({"error": "Borrowing request not found."}), 404
 
     db.session.delete(br)
     db.session.commit()

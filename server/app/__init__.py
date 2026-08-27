@@ -1,6 +1,6 @@
 from flask import Flask
 from models import Profile, User  
-from routes import profile_bp, user_bp
+from routes import profile_bp, user_bp, borrowing_requests_bp
 
 from app.config import Config
 from app.extensions import (
@@ -18,10 +18,11 @@ def create_app(config_class=Config):
 
     ma.init_app(app)
 
-    from routes import profile_bp, user_bp
+    from routes import profile_bp, user_bp, borrowing_requests_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(borrowing_requests_bp)
 
     db.init_app(app)
     migrate.init_app(app, db)
