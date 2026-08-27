@@ -37,7 +37,7 @@ def create_membership():
         return jsonify({"error": "Request body is required."}), 400
  
     current_user_id = int(get_jwt_identity())
-    json_data["user_id"] = current_user_id  # always tie to the logged-in user, never trust the body
+    json_data["user_id"] = current_user_id  
  
     try:
         membership = membership_schema.load(json_data, session=db.session)
@@ -48,3 +48,12 @@ def create_membership():
     db.session.commit()
  
     return jsonify({"membership": membership_schema.dump(membership)}), 201
+
+
+@membership_bp.patch("/<int:membership_id>")
+@jwt_required()
+def update_membership(membership_id):
+    membership = db.session.get(Membership, membership_id)
+ 
+    if membership is None:
+        return jsonify({"error": "Membership not found."}), 404
