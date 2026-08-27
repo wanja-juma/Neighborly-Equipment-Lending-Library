@@ -12,3 +12,5 @@ class Item(db.Model):
     category_id = db.Column(db.Integer)
     condition = db.Column(db.String(50))
     status = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
