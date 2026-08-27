@@ -41,3 +41,6 @@ class BorrowingRequest(db.Model):
 
     item = db.relationship("Item", backref="borrowing_requests")
     borrower = db.relationship("User", backref="borrowing_requests")
+
+    def owner(self):
+        return self.item.owner_id if self.item else None
