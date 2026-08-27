@@ -30,3 +30,5 @@ class BorrowingRequest(db.Model):
     __tablename__ = "borrowing_requests"
 
     id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id", ondelete="CASCADE"), nullable=False)
+    borrower_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
