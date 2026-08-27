@@ -17,7 +17,3 @@ class Loan(db.Model):
     due_date = db.Column(db.Date, nullable=True)
     returned_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    
-    item = db.relationship('Item', backref='loans')
-    borrower = db.relationship('User', backref='loans')
