@@ -1,119 +1,92 @@
 from flask import Blueprint, jsonify, request
-from werkzeug.security import generate_password_hash
+from flask_jwt_extended import (
+    create_access_token,
+    get_jwt_identity,
+    jwt_required,
+)
+from marshmallow import ValidationError
 
+from app.extensions import db
+from models import Profile, User
+from schemas import ProfileSchema, UserSchema
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
-REQUIRED_FIELDS = ("firstName", "lastName", "email", "password")
+user_schema = UserSchema()
+profile_schema = ProfileSchema()
 
 
 @auth_bp.post("/register")
 def register():
     data = request.get_json(silent=True) or {}
 
-    missing = [field for field in REQUIRED_FIELDS if not data.get(field)]
-    if missing:
-        return (
-            jsonify({"message": f"Missing required field(s): {', '.join(missing)}"}),
-            400,
+    try:
+        user = user_schema.load(
+            {"email": data.get("email"), "password": data.get("password")}
         )
+    except ValidationError as err:
+        return jsonify({"message": "Validation failed", "errors": err.messages}), 400
 
-    first_name = data["firstName"].strip()
-    last_name = data["lastName"].strip()
-    email = data["email"].strip().lower()
-    password = data["password"]
+    if db.session.query(User).filter_by(email=user.email).first():
+        return jsonify({"message": "An account with that email already exists"}), 409
 
-    if "@" not in email or "." not in email.split("@")[-1]:
-        return jsonify({"message": "Please enter a valid email address"}), 400
+    db.session.add(user)
+    db.session.flush()  # assigns user.id, needed for the profile's FK
 
-    if len(password) < 8:
-        return jsonify({"message": "Password must be at least 8 characters"}), 400
-
-    password_hash = generate_password_hash(password)
-
-
-    return (
-        jsonify(
+    try:
+        profile = profile_schema.load(
             {
-                "message": "Validation passed, but the User model isn't implemented yet "
-                "so registration can't be persisted.",
-                "received": {
-                    "firstName": first_name,
-                    "lastName": last_name,
-                    "email": email,
-                },
+                "user_id": user.id,
+                "first_name": data.get("firstName"),
+                "last_name": data.get("lastName"),
             }
-        ),
-        501,
-    )
+        )
+    except ValidationError as err:
+        db.session.rollback()
+        return jsonify({"message": "Validation failed", "errors": err.messages}), 400
+
+    db.session.add(profile)
+    db.session.commit()
+
+    token = create_access_token(identity=str(user.id))
+
+    return jsonify({"user": user_schema.dump(user), "accessToken": token}), 201
 
 
 @auth_bp.post("/login")
 def login():
     data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
 
-    missing = [field for field in ("email", "password") if not data.get(field)]
-    if missing:
-        return (
-            jsonify({"message": f"Missing required field(s): {', '.join(missing)}"}),
-            400,
-        )
+    if not email or not password:
+        return jsonify({"message": "Missing required field(s): email, password"}), 400
 
-    email = data["email"].strip().lower()
+    user = db.session.query(User).filter_by(email=email).first()
+    if user is None or not user.check_password(password):
+        return jsonify({"message": "Invalid email or password"}), 401
 
+    token = create_access_token(identity=str(user.id))
 
-    return (
-        jsonify(
-            {
-                "message": "Validation passed, but the User model isn't implemented yet "
-                "so login can't be verified.",
-                "received": {"email": email},
-            }
-        ),
-        501,
-    )
+    return jsonify({"user": user_schema.dump(user), "accessToken": token})
 
 
 @auth_bp.get("/me")
+@jwt_required()
 def me():
-    auth_header = request.headers.get("Authorization", "")
+    user = db.session.get(User, int(get_jwt_identity()))
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
 
-    if not auth_header.startswith("Bearer "):
-        return jsonify({"message": "Missing or invalid Authorization header"}), 401
-
-    token = auth_header.removeprefix("Bearer ").strip()
-    if not token:
-        return jsonify({"message": "Missing or invalid Authorization header"}), 401
-    
-    return (
-        jsonify(
-            {
-                "message": "Authorization header present, but token verification isn't "
-                "implemented yet so the current user can't be resolved.",
-            }
-        ),
-        501,
-    )
+    return jsonify({"user": user_schema.dump(user)})
 
 
 @auth_bp.post("/logout")
+@jwt_required()
 def logout():
-    auth_header = request.headers.get("Authorization", "")
-
-    if not auth_header.startswith("Bearer "):
-        return jsonify({"message": "Missing or invalid Authorization header"}), 401
-
-    token = auth_header.removeprefix("Bearer ").strip()
-    if not token:
-        return jsonify({"message": "Missing or invalid Authorization header"}), 401
-
-
-    return (
-        jsonify(
-            {
-                "message": "Authorization header present, but token revocation isn't "
-                "implemented yet so nothing was actually invalidated.",
-            }
-        ),
-        501,
-    )
+    # JWTs are stateless here -- there's no server-side session or token
+    # blocklist to clear, so this just confirms the token was valid. The
+    # frontend is responsible for discarding its stored token. If real
+    # server-side revocation is needed later, wire up flask_jwt_extended's
+    # token-blocklist support (a revoked-JTI table + jwt.token_in_blocklist_loader).
+    return jsonify({"message": "Logged out"})
