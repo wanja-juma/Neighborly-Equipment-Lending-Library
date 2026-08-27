@@ -65,3 +65,14 @@ def update_status(request_id):
     br.status = new_status
     db.session.commit()
     return jsonify(br.to_dict()), 200
+
+
+@borrowing_requests_bp.route("/<int:request_id>", methods=["DELETE"])
+def delete_request(request_id):
+    br = BorrowingRequest.query.get(request_id)
+    if not br:
+        return jsonify({"error": "Borrowing request not found"}), 404
+
+    db.session.delete(br)
+    db.session.commit()
+    return jsonify({"message": "Deleted"}), 200
