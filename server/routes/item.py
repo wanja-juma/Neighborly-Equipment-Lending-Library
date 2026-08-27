@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from extensions import db
+from app.extensions import db
 from models.item import Item
 
 items_bp = Blueprint("items", __name__, url_prefix="/api/items")
@@ -139,8 +139,6 @@ def delete_item(item_id):
     return jsonify({"message": "Item deleted", "id": item_id})
 
 
-# "My listings" lives under /users, not /items, so it gets its own blueprint.
-# Whoever wires up the Flask app needs to register this alongside items_bp.
 users_bp = Blueprint("users_items", __name__, url_prefix="/api/users")
 
 
