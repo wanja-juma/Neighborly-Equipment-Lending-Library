@@ -1,0 +1,32 @@
+.item-detail {
+  padding: 2rem 1.5rem;
+  max-width: 700px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #1e5631;
+  text-decoration: none;
+}
+
+.item-condition {
+  color: #666;
+}
+
+.item-rate {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1e5631;
+}
+
+.borrow-btn {
+  background-color: #1e5631;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.4rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
