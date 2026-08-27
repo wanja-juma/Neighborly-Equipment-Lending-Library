@@ -23,6 +23,7 @@ class User(db.Model):
     updated_at = db.Column( db.DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc),)
        
     profile = db.relationship("Profile", back_populates="user",  uselist=False, cascade="all, delete-orphan",)
+    memberships = db.relationship("Membership", back_populates="user")
         
     @validates("email")
     def validate_email(self, key, value):

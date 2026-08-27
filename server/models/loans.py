@@ -1,7 +1,5 @@
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
 from app.extensions import db
-db = SQLAlchemy()
 
 class Loan(db.Model):
     __tablename__ = 'loans'
@@ -21,3 +19,4 @@ class Loan(db.Model):
     
     item = db.relationship('Item', backref='loans')
     borrower = db.relationship('User', backref='loans')
+    payment = db.relationship('Payment', back_populates='loan', uselist=False, cascade='all, delete-orphan')

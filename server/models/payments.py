@@ -15,4 +15,4 @@ class Payment(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())   
 
-    loan = db.relationship('Loan', back_populates='paymeants')
+    loan = db.relationship('Loan', back_populates='payment')
