@@ -24,4 +24,12 @@ def _is_authorized_for_loan(loan, user_id):
     if loan.item and loan.item.owner_id == user_id:
         return True
     return False
-    
+
+
+@payment_bp.get("/<int:payment_id>")
+@jwt_required()
+def get_payment(payment_id):
+    payment = db.session.get(Payment, payment_id)
+ 
+    if payment is None:
+        return jsonify({"error": "Payment not found."}), 404
