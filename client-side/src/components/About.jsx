@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import './About.css';
 import { 
   Calendar, 
@@ -21,6 +21,21 @@ export default function LandingPage1() {
   const toggleFaq = (index) => {
     setFaqOpen(faqOpen === index ? null : index);
   };
+
+  const topLoanedTools = [
+    {
+      name: "Electric Drill",
+      image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      name: "Garden Mower",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNdSZY0xmXVuGqwst-llD7ZBOpnJknjTUnhK1nHChnPA&s=10"
+    },
+    {
+      name: "Jembe",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXFB5OqgDO0_PWypT7aUDSHlLzno7-Q-gGvJePJnzTTQ&s=10"
+    }
+  ];
 
   const testimonials = [
     {
@@ -205,6 +220,32 @@ export default function LandingPage1() {
                   <h4 className="font-bold text-sm text-slate-900">{item.name}</h4>
                   <p className="text-xs text-slate-500">{item.role}</p>
                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Most Loaned Tools Section */}
+      <section className="section">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-slate-900">Most Loaned Tools by Neighbors</h2>
+          <p className="text-slate-600 text-sm mt-1">Check out the most popular tools available in your community.</p>
+        </div>
+
+        <div className="grid">
+          {topLoanedTools.map((tool, idx) => (
+            <div key={idx} className="card" style={{ padding: '0', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '180px', backgroundColor: '#f1f5f9' }}>
+                <img 
+                  src={tool.image} 
+                  alt={tool.name} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              </div>
+              <div style={{ padding: '20px', textAlign: 'left' }}>
+                <h3 className="card-title" style={{ marginBottom: '4px' }}>{tool.name}</h3>
+                <p className="card-desc">{tool.condition}</p>
               </div>
             </div>
           ))}

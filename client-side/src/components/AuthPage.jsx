@@ -38,6 +38,14 @@ function AuthPage() {
     }));
   };
 
+  const updateName = (field) => (event) => {
+    const lettersOnly = event.target.value.replace(/[^A-Za-z\s'-]/g, "");
+    setForm((currentForm) => ({
+      ...currentForm,
+      [field]: lettersOnly,
+    }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -48,6 +56,18 @@ function AuthPage() {
     ) {
       setError(
         "Please enter your first and last name."
+      );
+      return;
+    }
+
+    const NAME_PATTERN = /^[A-Za-z\s'-]+$/;
+    if (
+      isRegister &&
+      (!NAME_PATTERN.test(form.firstName.trim()) ||
+        !NAME_PATTERN.test(form.lastName.trim()))
+    ) {
+      setError(
+        "Names can only contain letters."
       );
       return;
     }
@@ -183,8 +203,9 @@ function AuthPage() {
 
                   <input
                     type="text"
+                    pattern="[A-Za-z\s'-]+"
                     value={form.firstName}
-                    onChange={update(
+                    onChange={updateName(
                       "firstName"
                     )}
                     autoComplete="given-name"
@@ -196,8 +217,9 @@ function AuthPage() {
 
                   <input
                     type="text"
+                    pattern="[A-Za-z\s'-]+"
                     value={form.lastName}
-                    onChange={update(
+                    onChange={updateName(
                       "lastName"
                     )}
                     autoComplete="family-name"
