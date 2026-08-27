@@ -40,3 +40,26 @@ def get_payment(payment_id):
         return jsonify({"error": "You are not authorized to view this payment."}), 403
  
     return jsonify({"payment": payment_schema.dump(payment)}), 200
+
+
+@payment_bp.post("")
+@jwt_required()
+def create_payment():
+    json_data = request.get_json(silent=True)
+    if not json_data:
+        return jsonify({"error": "Request body is required."}), 400
+ 
+    current_user_id = int(get_jwt_identity())
+    loan = db.session.get(Loan, json_data.get("loan_id"))
+    if not _is_authorized_for_loan(loan, current_user_id):
+        return jsonify({"error": "You are not authorized to create a payment for this loan."}), 403
+ 
+    try:
+        payment = payment_schema.load(json_data, session=db.session)
+    except ValidationError as error:
+        return jsonify({"error": "Validation failed.", "details": error.messages}), 400
+ 
+    db.session.add(payment)
+    db.session.commit()
+ 
+    return jsonify({"payment": payment_schema.dump(payment)}), 201
