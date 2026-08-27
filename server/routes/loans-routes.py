@@ -1,19 +1,18 @@
 from flask import request
 from flask_restful import Resource
 from marshmallow import ValidationError
-from models import db, Loan
-from schemas import loan_schema, loans_schema
+from server.models import db
+from server.models.loans import Loan
+from server.schemas.loans_schemas import loan_schema, loans_schema
 
 class LoanListResource(Resource):
     def get(self):
         loans = Loan.query.all()
-        # Full Serialization (Objects -> JSON)
         return loans_schema.dump(loans), 200
 
     def post(self):
         json_data = request.get_json()
         try:
-            # Full Deserialization & Validation (JSON -> SQLAlchemy Object)
             new_loan = loan_schema.load(json_data, session=db.session)
             db.session.add(new_loan)
             db.session.commit()
@@ -30,9 +29,7 @@ class LoanResource(Resource):
     def patch(self, loan_id):
         loan = Loan.query.get_or_404(loan_id, description="Loan record not found")
         json_data = request.get_json()
-        
         try:
-            # Partial Deserialization & Update
             updated_loan = loan_schema.load(json_data, instance=loan, partial=True, session=db.session)
             db.session.commit()
             return loan_schema.dump(updated_loan), 200
