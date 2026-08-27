@@ -63,3 +63,18 @@ def create_payment():
     db.session.commit()
  
     return jsonify({"payment": payment_schema.dump(payment)}), 201
+
+
+@payment_bp.patch("/<int:payment_id>/refund")
+@jwt_required()
+def refund_payment(payment_id):
+    payment = db.session.get(Payment, payment_id)
+ 
+    if payment is None:
+        return jsonify({"error": "Payment not found."}), 404
+ 
+    current_user_id = int(get_jwt_identity())
+    loan = db.session.get(Loan, payment.loan_id)
+    # Refunding is an owner action, not a borrower one.
+    if not (loan and loan.item and loan.item.owner_id == current_user_id):
+        return jsonify({"error": "Only the item's owner can issue a refund."}), 403
