@@ -1,28 +1,47 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import AuthPage from "./components/AuthPage.jsx";
-import About from "./components/About";
+import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import Home from "./components/Home";
+import About from "./components/About";
+import BrowseTools from "./components/BrowseTools";
+import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
-import Home from "./components/Home";
-import BrowseItems from "./pages/BrowseItems";
-import DamageReports from "./pages/DamageReports";
-import Loans from "./pages/Loans";
-import MyListings from "./pages/MyListings";
-import Requests from "./pages/Requests";
-import AddItem from "./pages/AddItem";
-import EditItem from "./pages/EditItem";
-
+import BrowseItems from "./Pages/BrowseItems";
+import AddItem from "./Pages/AddItem";
+import EditItem from "./Pages/EditItem";
+import MyListings from "./Pages/MyListings";
+import Requests from "./Pages/Requests";
+import Loans from "./Pages/Loans";
+import DamageReports from "./Pages/DamageReports";
 import ItemsProvider from "./context/ItemsProvider";
-import RequestProvider from "./context/RequestsProvider";
-import LoansProvider from "./context/LoansProvider.jsx";
-import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
-
+import RequestsProvider from "./context/RequestsProvider";
+import LoansProvider from "./context/LoansProvider";
+import DamageReportsProvider from "./context/DamageReportsProvider";
+import AuthProvider from "./context/AuthProvider.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import "./App.css";
 
 function App() {
   const location = useLocation();
+
+  useEffect(() => { // # this makes the page scroll to the about section when the URL has #about in it
+  if (location.hash) {
+    const element = document.getElementById(
+      location.hash.substring(1)
+    );
+
+    if (element) {
+      setTimeout(() => {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 0);
+    }
+  }
+}, [location]);
 
   const dashboardRoutePrefixes = [
     "/dashboard",
@@ -40,43 +59,78 @@ function App() {
   );
 
   return (
+    <AuthProvider>
     <ItemsProvider>
-      <RequestProvider>
+      <RequestsProvider>
         <LoansProvider>
           <DamageReportsProvider>
             <Navbar />
+
             <div className="app-content">
               <Routes>
-                {/* Landing page */}
-                <Route path="/" element={<Home />} />
-                
+
+                              {/* Landing page */}
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <Home />
+                      <About />
+                    </>
+                  }
+                />
+
                 {/* About page */}
-                <Route path="/about" element={<About />} />
-                
+                <Route
+                  path="/about"
+                  element={
+                    <>
+                      <Home />
+                      <About />
+                    </>
+                  }
+                />
+
+                {/* Browse tools */}
+                <Route path="/browse-tools" element={<BrowseTools />} />
+
                 {/* Authentication */}
+
                 <Route path="/auth" element={<AuthPage />} />
 
-                {/* Dashboard pages */}
-                <Route element={<DashboardLayout />}>
+                <Route
+  element={
+    <ProtectedRoute>
+      <DashboardLayout />
+    </ProtectedRoute>
+  }
+>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/items" element={<BrowseItems />} />
                   <Route path="/items/new" element={<AddItem />} />
                   <Route path="/listings" element={<MyListings />} />
-                  <Route path="/listings/:itemId/edit" element={<EditItem />} />
+                  <Route
+                    path="/listings/:itemId/edit"
+                    element={<EditItem />}
+                  />
                   <Route path="/requests" element={<Requests />} />
                   <Route path="/loans" element={<Loans />} />
-                  <Route path="/damage-reports" element={<DamageReports />} />
+                  <Route
+                    path="/damage-reports"
+                    element={<DamageReports />}
+                  />
                 </Route>
 
-                {/* 404 - Not Found */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
+
             {!isDashboardRoute && <Footer />}
           </DamageReportsProvider>
         </LoansProvider>
-      </RequestProvider>
+      </RequestsProvider>
     </ItemsProvider>
+    </AuthProvider>
   );
 }
 

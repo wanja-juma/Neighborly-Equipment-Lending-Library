@@ -2,6 +2,7 @@
     "_meta": {
         "hash": {
             "sha256": "9aabf8c47bd251b42fbba29ef69ad08ea4ec5959d239af963cfea92e5f571cb0"
+            "sha256": "801bef6faf738d250be6ffd54a939141855148e9b664c3f3bdde8d7452e67db6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -69,6 +70,14 @@
             "index": "pypi",
             "markers": "python_version >= '3.10' and python_version < '4'",
             "version": "==4.7.4"
+        "flask-marshmallow": {
+            "hashes": [
+                "sha256:7c06b56e41647eccdb3cd57c25b109f19191b4c62509362bd64920cdf601a066",
+                "sha256:99951c77e5654111ed733811c6dc9310bfb4c3688c78a9e76f80b5ae0b2279a6"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.10'",
+            "version": "==1.5.0"
         },
         "flask-migrate": {
             "hashes": [
@@ -172,6 +181,7 @@
             ],
             "index": "pypi",
             "markers": "python_version >= '3.10'",
+            "markers": "platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))",
             "version": "==3.5.5"
         },
         "itsdangerous": {
@@ -397,6 +407,17 @@
             "index": "pypi",
             "markers": "python_version >= '3.10'",
             "version": "==1.2.3"
+            "markers": "python_version >= '3.10'",
+            "version": "==4.3.1"
+        },
+        "marshmallow-sqlalchemy": {
+            "hashes": [
+                "sha256:3865232672f3dd38c4d5e4e85fdedce76904200742c3594948a2d11d0af93258",
+                "sha256:e51192c204770645a2fab0d72f44f8789272eef75951f84b1608d6b4b0bfe0e6"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.10'",
+            "version": "==1.5.0"
         },
         "sqlalchemy": {
             "hashes": [

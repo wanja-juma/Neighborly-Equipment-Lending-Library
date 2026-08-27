@@ -174,7 +174,9 @@
   }
 }
 
-
+html {
+  scroll-behavior: smooth;
+}
 
 
 
