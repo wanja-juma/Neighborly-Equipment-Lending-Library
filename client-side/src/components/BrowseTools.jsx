@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { getTools } from '../services/tools';
 import './BrowseTools.css';
@@ -7,7 +8,7 @@ function BrowseTools() {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
- 
+
   useEffect(() => {
     getTools()
       .then((data) => {
@@ -23,7 +24,7 @@ function BrowseTools() {
   if (loading) {
     return <p className="browse-tools__status">Loading tools…</p>;
   }
- 
+
   if (error) {
     return (
       <p className="browse-tools__status browse-tools__status--error">
@@ -32,12 +33,12 @@ function BrowseTools() {
     );
   }
 
-    return (
+  return (
     <section className="browse-tools">
       <h2 className="browse-tools__heading">Browse tools</h2>
       <div className="browse-tools__grid">
         {tools.map((tool) => (
-          <div className="tool-card" key={tool.id}>
+          <Link to={`/tools/${tool.id}`} key={tool.id} className="tool-card">
             <div className="tool-card__image-wrap">
               <img
                 src={tool.imageUrl}
@@ -56,11 +57,11 @@ function BrowseTools() {
                 <MapPin size={14} /> {tool.distanceKm} km away
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
   );
 }
- 
+
 export default BrowseTools;

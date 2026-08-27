@@ -1,5 +1,7 @@
 from datetime import datetime
-from server.models import db
+from flask_sqlalchemy import SQLAlchemy
+from app.extensions import db
+db = SQLAlchemy()
 
 class Loan(db.Model):
     __tablename__ = 'loans'
