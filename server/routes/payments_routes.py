@@ -26,7 +26,7 @@ def _is_authorized_for_loan(loan, user_id):
     return False
 
 
-payment_bp.get("/<int:payment_id>")
+@payment_bp.get("/<int:payment_id>")
 @jwt_required()
 def get_payment(payment_id):
     payment = db.session.get(Payment, payment_id)
@@ -38,3 +38,5 @@ def get_payment(payment_id):
     loan = db.session.get(Loan, payment.loan_id)
     if not _is_authorized_for_loan(loan, current_user_id):
         return jsonify({"error": "You are not authorized to view this payment."}), 403
+ 
+    return jsonify({"payment": payment_schema.dump(payment)}), 200
