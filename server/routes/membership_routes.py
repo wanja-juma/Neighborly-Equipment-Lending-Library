@@ -27,3 +27,24 @@ def get_membership(membership_id):
         return jsonify({"error": "You are not authorized to view this membership."}), 403
  
     return jsonify({"membership": membership_schema.dump(membership)}), 200
+
+
+@membership_bp.post("")
+@jwt_required()
+def create_membership():
+    json_data = request.get_json(silent=True)
+    if not json_data:
+        return jsonify({"error": "Request body is required."}), 400
+ 
+    current_user_id = int(get_jwt_identity())
+    json_data["user_id"] = current_user_id  # always tie to the logged-in user, never trust the body
+ 
+    try:
+        membership = membership_schema.load(json_data, session=db.session)
+    except ValidationError as error:
+        return jsonify({"error": "Validation failed.", "details": error.messages}), 400
+ 
+    db.session.add(membership)
+    db.session.commit()
+ 
+    return jsonify({"membership": membership_schema.dump(membership)}), 201
