@@ -3,6 +3,19 @@
 /.pnp
 .pnp.js
 
+.env
+venv/
+__pycache__/
+*.pyc
+
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+server/venv/
+server/.env
+
 # testing
 /coverage
 
