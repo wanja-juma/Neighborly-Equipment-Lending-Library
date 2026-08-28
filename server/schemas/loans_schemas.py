@@ -1,8 +1,10 @@
 from flask_marshmallow import Marshmallow
 from marshmallow import fields, validate
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from server.models.loans import Loan
-from server.schemas.borrowing_requests_schemas import BorrowingRequestSchema
+from models import Loan
+from schemas.borrowing_request_schemas import (
+    BorrowingRequestSchema,
+)
 
 ma = Marshmallow()
 

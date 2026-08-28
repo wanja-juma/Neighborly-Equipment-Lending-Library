@@ -5,8 +5,8 @@ from app.extensions import (
     cors,
     db,
     jwt,
-    migrate,
     ma,
+    migrate,
 )
 
 
@@ -14,6 +14,7 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # Initialize Flask extensions.
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
@@ -30,52 +31,41 @@ def create_app(config_class=Config):
         },
     )
 
-    # Import models so they're registered with SQLAlchemy before migrations run
-    # Import models so they are registered with SQLAlchemy
-    from models import (
-<<<<<<< HEAD
-        #Item,
-        #Loan,
-        #Membership,
-        #Payment,
-=======
-        Item,
-        Loan,
-        Membership,
-        Payment,
->>>>>>> 95646b29cd6725b7c14f8d5e4181f797d3f8ce53
-        Profile,
-        User,
+    # Load every model so SQLAlchemy and
+    # Flask-Migrate can discover them.
+    import models  # noqa: F401
+
+    # Import application blueprints.
+    from routes import (
+        auth_bp,
+        borrowing_request_bp,
+        items_bp,
+        loan_bp,
+        membership_bp,
+        payment_bp,
+        profile_bp,
+        user_bp,
     )
 
-    from routes import (
-    auth_bp,
-    profile_bp,
-    user_bp,
-)
-
+    # Register every blueprint exactly once.
     app.register_blueprint(auth_bp)
+    app.register_blueprint(
+        borrowing_request_bp
+    )
+    app.register_blueprint(items_bp)
+    app.register_blueprint(loan_bp)
+    app.register_blueprint(membership_bp)
+    app.register_blueprint(payment_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(user_bp)
-
-    # Register blueprints
-    # Register routes
-<<<<<<< HEAD
-   
-
-    
-=======
-    from routes import profile_bp, user_bp
-
-    app.register_blueprint(user_bp)
-    app.register_blueprint(profile_bp)
->>>>>>> 95646b29cd6725b7c14f8d5e4181f797d3f8ce53
 
     @app.get("/api/health")
     def health_check():
         return {
             "status": "healthy",
-            "message": "Neighborly API is running.",
+            "message": (
+                "Neighborly API is running."
+            ),
         }, 200
 
     return app
