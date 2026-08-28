@@ -84,4 +84,3 @@ def refund_payment(payment_id):
     db.session.commit()
 
     return jsonify({"payment": payment_schema.dump(payment)}), 200
-    
