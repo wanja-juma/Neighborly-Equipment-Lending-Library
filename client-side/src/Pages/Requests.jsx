@@ -180,6 +180,7 @@ setNotice(
       request.status?.toLowerCase() ===
       "pending";
 
+<<<<<<< Updated upstream
     const isUpdating =
       updatingRequestId === request.id;
 
@@ -243,6 +244,15 @@ setNotice(
               ? borrowerName
               : ownerName}
           </p>
+=======
+ 
+    return (
+    <main className="dashboard-main">
+    <section className="requests-page">
+      <div className="requests-heading">
+        <div>
+          <h1>Borrowing Requests</h1>
+>>>>>>> Stashed changes
 
           <p>
             <strong>Date range:</strong>{" "}
@@ -478,8 +488,9 @@ setNotice(
           </div>
         </section>
       </section>
-    </main>
-  );
+        </section>
+  </main>
+);
 }
 
 export default Requests;
