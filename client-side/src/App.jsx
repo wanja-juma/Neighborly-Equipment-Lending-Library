@@ -17,13 +17,15 @@ import Loans from "./Pages/Loans";
 import MyListings from "./Pages/MyListings";
 import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
-import EditItem from "./Pages/EditItem";
+import EditItem from "./Pages/EditListing.jsx";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider";
 import DamageReportsProvider from "./context/DamageReportsProvider";
 import AuthProvider from "./context/AuthProvider.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ChangeAvailability from "./Pages/ChangeAvailability";
+import EditListing from "./Pages/EditListing";
 import "./App.css";
 
 function App() {
@@ -70,6 +72,11 @@ function App() {
 
                   {/* About page */}
                   <Route path="/about" element={<><Home /><About /></>} />
+                  <Route path="/listings/:itemId/availability"
+                        element={<ChangeAvailability />} />
+
+                  <Route path="/listings/:itemId/edit"
+                        element={<EditListing />} />
 
                   {/* Browse tools */}
                   <Route path="/browse-tools" element={<BrowseTools />} />

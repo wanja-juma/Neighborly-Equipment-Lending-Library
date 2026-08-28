@@ -30,6 +30,7 @@ def create_app(config_class=Config):
         },
     )
 
+    # Import models so they're registered with SQLAlchemy before migrations run
     # Import models so they are registered with SQLAlchemy
     from models import (
         Item,
@@ -40,6 +41,17 @@ def create_app(config_class=Config):
         User,
     )
 
+    from routes import (
+    auth_bp,
+    profile_bp,
+    user_bp,
+)
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(user_bp)
+
+    # Register blueprints
     # Register routes
     from routes import profile_bp, user_bp
 
