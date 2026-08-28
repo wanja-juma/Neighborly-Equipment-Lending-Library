@@ -1,10 +1,9 @@
 import { useState } from "react";
+import useAuth from "../hooks/useAuth";
 import useRequests from "../hooks/useRequests";
 import useLoans from "../hooks/useLoans";
 import useItems from "../hooks/useItems";
 import "./BrowseItems.css";
-
-const CURRENT_USER_ID = "1";
 
 function Requests() {
   const {
@@ -17,151 +16,120 @@ function Requests() {
 
   const { addLoan } = useLoans();
   const { updateItem } = useItems();
+  const { currentUser } = useAuth();
+
+  const currentUserId = String(currentUser?.id || "");
 
   const [notice, setNotice] = useState("");
-  const [actionError, setActionError] =
-    useState("");
-  const [updatingRequestId, setUpdatingRequestId] =
-    useState(null);
+  const [actionError, setActionError] = useState("");
+  const [updatingRequestId, setUpdatingRequestId] = useState(null);
 
-  const incomingRequests =
-    borrowingRequests.filter(
-      (request) =>
-        String(request.ownerId) ===
-        CURRENT_USER_ID
-    );
-
-  const outgoingRequests =
-    borrowingRequests.filter(
-      (request) =>
-        String(request.borrowerId) ===
-        CURRENT_USER_ID
-    );
-
-  const handleStatusChange = async (
-  requestId,
-  newStatus
-) => {
-  setNotice("");
-  setActionError("");
-  setUpdatingRequestId(requestId);
-
-  const selectedRequest =
-    borrowingRequests.find(
-      (request) =>
-        String(request.id) ===
-        String(requestId)
-    );
-
-  if (!selectedRequest) {
-    setActionError(
-      "The borrowing request could not be found."
-    );
-    setUpdatingRequestId(null);
-    return;
-  }
-
-  const requestResult =
-    await updateRequestStatus(
-      requestId,
-      newStatus
-    );
-
-  if (!requestResult.success) {
-    setActionError(requestResult.message);
-    setUpdatingRequestId(null);
-    return;
-  }
-
-  if (newStatus === "Approved") {
-    const loanResult = await addLoan({
-      requestId: selectedRequest.id,
-      itemId: selectedRequest.itemId,
-
-      item:
-        selectedRequest.item ||
-        selectedRequest.itemName ||
-        "Equipment",
-
-      icon:
-        selectedRequest.itemIcon ||
-        selectedRequest.icon ||
-        "🧰",
-
-      ownerId: selectedRequest.ownerId,
-      borrowerId: selectedRequest.borrowerId,
-
-      ownerName:
-        selectedRequest.ownerName ||
-        selectedRequest.owner ||
-        "Item owner",
-
-      borrowerName:
-        selectedRequest.borrowerName ||
-        selectedRequest.borrower ||
-        "Neighbour",
-
-      person:
-        selectedRequest.borrowerName ||
-        selectedRequest.borrower ||
-        "Neighbour",
-
-      loanType:
-        String(selectedRequest.ownerId) ===
-        CURRENT_USER_ID
-          ? "lent"
-          : "borrowed",
-
-      startDate: selectedRequest.startDate,
-      dueDate: selectedRequest.endDate,
-      status: "On Track",
-    });
-
-    if (!loanResult.success) {
-  setActionError(
-    `The request was approved, but the loan could not be created: ${loanResult.message}`
+  const incomingRequests = borrowingRequests.filter(
+    (request) => String(request.ownerId) === currentUserId
   );
 
-  setUpdatingRequestId(null);
-  return;
-}
-
-try {
-  await updateItem(
-    selectedRequest.itemId,
-    {
-      availability: "Unavailable",
-    }
-  );
-} catch (error) {
-  setActionError(
-    error.message ||
-      "The loan was created, but the item availability could not be updated."
+  const outgoingRequests = borrowingRequests.filter(
+    (request) => String(request.borrowerId) === currentUserId
   );
 
-  setUpdatingRequestId(null);
-  return;
-}
-
-setNotice(
-  "Request approved, active loan created and item marked unavailable."
-);
-  } else {
-    setNotice(requestResult.message);
-  }
-
-  setUpdatingRequestId(null);
-};
-
-  const handleCancelRequest = async (
-    requestId
-  ) => {
+  const handleStatusChange = async (requestId, newStatus) => {
     setNotice("");
     setActionError("");
     setUpdatingRequestId(requestId);
 
-    const result =
-      await cancelBorrowingRequest(requestId);
+    const selectedRequest = borrowingRequests.find(
+      (request) => String(request.id) === String(requestId)
+    );
+
+    if (!selectedRequest) {
+      setActionError("The borrowing request could not be found.");
+      setUpdatingRequestId(null);
+      return;
+    }
+
+    const requestResult = await updateRequestStatus(requestId, newStatus);
+
+    if (!requestResult.success) {
+      setActionError(requestResult.message);
+      setUpdatingRequestId(null);
+      return;
+    }
+
+    if (newStatus === "Approved") {
+      const loanResult = await addLoan({
+        requestId: selectedRequest.id,
+        itemId: selectedRequest.itemId,
+
+        item:
+          selectedRequest.item || selectedRequest.itemName || "Equipment",
+
+        icon: selectedRequest.itemIcon || selectedRequest.icon || "🧰",
+
+        ownerId: selectedRequest.ownerId,
+        borrowerId: selectedRequest.borrowerId,
+
+        ownerName:
+          selectedRequest.ownerName || selectedRequest.owner || "Item owner",
+
+        borrowerName:
+          selectedRequest.borrowerName ||
+          selectedRequest.borrower ||
+          "Neighbour",
+
+        person:
+          selectedRequest.borrowerName ||
+          selectedRequest.borrower ||
+          "Neighbour",
+
+        loanType:
+          String(selectedRequest.ownerId) === currentUserId
+            ? "lent"
+            : "borrowed",
+
+        startDate: selectedRequest.startDate,
+        dueDate: selectedRequest.endDate,
+        status: "On Track",
+      });
+
+      if (!loanResult.success) {
+        setActionError(
+          `The request was approved, but the loan could not be created: ${loanResult.message}`
+        );
+
+        setUpdatingRequestId(null);
+        return;
+      }
+
+      try {
+        await updateItem(selectedRequest.itemId, {
+          availability: "Unavailable",
+        });
+      } catch (error) {
+        setActionError(
+          error.message ||
+            "The loan was created, but the item availability could not be updated."
+        );
+
+        setUpdatingRequestId(null);
+        return;
+      }
+
+      setNotice(
+        "Request approved, active loan created and item marked unavailable."
+      );
+    } else {
+      setNotice(requestResult.message);
+    }
+
+    setUpdatingRequestId(null);
+  };
+
+  const handleCancelRequest = async (requestId) => {
+    setNotice("");
+    setActionError("");
+    setUpdatingRequestId(requestId);
+
+    const result = await cancelBorrowingRequest(requestId);
 
     if (result.success) {
       setNotice(result.message);
@@ -172,44 +140,21 @@ setNotice(
     setUpdatingRequestId(null);
   };
 
-  const renderRequestCard = (
-    request,
-    requestType
-  ) => {
-    const isPending =
-      request.status?.toLowerCase() ===
-      "pending";
+  const renderRequestCard = (request, requestType) => {
+    const isPending = request.status?.toLowerCase() === "pending";
+    const isUpdating = updatingRequestId === request.id;
 
-<<<<<<< Updated upstream
-    const isUpdating =
-      updatingRequestId === request.id;
-
-    const itemName =
-      request.itemName ||
-      request.item ||
-      "Item";
-
+    const itemName = request.itemName || request.item || "Item";
     const borrowerName =
-      request.borrowerName ||
-      request.borrower ||
-      "Neighbour";
-
-    const ownerName =
-      request.ownerName ||
-      request.owner ||
-      "Item owner";
+      request.borrowerName || request.borrower || "Neighbour";
+    const ownerName = request.ownerName || request.owner || "Item owner";
 
     return (
-      <article
-        className="request-page-card"
-        key={request.id}
-      >
+      <article className="request-page-card" key={request.id}>
         <div className="request-card-top">
           <div className="request-item-details">
             <span className="request-item-icon">
-              {request.itemIcon ||
-                request.icon ||
-                "🧰"}
+              {request.itemIcon || request.icon || "🧰"}
             </span>
 
             <div>
@@ -225,8 +170,7 @@ setNotice(
 
           <span
             className={`request-status-badge ${
-              request.status?.toLowerCase() ||
-              "pending"
+              request.status?.toLowerCase() || "pending"
             }`}
           >
             {request.status || "Pending"}
@@ -236,23 +180,10 @@ setNotice(
         <div className="request-page-information">
           <p>
             <strong>
-              {requestType === "incoming"
-                ? "Borrower:"
-                : "Owner:"}
+              {requestType === "incoming" ? "Borrower:" : "Owner:"}
             </strong>{" "}
-            {requestType === "incoming"
-              ? borrowerName
-              : ownerName}
+            {requestType === "incoming" ? borrowerName : ownerName}
           </p>
-=======
- 
-    return (
-    <main className="dashboard-main">
-    <section className="requests-page">
-      <div className="requests-heading">
-        <div>
-          <h1>Borrowing Requests</h1>
->>>>>>> Stashed changes
 
           <p>
             <strong>Date range:</strong>{" "}
@@ -262,64 +193,45 @@ setNotice(
 
           {request.message && (
             <p>
-              <strong>Message:</strong>{" "}
-              {request.message}
+              <strong>Message:</strong> {request.message}
             </p>
           )}
         </div>
 
-        {requestType === "incoming" &&
-          isPending && (
-            <div className="request-page-actions">
-              <button
-                className="decline-button"
-                type="button"
-                disabled={isUpdating}
-                onClick={() =>
-                  handleStatusChange(
-                    request.id,
-                    "Declined"
-                  )
-                }
-              >
-                {isUpdating
-                  ? "Updating..."
-                  : "Decline"}
-              </button>
+        {requestType === "incoming" && isPending && (
+          <div className="request-page-actions">
+            <button
+              className="decline-button"
+              type="button"
+              disabled={isUpdating}
+              onClick={() => handleStatusChange(request.id, "Declined")}
+            >
+              {isUpdating ? "Updating..." : "Decline"}
+            </button>
 
-              <button
-  className="approve-button"
-  type="button"
-  disabled={isUpdating}
-  onClick={() =>
-    handleStatusChange(
-      request.id,
-      "Approved"
-    )
-  }
->
-  {isUpdating ? "Updating..." : "Approve"}
-</button>
-            </div>
-          )}
+            <button
+              className="approve-button"
+              type="button"
+              disabled={isUpdating}
+              onClick={() => handleStatusChange(request.id, "Approved")}
+            >
+              {isUpdating ? "Updating..." : "Approve"}
+            </button>
+          </div>
+        )}
 
-        {requestType === "outgoing" &&
-          isPending && (
-            <div className="request-page-actions">
-              <button
-                className="cancel-request-button"
-                type="button"
-                disabled={isUpdating}
-                onClick={() =>
-                  handleCancelRequest(request.id)
-                }
-              >
-                {isUpdating
-                  ? "Cancelling..."
-                  : "Cancel Request"}
-              </button>
-            </div>
-          )}
+        {requestType === "outgoing" && isPending && (
+          <div className="request-page-actions">
+            <button
+              className="cancel-request-button"
+              type="button"
+              disabled={isUpdating}
+              onClick={() => handleCancelRequest(request.id)}
+            >
+              {isUpdating ? "Cancelling..." : "Cancel Request"}
+            </button>
+          </div>
+        )}
       </article>
     );
   };
@@ -329,9 +241,7 @@ setNotice(
       <main className="dashboard-main">
         <section className="page-content">
           <div className="requests-page-message">
-            <p>
-              Loading borrowing requests...
-            </p>
+            <p>Loading borrowing requests...</p>
           </div>
         </section>
       </main>
@@ -355,49 +265,37 @@ setNotice(
       <section className="page-content requests-page">
         <header className="requests-page-header">
           <div>
-            <p className="page-label">
-              BORROWING MANAGEMENT
-            </p>
+            <p className="page-label">BORROWING MANAGEMENT</p>
 
             <h1>Borrowing Requests</h1>
 
             <p>
-              Review incoming requests and track
-              requests you have submitted.
+              Review incoming requests and track requests you have
+              submitted.
             </p>
           </div>
 
           <div className="requests-summary">
             <div>
-              <strong>
-                {incomingRequests.length}
-              </strong>
+              <strong>{incomingRequests.length}</strong>
               <span>Incoming</span>
             </div>
 
             <div>
-              <strong>
-                {outgoingRequests.length}
-              </strong>
+              <strong>{outgoingRequests.length}</strong>
               <span>Outgoing</span>
             </div>
           </div>
         </header>
 
         {notice && (
-          <p
-            className="request-action-notice success"
-            role="status"
-          >
+          <p className="request-action-notice success" role="status">
             {notice}
           </p>
         )}
 
         {actionError && (
-          <p
-            className="request-action-notice error"
-            role="alert"
-          >
+          <p className="request-action-notice error" role="alert">
             {actionError}
           </p>
         )}
@@ -406,11 +304,7 @@ setNotice(
           <div className="request-section-heading">
             <div>
               <h2>Incoming Requests</h2>
-
-              <p>
-                Requests from neighbours who want
-                to borrow your items.
-              </p>
+              <p>Requests from neighbours who want to borrow your items.</p>
             </div>
 
             <span className="request-count">
@@ -421,24 +315,15 @@ setNotice(
           <div className="request-page-grid">
             {incomingRequests.length > 0 ? (
               incomingRequests.map((request) =>
-                renderRequestCard(
-                  request,
-                  "incoming"
-                )
+                renderRequestCard(request, "incoming")
               )
             ) : (
               <div className="request-page-empty">
                 <span>✓</span>
 
                 <div>
-                  <strong>
-                    No incoming requests
-                  </strong>
-
-                  <p>
-                    New borrowing requests will
-                    appear here.
-                  </p>
+                  <strong>No incoming requests</strong>
+                  <p>New borrowing requests will appear here.</p>
                 </div>
               </div>
             )}
@@ -449,11 +334,7 @@ setNotice(
           <div className="request-section-heading">
             <div>
               <h2>My Requests</h2>
-
-              <p>
-                Track the borrowing requests you
-                have submitted.
-              </p>
+              <p>Track the borrowing requests you have submitted.</p>
             </div>
 
             <span className="request-count">
@@ -464,33 +345,23 @@ setNotice(
           <div className="request-page-grid">
             {outgoingRequests.length > 0 ? (
               outgoingRequests.map((request) =>
-                renderRequestCard(
-                  request,
-                  "outgoing"
-                )
+                renderRequestCard(request, "outgoing")
               )
             ) : (
               <div className="request-page-empty">
                 <span>📭</span>
 
                 <div>
-                  <strong>
-                    You have no requests
-                  </strong>
-
-                  <p>
-                    Browse available items to submit
-                    a borrowing request.
-                  </p>
+                  <strong>You have no requests</strong>
+                  <p>Browse available items to submit a borrowing request.</p>
                 </div>
               </div>
             )}
           </div>
         </section>
       </section>
-        </section>
-  </main>
-);
+    </main>
+  );
 }
 
 export default Requests;
