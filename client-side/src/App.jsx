@@ -17,7 +17,7 @@ import Loans from "./Pages/Loans";
 import MyListings from "./Pages/MyListings";
 import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
-import EditItem from "./Pages/EditItem";
+import EditItem from "./Pages/EditListing.jsx";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider";
