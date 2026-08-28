@@ -10,13 +10,14 @@ import PaymentBar from "./components/PaymentBar";
 import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
+
 import BrowseItems from "./Pages/BrowseItems";
-import AddItem from "./Pages/AddItem";
-import EditItem from "./Pages/EditItem";
+import DamageReports from "./Pages/DamageReports";
+import Loans from "./Pages/Loans";
 import MyListings from "./Pages/MyListings";
 import Requests from "./Pages/Requests";
-import Loans from "./Pages/Loans";
-import DamageReports from "./Pages/DamageReports";
+import AddItem from "./Pages/AddItem";
+import EditItem from "./Pages/EditItem";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider";
