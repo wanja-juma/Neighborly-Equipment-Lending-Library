@@ -33,10 +33,17 @@ def create_app(config_class=Config):
     # Import models so they're registered with SQLAlchemy before migrations run
     # Import models so they are registered with SQLAlchemy
     from models import (
+<<<<<<< HEAD
         #Item,
         #Loan,
         #Membership,
         #Payment,
+=======
+        Item,
+        Loan,
+        Membership,
+        Payment,
+>>>>>>> 95646b29cd6725b7c14f8d5e4181f797d3f8ce53
         Profile,
         User,
     )
@@ -53,9 +60,16 @@ def create_app(config_class=Config):
 
     # Register blueprints
     # Register routes
+<<<<<<< HEAD
    
 
     
+=======
+    from routes import profile_bp, user_bp
+
+    app.register_blueprint(user_bp)
+    app.register_blueprint(profile_bp)
+>>>>>>> 95646b29cd6725b7c14f8d5e4181f797d3f8ce53
 
     @app.get("/api/health")
     def health_check():
