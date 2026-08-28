@@ -13,7 +13,7 @@ import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
 import Loans from "./Pages/Loans";
 import MyListings from "./Pages/MyListings";
-import Requests from "./pages/Requests";
+import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
 import EditItem from "./Pages/EditItem";
 import ItemsProvider from "./context/ItemsProvider";
