@@ -7,6 +7,14 @@ function Requests() {
   const [activeTab, setActiveTab] =
     useState("incoming");
 
+  const [
+    updatingRequestId,
+    setUpdatingRequestId,
+  ] = useState(null);
+
+  const [actionError, setActionError] =
+    useState("");
+
   const { currentUser } = useAuth();
 
   const {
@@ -57,7 +65,8 @@ function Requests() {
       ).toLowerCase();
 
       return (
-        String(borrowerId) === currentUserId ||
+        String(borrowerId) ===
+          currentUserId ||
         requestType === "outgoing"
       );
     });
@@ -67,14 +76,31 @@ function Requests() {
       ? incomingRequests
       : outgoingRequests;
 
-  const handleRequestStatus = async (
+  const handleRequestAction = async (
     requestId,
-    status
+    newStatus
   ) => {
-    await updateRequestStatus(
-      requestId,
-      status
-    );
+    setActionError("");
+    setUpdatingRequestId(requestId);
+
+    try {
+      await updateRequestStatus(
+        requestId,
+        newStatus
+      );
+    } catch (error) {
+      setActionError(
+        error.message ||
+          `Unable to ${newStatus.toLowerCase()} the request.`
+      );
+    } finally {
+      setUpdatingRequestId(null);
+    }
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setActionError("");
   };
 
   return (
@@ -102,7 +128,7 @@ function Requests() {
               : ""
           }`}
           onClick={() =>
-            setActiveTab("incoming")
+            handleTabChange("incoming")
           }
           aria-pressed={
             activeTab === "incoming"
@@ -132,7 +158,7 @@ function Requests() {
               : ""
           }`}
           onClick={() =>
-            setActiveTab("outgoing")
+            handleTabChange("outgoing")
           }
           aria-pressed={
             activeTab === "outgoing"
@@ -176,6 +202,25 @@ function Requests() {
           </span>
         </div>
 
+        {actionError && (
+          <div
+            className="request-action-error"
+            role="alert"
+          >
+            <span>{actionError}</span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setActionError("")
+              }
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {requestsLoading ? (
           <div className="requests-state">
             <p>Loading requests...</p>
@@ -204,6 +249,18 @@ function Requests() {
           <div className="requests-list">
             {displayedRequests.map(
               (request) => {
+                const status =
+                  request.status || "Pending";
+
+                const isPending =
+                  status.toLowerCase() ===
+                  "pending";
+
+                const isUpdating =
+                  String(
+                    updatingRequestId
+                  ) === String(request.id);
+
                 const personName =
                   activeTab === "incoming"
                     ? request.borrowerName ||
@@ -219,15 +276,26 @@ function Requests() {
                   request.item ||
                   "Equipment";
 
-                const status =
-                  request.status || "Pending";
-
                 const initials = personName
                   .split(" ")
                   .map((name) => name[0])
                   .join("")
                   .slice(0, 2)
                   .toUpperCase();
+
+                const startDate =
+                  request.startDate ||
+                  request.start_date ||
+                  "Start date unavailable";
+
+                const endDate =
+                  request.endDate ||
+                  request.end_date ||
+                  "End date unavailable";
+
+                const statusClass = status
+                  .toLowerCase()
+                  .replaceAll(" ", "-");
 
                 return (
                   <article
@@ -252,52 +320,54 @@ function Requests() {
                       </p>
 
                       <small>
-                        {request.startDate ||
-                          request.start_date ||
-                          "Start date unavailable"}
-                        {" – "}
-                        {request.endDate ||
-                          request.end_date ||
-                          "End date unavailable"}
+                        {startDate} – {endDate}
                       </small>
                     </div>
 
                     <span
-                      className={`request-status ${status
-                        .toLowerCase()
-                        .replaceAll(" ", "-")}`}
+                      className={`request-status ${statusClass}`}
                     >
                       {status}
                     </span>
 
-                    {activeTab === "incoming" &&
-                      status.toLowerCase() ===
-                        "pending" && (
+                    {activeTab ===
+                      "incoming" &&
+                      isPending && (
                         <div className="request-actions">
                           <button
                             type="button"
-                            className="decline-button"
+                            className="decline-request-button"
+                            disabled={
+                              isUpdating
+                            }
                             onClick={() =>
-                              handleRequestStatus(
+                              handleRequestAction(
                                 request.id,
                                 "Declined"
                               )
                             }
                           >
-                            Decline
+                            {isUpdating
+                              ? "Updating..."
+                              : "Decline"}
                           </button>
 
                           <button
                             type="button"
-                            className="approve-button"
+                            className="approve-request-button"
+                            disabled={
+                              isUpdating
+                            }
                             onClick={() =>
-                              handleRequestStatus(
+                              handleRequestAction(
                                 request.id,
                                 "Approved"
                               )
                             }
                           >
-                            Approve
+                            {isUpdating
+                              ? "Updating..."
+                              : "Approve"}
                           </button>
                         </div>
                       )}
