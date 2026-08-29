@@ -45,6 +45,7 @@ class ItemList(Resource):
         return {"items": [_serialize(item) for item in items]}
 
     def post(self):
+        #adds an item to the system
         data = request.get_json(silent=True) or {}
 
         name = (data.get("name") or "").strip()
