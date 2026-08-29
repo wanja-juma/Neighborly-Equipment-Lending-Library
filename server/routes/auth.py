@@ -188,6 +188,7 @@ api.add_resource(Login, "/login")
 class Me(Resource):
     @jwt_required()
     def get(self):
+        # returns the current user details
         user_id = int(get_jwt_identity())
 
         user = db.session.get(User, user_id)
