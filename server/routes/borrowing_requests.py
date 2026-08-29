@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 from app.extensions import db
-from models import BorrowingRequest, Item, User
+from models import BorrowingRequest, Loan
 from schemas import BorrowingRequestSchema
 
 borrowing_requests_bp = Blueprint(
@@ -29,16 +29,9 @@ def create_request():
     except ValidationError as err:
         return jsonify({"errors": err.messages}), 400
 
-    item = db.session.get(Item, data.item_id)
-    if item is None:
-        return jsonify({"error": "Item not found."}), 404
-
-    borrower = db.session.get(User, data.borrower_id)
-    if borrower is None:
-        return jsonify({"error": "Borrower not found."}), 404
-
-    if item.owner_id == data.borrower_id:
-        return jsonify({"error": "You cannot borrow your own item."}), 400
+    loan = db.session.get(Loan, data.loan_id)
+    if loan is None:
+        return jsonify({"error": "Loan not found."}), 404
 
     data.status = "pending"
     db.session.add(data)
@@ -51,13 +44,9 @@ def create_request():
 def list_requests():
     query = BorrowingRequest.query
 
-    borrower_id = request.args.get("borrower_id")
-    if borrower_id:
-        query = query.filter_by(borrower_id=borrower_id)
-
-    item_id = request.args.get("item_id")
-    if item_id:
-        query = query.filter_by(item_id=item_id)
+    loan_id = request.args.get("loan_id")
+    if loan_id:
+        query = query.filter_by(loan_id=loan_id)
 
     requests = query.order_by(BorrowingRequest.created_at.desc()).all()
     return jsonify({"borrowing_requests": borrowing_requests_schema.dump(requests)}), 200
