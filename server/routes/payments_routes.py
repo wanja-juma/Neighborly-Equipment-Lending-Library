@@ -4,7 +4,9 @@ from marshmallow import ValidationError
 
 from app.extensions import db
 from models import Loan, Payment
-from schemas import PaymentSchema
+from schemas.payments_schemas import (
+    PaymentSchema,
+)
 
 payment_bp = Blueprint(
     "payments",

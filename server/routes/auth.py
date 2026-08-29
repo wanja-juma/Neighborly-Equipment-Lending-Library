@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
 from models import Profile, User
-from schemas import UserSchema
+from schemas.user_schema import UserSchema
 
 
 auth_bp = Blueprint(

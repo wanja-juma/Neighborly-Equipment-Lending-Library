@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+
 import useAuth from "../hooks/useAuth";
 import useRequests from "../hooks/useRequests";
+
+import "./BrowseItems.css";
 import "./Requests.css";
 
 function Requests() {
@@ -15,6 +19,9 @@ function Requests() {
   const [actionError, setActionError] =
     useState("");
 
+  const [notice, setNotice] =
+    useState("");
+
   const { currentUser } = useAuth();
 
   const {
@@ -22,6 +29,7 @@ function Requests() {
     requestsLoading,
     requestsError,
     updateRequestStatus,
+    cancelBorrowingRequest,
   } = useRequests();
 
   const currentUserId = String(
@@ -36,10 +44,10 @@ function Requests() {
         request.item?.ownerId ??
         request.item?.owner_id;
 
-      const requestType = (
-        request.requestType ||
-        request.direction ||
-        request.type ||
+      const requestType = String(
+        request.requestType ??
+        request.direction ??
+        request.type ??
         ""
       ).toLowerCase();
 
@@ -57,10 +65,10 @@ function Requests() {
         request.userId ??
         request.user_id;
 
-      const requestType = (
-        request.requestType ||
-        request.direction ||
-        request.type ||
+      const requestType = String(
+        request.requestType ??
+        request.direction ??
+        request.type ??
         ""
       ).toLowerCase();
 
@@ -76,18 +84,62 @@ function Requests() {
       ? incomingRequests
       : outgoingRequests;
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setActionError("");
+    setNotice("");
+  };
+
   const handleRequestAction = async (
     requestId,
     newStatus
   ) => {
+    setNotice("");
     setActionError("");
     setUpdatingRequestId(requestId);
 
-    try {
-      await updateRequestStatus(
-        requestId,
-        newStatus
+    const selectedRequest =
+      borrowingRequests.find(
+        (request) =>
+          String(request.id) ===
+          String(requestId)
       );
+
+    if (!selectedRequest) {
+      setActionError(
+        "The borrowing request could not be found."
+      );
+
+      setUpdatingRequestId(null);
+      return;
+    }
+
+    try {
+      const result =
+        await updateRequestStatus(
+          requestId,
+          newStatus
+        );
+
+      if (result?.success === false) {
+        setActionError(
+          result.message ||
+            "The request could not be updated."
+        );
+
+        return;
+      }
+
+      if (newStatus === "Approved") {
+        setNotice(
+          "Request approved. The borrower can now complete the payment."
+        );
+      } else {
+        setNotice(
+          result?.message ||
+            "Request declined successfully."
+        );
+      }
     } catch (error) {
       setActionError(
         error.message ||
@@ -98,10 +150,67 @@ function Requests() {
     }
   };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
+  const handleCancelRequest = async (
+    requestId
+  ) => {
+    setNotice("");
     setActionError("");
+    setUpdatingRequestId(requestId);
+
+    try {
+      const result =
+        await cancelBorrowingRequest(
+          requestId
+        );
+
+      if (result?.success === false) {
+        setActionError(
+          result.message ||
+            "Unable to cancel the request."
+        );
+
+        return;
+      }
+
+      setNotice(
+        result?.message ||
+          "Request cancelled successfully."
+      );
+    } catch (error) {
+      setActionError(
+        error.message ||
+          "Unable to cancel the request."
+      );
+    } finally {
+      setUpdatingRequestId(null);
+    }
   };
+
+  if (requestsLoading) {
+    return (
+      <main className="dashboard-main">
+        <section className="page-content">
+          <div className="requests-page-message">
+            <p>
+              Loading borrowing requests...
+            </p>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (requestsError) {
+    return (
+      <main className="dashboard-main">
+        <section className="page-content">
+          <div className="requests-page-message error">
+            <p>{requestsError}</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="requests-page">
@@ -116,70 +225,57 @@ function Requests() {
         </div>
       </div>
 
-      <section
-        className="request-tabs"
-        aria-label="Request categories"
-      >
-        <button
-          type="button"
-          className={`request-tab-card ${
-            activeTab === "incoming"
-              ? "active"
-              : ""
-          }`}
-          onClick={() =>
-            handleTabChange("incoming")
-          }
-          aria-pressed={
-            activeTab === "incoming"
-          }
-        >
-          <span className="request-tab-icon">
-            ↓
-          </span>
+      <div
+  className="requests-tab-switcher"
+  role="tablist"
+  aria-label="Borrowing request categories"
+>
+  <button
+    type="button"
+    role="tab"
+    className={`requests-tab-button ${
+      activeTab === "incoming"
+        ? "active"
+        : ""
+    }`}
+    onClick={() =>
+      handleTabChange("incoming")
+    }
+    aria-selected={
+      activeTab === "incoming"
+    }
+    aria-controls="requests-content"
+  >
+    <span>Incoming</span>
 
-          <div>
-            <strong>Incoming Requests</strong>
+    <span className="tab-count">
+      {incomingRequests.length}
+    </span>
+  </button>
 
-            <span>
-              {incomingRequests.length}{" "}
-              {incomingRequests.length === 1
-                ? "request"
-                : "requests"}
-            </span>
-          </div>
-        </button>
+  <button
+    type="button"
+    role="tab"
+    className={`requests-tab-button ${
+      activeTab === "outgoing"
+        ? "active"
+        : ""
+    }`}
+    onClick={() =>
+      handleTabChange("outgoing")
+    }
+    aria-selected={
+      activeTab === "outgoing"
+    }
+    aria-controls="requests-content"
+  >
+    <span>Outgoing</span>
 
-        <button
-          type="button"
-          className={`request-tab-card ${
-            activeTab === "outgoing"
-              ? "active"
-              : ""
-          }`}
-          onClick={() =>
-            handleTabChange("outgoing")
-          }
-          aria-pressed={
-            activeTab === "outgoing"
-          }
-        >
-          <span className="request-tab-icon">
-            ↑
-          </span>
-
-          <div>
-            <strong>Outgoing Requests</strong>
-
-            <span>
-              {outgoingRequests.length}{" "}
-              {outgoingRequests.length === 1
-                ? "request"
-                : "requests"}
-            </span>
-          </div>
-        </button>
-      </section>
+    <span className="tab-count">
+      {outgoingRequests.length}
+    </span>
+  </button>
+</div>
 
       <section className="requests-panel">
         <div className="requests-panel-heading">
@@ -193,7 +289,7 @@ function Requests() {
             <p>
               {activeTab === "incoming"
                 ? "Requests from neighbours who want to borrow your items."
-                : "Requests you have sent to borrow your neighbours’ items."}
+                : "Requests you have sent to borrow your neighbours' items."}
             </p>
           </div>
 
@@ -201,6 +297,23 @@ function Requests() {
             {displayedRequests.length}
           </span>
         </div>
+
+        {notice && (
+          <div
+            className="request-action-notice success"
+            role="status"
+          >
+            <span>{notice}</span>
+
+            <button
+              type="button"
+              onClick={() => setNotice("")}
+              aria-label="Dismiss notification"
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         {actionError && (
           <div
@@ -221,15 +334,7 @@ function Requests() {
           </div>
         )}
 
-        {requestsLoading ? (
-          <div className="requests-state">
-            <p>Loading requests...</p>
-          </div>
-        ) : requestsError ? (
-          <div className="requests-state error">
-            <p>{requestsError}</p>
-          </div>
-        ) : displayedRequests.length === 0 ? (
+        {displayedRequests.length === 0 ? (
           <div className="requests-state">
             <span className="empty-icon">
               ✓
@@ -249,17 +354,33 @@ function Requests() {
           <div className="requests-list">
             {displayedRequests.map(
               (request) => {
-                const status =
-                  request.status || "Pending";
+                const status = String(
+                  request.status || "Pending"
+                );
+
+                const normalizedStatus =
+                  status.toLowerCase();
+
+                const paymentStatus = String(
+                  request.paymentStatus ??
+                    request.payment_status ??
+                    "unpaid"
+                ).toLowerCase();
 
                 const isPending =
-                  status.toLowerCase() ===
+                  normalizedStatus ===
                   "pending";
 
                 const isUpdating =
                   String(
                     updatingRequestId
                   ) === String(request.id);
+
+                const canPay =
+                  activeTab === "outgoing" &&
+                  normalizedStatus ===
+                    "approved" &&
+                  paymentStatus !== "paid";
 
                 const personName =
                   activeTab === "incoming"
@@ -272,12 +393,18 @@ function Requests() {
 
                 const itemName =
                   request.itemName ||
+                  request.item_name ||
                   request.item?.name ||
-                  request.item ||
-                  "Equipment";
+                  (typeof request.item ===
+                  "string"
+                    ? request.item
+                    : "Equipment");
 
-                const initials = personName
+                const initials = String(
+                  personName
+                )
                   .split(" ")
+                  .filter(Boolean)
                   .map((name) => name[0])
                   .join("")
                   .slice(0, 2)
@@ -293,9 +420,11 @@ function Requests() {
                   request.end_date ||
                   "End date unavailable";
 
-                const statusClass = status
-                  .toLowerCase()
-                  .replaceAll(" ", "-");
+                const statusClass =
+                  normalizedStatus.replaceAll(
+                    " ",
+                    "-"
+                  );
 
                 return (
                   <article
@@ -312,7 +441,8 @@ function Requests() {
                       </strong>
 
                       <p>
-                        {activeTab === "incoming"
+                        {activeTab ===
+                        "incoming"
                           ? "Wants to borrow "
                           : "Request to borrow "}
 
@@ -322,6 +452,15 @@ function Requests() {
                       <small>
                         {startDate} – {endDate}
                       </small>
+
+                      {request.message && (
+                        <small>
+                          <strong>
+                            Message:
+                          </strong>{" "}
+                          {request.message}
+                        </small>
+                      )}
                     </div>
 
                     <span
@@ -371,6 +510,40 @@ function Requests() {
                           </button>
                         </div>
                       )}
+
+                    {activeTab ===
+                      "outgoing" &&
+                      isPending && (
+                        <div className="request-actions">
+                          <button
+                            type="button"
+                            className="cancel-request-button"
+                            disabled={
+                              isUpdating
+                            }
+                            onClick={() =>
+                              handleCancelRequest(
+                                request.id
+                              )
+                            }
+                          >
+                            {isUpdating
+                              ? "Cancelling..."
+                              : "Cancel Request"}
+                          </button>
+                        </div>
+                      )}
+
+                    {canPay && (
+                      <div className="request-payment-action">
+                        <Link
+                          className="pay-request-button"
+                          to={`/payments/${request.id}`}
+                        >
+                          Pay Now
+                        </Link>
+                      </div>
+                    )}
                   </article>
                 );
               }

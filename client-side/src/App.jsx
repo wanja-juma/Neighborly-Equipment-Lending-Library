@@ -26,6 +26,7 @@ import AuthProvider from "./context/AuthProvider.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import ChangeAvailability from "./Pages/ChangeAvailability";
 import EditListing from "./Pages/EditListing";
+
 import "./App.css";
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
     "/requests",
     "/loans",
     "/damage-reports",
+     "/paymentbar",
   ];
 
   const isDashboardRoute = dashboardRoutePrefixes.some(
@@ -81,7 +83,12 @@ function App() {
                   {/* Browse tools */}
                   <Route path="/browse-tools" element={<BrowseTools />} />
                   <Route path="/tools/:id" element={<ItemDetail />} />
-                  <Route path="/payment/:id" element={<PaymentBar />} />
+       
+
+<Route
+  path="/payments/:requestId"
+  element={<PaymentBar />}
+/>
 
                   {/* Authentication */}
                   <Route path="/auth" element={<AuthPage />} />
@@ -101,6 +108,7 @@ function App() {
                     <Route path="/requests" element={<Requests />} />
                     <Route path="/loans" element={<Loans />} />
                     <Route path="/damage-reports" element={<DamageReports />} />
+                    
                   </Route>
 
                   <Route path="*" element={<Navigate to="/" replace />} />

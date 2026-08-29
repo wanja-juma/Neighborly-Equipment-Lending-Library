@@ -1,5 +1,5 @@
 from datetime import datetime
-from server.models import db
+from app.extensions import db
 
 class BorrowingRequest(db.Model):
     __tablename__ = 'borrowing_requests'
