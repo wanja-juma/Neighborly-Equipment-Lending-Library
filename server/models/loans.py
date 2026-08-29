@@ -1,7 +1,5 @@
-from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime, timezone
 from app.extensions import db
-db = SQLAlchemy()
 
 class Loan(db.Model):
     __tablename__ = 'loans'
@@ -9,16 +7,14 @@ class Loan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
     borrower_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    
-    requested_at = db.Column(db.DateTime, default=datetime.utcnow)
-    approved_at = db.Column(db.DateTime, nullable=True)
-    status = db.Column(db.String(50), nullable=False, default='pending')
-    start_date = db.Column(db.Date, nullable=True)
-    due_date = db.Column(db.Date, nullable=True)
-    returned_at = db.Column(db.DateTime, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    start_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    end_date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(50), default='Active')
 
-    
-    item = db.relationship('Item', backref='loans')
+    # Relationships
+    item = db.relationship('Item', back_populates='loans')
     borrower = db.relationship('User', backref='loans')
-    borrowing_requests = db.relationship('BorrowingRequest', backref='loan', cascade='all, delete-orphan')
+    payments = db.relationship('Payment', back_populates='loan', cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return f'<Loan {self.id}>'

@@ -21,7 +21,8 @@ class Item(db.Model):
     )
 
     owner = db.relationship("User", backref="items")
-    category = db.relationship("Category", backref="items")
+    category = db.relationship("Category", back_populates="items")
+    loans = db.relationship('Loan', back_populates='item', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<Item {self.id} {self.name!r}>"

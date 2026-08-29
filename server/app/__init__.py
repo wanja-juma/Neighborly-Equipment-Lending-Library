@@ -1,6 +1,7 @@
 from flask import Flask
 
 from app.config import Config
+from routes.auth import auth_bp
 from app.extensions import (
     cors,
     db,
@@ -41,10 +42,18 @@ def create_app(config_class=Config):
     )
 
     # Register routes
-    from routes import profile_bp, user_bp
+    from routes.user_routes import user_bp
+    from routes.profile_routes import profile_bp
+    from routes.loans_routes import loans_bp
+    from routes.borrow_request_routes import borrow_requests_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(loans_bp)
+    app.register_blueprint(borrow_requests_bp)
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    
+    
 
     @app.get("/api/health")
     def health_check():

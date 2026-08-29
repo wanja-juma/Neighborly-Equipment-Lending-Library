@@ -19,4 +19,4 @@ class Category(db.Model):
         onupdate=lambda: datetime.now(timezone.utc)
     )
 
-    items = db.relationship("Item", backref="category")
+    items = db.relationship("Item", back_populates="category")
