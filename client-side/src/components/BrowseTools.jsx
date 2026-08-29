@@ -62,7 +62,7 @@ function BrowseTools() {
   if (error) {
     return (
       <p className="browse-tools__status browse-tools__status--error">
-        Couldn't load tools. Is json-server running on port 3001?
+        Couldn't load tools. Is json-server running on port 3000?
       </p>
     );
   }
