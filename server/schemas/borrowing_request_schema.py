@@ -12,7 +12,6 @@ class BorrowingRequestSchema(ma.SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer(dump_only=True)
-    item_id = fields.Integer(required=True)
     borrower_id = fields.Integer(required=True)
     status = fields.String(
         dump_default="pending",
