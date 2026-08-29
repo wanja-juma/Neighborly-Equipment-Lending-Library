@@ -4,6 +4,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
 )
+from flask_restful import Api, Resource
 from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
@@ -16,6 +17,7 @@ auth_bp = Blueprint(
     __name__,
     url_prefix="/api/auth",
 )
+api = Api(auth_bp)
 
 user_schema = UserSchema()
 
@@ -27,123 +29,112 @@ REQUIRED_REGISTER_FIELDS = (
 )
 
 
-@auth_bp.post("/register")
-def register():
-    data = request.get_json(silent=True) or {}
+class Register(Resource):
+    def post(self):
+        data = request.get_json(silent=True) or {}
 
-    missing_fields = [
-        field
-        for field in REQUIRED_REGISTER_FIELDS
-        if not data.get(field)
-    ]
+        missing_fields = [
+            field
+            for field in REQUIRED_REGISTER_FIELDS
+            if not data.get(field)
+        ]
 
-    if missing_fields:
-        return jsonify(
-            {
+        if missing_fields:
+            return {
                 "error": (
                     "Missing required field(s): "
                     + ", ".join(missing_fields)
                 )
-            }
-        ), 400
+            }, 400
 
-    first_name = data["firstName"].strip()
-    last_name = data["lastName"].strip()
-    email = data["email"].strip().lower()
-    password = data["password"]
+        first_name = data["firstName"].strip()
+        last_name = data["lastName"].strip()
+        email = data["email"].strip().lower()
+        password = data["password"]
 
-    if not first_name or not last_name:
-        return jsonify(
-            {
+        if not first_name or not last_name:
+            return {
                 "error": (
                     "First name and last name "
                     "are required."
                 )
-            }
-        ), 400
+            }, 400
 
-    if (
-        "@" not in email
-        or "." not in email.split("@")[-1]
-    ):
-        return jsonify(
-            {
+        if (
+            "@" not in email
+            or "." not in email.split("@")[-1]
+        ):
+            return {
                 "error": (
                     "Please enter a valid "
                     "email address."
                 )
-            }
-        ), 400
+            }, 400
 
-    if len(password) < 8:
-        return jsonify(
-            {
+        if len(password) < 8:
+            return {
                 "error": (
                     "Password must be at least "
                     "8 characters."
                 )
-            }
-        ), 400
+            }, 400
 
-    existing_user = db.session.scalar(
-        db.select(User).where(
-            User.email == email
+        existing_user = db.session.scalar(
+            db.select(User).where(
+                User.email == email
+            )
         )
-    )
 
-    if existing_user:
-        return jsonify(
-            {
+        if existing_user:
+            return {
                 "error": (
                     "An account with that email "
                     "already exists."
                 )
-            }
-        ), 409
+            }, 409
 
-    try:
-        user = User(
-            email=email,
-            password=password,
-        )
-
-        user.profile = Profile(
-            first_name=first_name,
-            last_name=last_name,
-        )
-
-        db.session.add(user)
-        db.session.commit()
-
-    except (ValueError, IntegrityError) as error:
-        db.session.rollback()
-
-        if isinstance(error, ValueError):
-            message = str(error)
-        else:
-            message = (
-                "Unable to create the account. "
-                "The email or phone number may "
-                "already be in use."
+        try:
+            user = User(
+                email=email,
+                password=password,
             )
 
-        return jsonify(
-            {"error": message}
-        ), 400
+            user.profile = Profile(
+                first_name=first_name,
+                last_name=last_name,
+            )
 
-    access_token = create_access_token(
-        identity=str(user.id)
-    )
+            db.session.add(user)
+            db.session.commit()
 
-    return jsonify(
-        {
+        except (ValueError, IntegrityError) as error:
+            db.session.rollback()
+
+            if isinstance(error, ValueError):
+                message = str(error)
+            else:
+                message = (
+                    "Unable to create the account. "
+                    "The email or phone number may "
+                    "already be in use."
+                )
+
+            return {"error": message}, 400
+
+        access_token = create_access_token(
+            identity=str(user.id)
+        )
+
+        return {
             "message": (
                 "Account created successfully."
             ),
             "access_token": access_token,
             "user": user_schema.dump(user),
-        }
-    ), 201
+        }, 201
+
+
+api.add_resource(Register, "/register")
 
 
 @auth_bp.post("/login")
