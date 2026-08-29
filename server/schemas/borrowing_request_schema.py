@@ -12,6 +12,7 @@ class BorrowingRequestSchema(ma.SQLAlchemyAutoSchema):
         ordered = True
 
     id = fields.Integer(dump_only=True)
+    loan_id = fields.Integer(required=True)
     status = fields.String(
         dump_default="pending",
         validate=validate.OneOf(VALID_STATUSES),
