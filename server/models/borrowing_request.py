@@ -6,7 +6,6 @@ class BorrowingRequest(db.Model):
     __tablename__ = "borrowing_requests"
 
     id = db.Column(db.Integer, primary_key=True)
-    borrower_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     status = db.Column(db.String(20), nullable=False, default="pending")
     notification = db.Column(db.String(255), nullable=True)
@@ -18,5 +17,3 @@ class BorrowingRequest(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-
-    borrower = db.relationship("User", backref="borrowing_requests")
