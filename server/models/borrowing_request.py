@@ -18,3 +18,5 @@ class BorrowingRequest(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+
+    loan = db.relationship("Loan", backref="borrowing_requests")
