@@ -85,6 +85,7 @@ api.add_resource(ItemList, "")
 
 class ItemDetail(Resource):
     def get(self, item_id):
+        #returns a specific item
         item = Item.query.get(item_id)
 
         if item is None:
