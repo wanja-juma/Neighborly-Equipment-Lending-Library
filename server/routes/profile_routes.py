@@ -8,9 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
 from models import Profile
-from schemas.profile_schema import (
-    ProfileSchema,
-)
+from schemas import ProfileSchema
 
 
 profile_bp = Blueprint(
