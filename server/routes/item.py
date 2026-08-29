@@ -12,6 +12,7 @@ def _serialize(item):
         "ownerId": item.owner_id,
         "name": item.name,
         "description": item.description,
+        "image": item.image,
         "categoryId": item.category_id,
         "condition": item.condition,
         "status": item.status,
@@ -76,6 +77,7 @@ def create_item():
         name=name,
         owner_id=owner_id,
         description=data.get("description"),
+        image=data.get("image"),
         category_id=data.get("categoryId"),
         condition=data.get("condition"),
         status=data.get("status") or "Available",
@@ -109,6 +111,9 @@ def update_item(item_id):
 
     if "description" in data:
         item.description = data.get("description")
+
+    if "image" in data:
+        item.image = data.get("image")
 
     if "categoryId" in data:
         item.category_id = data.get("categoryId")
