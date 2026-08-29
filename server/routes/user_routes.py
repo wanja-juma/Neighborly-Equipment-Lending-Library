@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required
 
 from app.extensions import db
 from models import User
-from schemas import UserSchema
+from schemas.user_schema import UserSchema
 
 
 user_bp = Blueprint(

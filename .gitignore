@@ -15,6 +15,8 @@ instance/
 
 server/venv/
 server/.env
+server/__pycache__/
+server/instance/
 
 # testing
 /coverage
@@ -31,7 +33,8 @@ server/.env
 
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*server/venv/
-server/__pycache__/
-server/venv/
-server/__pycache__/
+yarn-error.log*
+
+# Python cache files
+__pycache__/
+*.py[cod]

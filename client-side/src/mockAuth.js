@@ -1,43 +1,56 @@
-const STORAGE_KEY = 'neighborly_mock_users'
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5555/api";
 
-function getUsers() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-}
+async function handleResponse(response) {
+  const data = await response.json();
 
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  if (!response.ok) {
+    throw new Error(
+      data.error || data.message || "Authentication request failed."
+    );
+  }
+
+  return data;
 }
 
 export async function registerUser({ firstName, lastName, email, password }) {
-  await delay(500)
-  const users = getUsers()
-  if (users.some((u) => u.email === email)) {
-    throw new Error('An account with that email already exists')
-  }
-  users.push({ firstName, lastName, email, password })
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(users))
-  return { firstName, lastName, email }
+  const response = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ firstName, lastName, email, password }),
+  });
+
+  return handleResponse(response);
 }
 
 export async function loginUser({ email, password }) {
-  await delay(500)
-  const user = getUsers().find((u) => u.email === email && u.password === password)
-  if (!user) {
-    throw new Error('Invalid email or password')
+  const response = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  return handleResponse(response);
+}
+
+export async function logoutUser() {
+  const token = localStorage.getItem("access_token");
+
+  if (token) {
+    const response = await fetch(`${API_URL}/auth/logout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    await handleResponse(response);
   }
-  return { firstName: user.firstName, lastName: user.lastName, email: user.email }
-}
 
-const LOGIN_KEY = 'neighborly_logged_in'
-
-export function setLoggedIn(user) {
-  localStorage.setItem(LOGIN_KEY, JSON.stringify(user))
-}
-
-export function getLoggedInUser() {
-  return JSON.parse(localStorage.getItem(LOGIN_KEY) || 'null')
-}
-
-export function logoutUser() {
-  localStorage.removeItem(LOGIN_KEY)
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("neighborlyUser");
 }

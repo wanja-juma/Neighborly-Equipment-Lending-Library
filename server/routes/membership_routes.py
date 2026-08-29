@@ -4,7 +4,9 @@ from marshmallow import ValidationError
 
 from app.extensions import db
 from models import Membership
-from schemas import MembershipSchema
+from schemas.membership_schemas import (
+    MembershipSchema,
+)
 
 membership_bp = Blueprint(
     "memberships",

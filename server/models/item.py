@@ -10,7 +10,7 @@ class Item(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text)
-    category_id = db.Column(db.String(100), db.ForeignKey("categories.id"))
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
     condition = db.Column(db.String(50))
     status = db.Column(db.String(50), default="Available")
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -21,7 +21,7 @@ class Item(db.Model):
     )
 
     owner = db.relationship("User", backref="items")
-    # category = db.relationship("Category", backref="items")  # TEMP: Category model missing
+    category = db.relationship("Category", back_populates="items")
 
     def __repr__(self):
         return f"<Item {self.id} {self.name!r}>"
