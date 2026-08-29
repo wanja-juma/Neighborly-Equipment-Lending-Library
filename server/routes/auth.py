@@ -141,6 +141,7 @@ api.add_resource(Register, "/register")
 
 class Login(Resource):
     def post(self):
+        # logs in a user into the system
         data = request.get_json(silent=True) or {}
 
         email = data.get("email", "").strip().lower()
