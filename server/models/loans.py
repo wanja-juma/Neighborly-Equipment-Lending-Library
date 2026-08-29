@@ -11,7 +11,7 @@ class Loan(db.Model):
     end_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(50), default='Active')
 
-    # Relationships
+    
     item = db.relationship('Item', back_populates='loans')
     borrower = db.relationship('User', backref='loans')
     payments = db.relationship('Payment', back_populates='loan', cascade='all, delete-orphan')
