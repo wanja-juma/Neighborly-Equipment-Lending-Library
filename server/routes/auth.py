@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import (
     create_access_token,
     get_jwt_identity,
@@ -200,14 +200,15 @@ class Me(Resource):
 api.add_resource(Me, "/me")
 
 
-@auth_bp.post("/logout")
-@jwt_required()
-def logout():
-    return jsonify(
-        {
+class Logout(Resource):
+    @jwt_required()
+    def post(self):
+        return {
             "message": (
                 "Logout successful. Remove the "
                 "access token from the client."
             )
-        }
-    ), 200
+        }, 200
+
+
+api.add_resource(Logout, "/logout")
