@@ -25,6 +25,7 @@ def _serialize(item):
 
 class ItemList(Resource):
     def get(self):
+        #returns an item
         query = Item.query
 
         search = request.args.get("search")
