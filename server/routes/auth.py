@@ -207,6 +207,7 @@ api.add_resource(Me, "/me")
 class Logout(Resource):
     @jwt_required()
     def post(self):
+        #logs out a user from the system
         return {
             "message": (
                 "Logout successful. Remove the "
