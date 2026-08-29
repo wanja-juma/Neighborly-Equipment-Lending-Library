@@ -21,7 +21,7 @@
   width: 100%;
   max-width: 1180px;
   display: grid;
-  grid-template-columns: minmax(360px, 460px) 1fr;
+  grid-template-columns: minmax(360px, 650px) 1fr;
   background: var(--cream);
   border-radius: 28px;
   overflow: hidden;
@@ -148,6 +148,16 @@
   margin: 0;
 }
 
+.server-success {
+  color: #2f7a4d;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(47, 122, 77, 0.08);
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin: 0;
+}
+
 .submit-button {
   margin-top: 6px;
   padding: 15px;
@@ -228,7 +238,6 @@
   );
 }
 
-/* ---------- responsive ---------- */
 
 @media (max-width: 900px) {
   .auth-card {

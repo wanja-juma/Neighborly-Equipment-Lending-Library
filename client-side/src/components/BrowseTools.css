@@ -1,0 +1,235 @@
+.browse-tools {
+  padding: 2rem 1.5rem;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  max-width: 900px;
+}
+
+.tool-card {
+  display: block;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  background-color: #fff;
+}
+
+.tool-card:hover {
+  border-color: #1e5631;
+}
+
+.tool-rate {
+  font-weight: 600;
+  color: #1e5631;
+  padding: 3rem 6%;
+  font-family: 'Inter', sans-serif;
+}
+
+.browse-tools__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.browse-tools__heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1F2B38;
+  margin: 0;
+}
+
+.browse-tools__cart-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #1E5E3D;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.browse-tools__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.5rem;
+}
+
+.tool-card {
+  background: #FFFFFF;
+  border: 1px solid #EDECE6;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tool-card:hover {
+  box-shadow: 0 12px 24px -8px rgba(31, 43, 56, 0.14);
+  transform: translateY(-3px);
+}
+
+.tool-card__icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  background: #FBF6ED;
+  overflow: hidden;
+}
+
+.tool-card__icon {
+  font-size: 52px;
+  line-height: 1;
+  transition: transform 0.25s ease;
+}
+
+.tool-card:hover .tool-card__icon {
+  transform: scale(1.12);
+}
+
+.tool-card__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #FAEEDA;
+  color: #854F0B;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 999px;
+}
+
+.tool-card__body {
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.tool-card__name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #141414;
+  margin: 0 0 4px;
+}
+
+.tool-card__condition {
+  font-size: 13px;
+  color: #55534E;
+  margin: 0;
+}
+
+.tool-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.tool-card__owner,
+.tool-card__location {
+  font-size: 12px;
+  color: #8B8A84;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tool-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tool-card__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0.55rem 0.6rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.tool-card__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-card__btn--request {
+  background: #1E5E3D;
+  color: #FFFFFF;
+  border: none;
+}
+
+.tool-card__btn--request:not(:disabled):hover {
+  background: #164A30;
+}
+
+.tool-card__btn--cart {
+  background: transparent;
+  color: #1E5E3D;
+  border: 1px solid #1E5E3D;
+}
+
+.tool-card__btn--cart:not(:disabled):hover {
+  background: rgba(30, 94, 61, 0.08);
+}
+
+.browse-tools__status {
+  padding: 2rem 6%;
+  font-family: 'Inter', sans-serif;
+  color: #55534E;
+}
+
+.browse-tools__status--error {
+  color: #A32D2D;
+}
+
+.browse-tools__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.browse-tools__page-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1E5E3D;
+  background: #FFFFFF;
+  border: 1px solid #1E5E3D;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.browse-tools__page-btn:not(:disabled):hover {
+  background: rgba(30, 94, 61, 0.08);
+}
+
+.browse-tools__page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.browse-tools__page-label {
+  font-size: 13px;
+  color: #55534E;
+}

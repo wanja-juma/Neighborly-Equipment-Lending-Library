@@ -1,119 +1,91 @@
-import { useState } from 'react';
-import { House, Search, MapPin, Calendar, Plus, Users, ShieldCheck, Leaf } from 'lucide-react';
+
+import { House, Calendar, Plus, Sparkles } from 'lucide-react';
 import heroPhoto from '../assets/hero-photo.jpg';
 import './Home.css';
 
-function Home() {
-  const [query, setQuery] = useState('');
-
-  function handleSearch(event) {
-    event.preventDefault();
-    // TODO: wire this up once the item-search endpoint exists
-    console.log('Searching for:', query);
-  }
-
+function LandingPage() {
   return (
-    <section className="home">
-      <div className="home__left">
-        <div className="home__logo">
-          <House color="#1E5E3D" size={30} />
-          <div className="home__logo-text">
-            <span className="home__logo-name">Neighborly</span>
-            <span className="home__logo-tagline">
-              Borrow. Share. Build Community.
-            </span>
+    <>
+      <section className="home">
+        <div className="home__blob home__blob--green" aria-hidden="true" />
+        <div className="home__blob home__blob--amber" aria-hidden="true" />
+
+        <div className="home__left">
+          <div className="home__logo">
+            <House color="#1E5E3D" size={28} />
+            <div>
+              <span className="home__logo-name">Neighborly</span>
+              <span className="home__logo-tagline">
+                Borrow. Share. Build Community.
+              </span>
+            </div>
+          </div>
+
+          <h1 className="home__headline">
+            Borrow what you need.
+            <br />
+            <span className="home__accent">Share</span> what you have{' '}
+            <Sparkles className="home__sparkle" size={22} aria-hidden="true" />
+          </h1>
+
+          <div className="home__actions">
+            <button type="button" className="home__btn home__btn--filled">
+              <Calendar size={18} />
+              Browse Tools
+            </button>
+            <button type="button" className="home__btn home__btn--outline">
+              <Plus size={18} />
+              List Your Tool
+            </button>gi
+          </div>
+
+          <div className="home__social-proof">
+            <div className="home__avatar-stack" aria-hidden="true">
+              <span className="home__avatar" style={{ backgroundColor: '#1E5E3D' }}>JM</span>
+              <span className="home__avatar" style={{ backgroundColor: '#B5432B' }}>AK</span>
+              <span className="home__avatar" style={{ backgroundColor: '#8B8A84' }}>SW</span>
+            </div>
+            <div>
+              <p className="home__social-proof-stat">500+ neighbors sharing</p>
+              <p className="home__social-proof-caption">
+                Join your street and start borrowing today
+              </p>
+            </div>
           </div>
         </div>
 
-        <h1 className="home__headline">
-          <span className="home__accent">Borrow</span> what you need.
-          <br />
-          <span className="home__accent">Share</span> what you have.
-        </h1>
-
-        <p className="home__subtext">
-          Neighborly is a community platform that connects neighbors to lend
-          and borrow tools and equipment with ease and trust.
-        </p>
-
-        <form className="home__search" onSubmit={handleSearch}>
-          <span className="home__search-icon" aria-hidden="true">
-            <Search size={18} />
-          </span>
-          <input
-            type="text"
-            className="home__search-input"
-            placeholder="Search tools (drill, ladder, mower)…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            aria-label="Search for equipment"
+        <div className="home__right">
+          <img
+            src={heroPhoto}
+            alt="A toolbox full of hand tools next to a lawnmower, ready to be borrowed"
+            className="home__photo"
           />
-          <button type="submit" className="home__search-button">
-            Search
-          </button>
-        </form>
-
-        <div className="home__actions">
-          <button type="button" className="home__btn home__btn--filled">
-            <Calendar size={18} />
-            Browse Tools
-          </button>
-          <button type="button" className="home__btn home__btn--outline">
-            <Plus size={18} />
-            List Your Tool
-          </button>
         </div>
+      </section>
 
-        <p className="home__trust">
-          <MapPin size={14} />
-          Trusted by your community. Right here, right now.
-        </p>
-      </div>
-
-      <div className="home__right">
-        <img
-          src={heroPhoto}
-          alt="A toolbox full of hand tools next to a lawnmower, ready to be borrowed"
-          className="home__photo"
-        />
-        <div className="home__highlights">
-          <div className="home__highlight">
-            <span className="home__highlight-icon">
-              <Users size={20} />
-            </span>
-            <div>
-              <p className="home__highlight-title">Share</p>
-              <p className="home__highlight-desc">
-                Save money by borrowing locally
-              </p>
-            </div>
+      <section className="home-stats">
+        <p className="home-stats__label">Trusted by your community</p>
+        <div className="home-stats__grid">
+          <div className="home-stats__item">
+            <p className="home-stats__number">500+</p>
+            <p className="home-stats__caption">Tools shared</p>
           </div>
-          <div className="home__highlight">
-            <span className="home__highlight-icon">
-              <ShieldCheck size={20} />
-            </span>
-            <div>
-              <p className="home__highlight-title">Trust</p>
-              <p className="home__highlight-desc">
-                Verified users and safe transactions
-              </p>
-            </div>
+          <div className="home-stats__item">
+            <p className="home-stats__number">1,200+</p>
+            <p className="home-stats__caption">Neighbors</p>
           </div>
-          <div className="home__highlight">
-            <span className="home__highlight-icon">
-              <Leaf size={20} />
-            </span>
-            <div>
-              <p className="home__highlight-title">Sustain</p>
-              <p className="home__highlight-desc">
-                Reduce waste and build community
-              </p>
-            </div>
+          <div className="home-stats__item">
+            <p className="home-stats__number">15</p>
+            <p className="home-stats__caption">Estates</p>
+          </div>
+          <div className="home-stats__item">
+            <p className="home-stats__number">KSh 2M+</p>
+            <p className="home-stats__caption">Saved by borrowing</p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
-export default Home;
+export default LandingPage;
