@@ -182,23 +182,22 @@ class Login(Resource):
 api.add_resource(Login, "/login")
 
 
-@auth_bp.get("/me")
-@jwt_required()
-def me():
-    user_id = int(get_jwt_identity())
+class Me(Resource):
+    @jwt_required()
+    def get(self):
+        user_id = int(get_jwt_identity())
 
-    user = db.session.get(User, user_id)
+        user = db.session.get(User, user_id)
 
-    if user is None:
-        return jsonify(
-            {"error": "User not found."}
-        ), 404
+        if user is None:
+            return {"error": "User not found."}, 404
 
-    return jsonify(
-        {
+        return {
             "user": user_schema.dump(user),
-        }
-    ), 200
+        }, 200
+
+
+api.add_resource(Me, "/me")
 
 
 @auth_bp.post("/logout")
