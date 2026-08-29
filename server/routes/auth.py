@@ -32,6 +32,7 @@ REQUIRED_REGISTER_FIELDS = (
 
 class Register(Resource):
     def post(self):
+        # registers user to the system
         data = request.get_json(silent=True) or {}
 
         missing_fields = [
