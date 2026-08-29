@@ -136,6 +136,7 @@ class ItemDetail(Resource):
         return {"item": _serialize(item)}
 
     def delete(self, item_id):
+        #deletes an item from the system.
         item = Item.query.get(item_id)
         if item is None:
             return {"message": "Item not found"}, 404
