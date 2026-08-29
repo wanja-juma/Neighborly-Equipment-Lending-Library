@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_restful import Api, Resource
 
 from app.extensions import db
@@ -151,14 +151,18 @@ api.add_resource(ItemDetail, "/<int:item_id>")
 
 
 users_bp = Blueprint("users_items", __name__, url_prefix="/api/users")
+users_api = Api(users_bp)
 
 
-@users_bp.get("/<int:user_id>/items")
-def get_user_items(user_id):
-    items = (
-        Item.query.filter(Item.owner_id == user_id)
-        .order_by(Item.created_at.desc())
-        .all()
-    )
+class UserItems(Resource):
+    def get(self, user_id):
+        items = (
+            Item.query.filter(Item.owner_id == user_id)
+            .order_by(Item.created_at.desc())
+            .all()
+        )
 
-    return jsonify({"items": [_serialize(item) for item in items]})
+        return {"items": [_serialize(item) for item in items]}
+
+
+users_api.add_resource(UserItems, "/<int:user_id>/items")
