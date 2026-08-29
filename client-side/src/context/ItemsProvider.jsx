@@ -23,7 +23,13 @@ function ItemsProvider({ children }) {
 
         const data = await getItems();
 
-        setItems(data);
+const normalizedItems = Array.isArray(data)
+  ? data
+  : Array.isArray(data?.items)
+    ? data.items
+    : [];
+
+setItems(normalizedItems);
       } catch (error) {
         setItemsError(
           error.message || "Failed to load items."

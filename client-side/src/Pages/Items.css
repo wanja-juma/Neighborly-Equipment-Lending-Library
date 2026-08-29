@@ -383,6 +383,118 @@
   background-color: #f4f7f5;
 }
 
+
+.listing-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.change-availability-button,
+.edit-listing-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  border-radius: 9px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.change-availability-button {
+  border: 1px solid #2f7d4b;
+  background: #2f7d4b;
+  color: #ffffff;
+}
+
+.change-availability-button:hover {
+  background: #25663c;
+  border-color: #25663c;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.edit-listing-button {
+  border: 1px solid #ced8d1;
+  background: #ffffff;
+  color: #2f6141;
+}
+
+.edit-listing-button:hover {
+  border-color: #2f7d4b;
+  background: #f0f8f2;
+  color: #25663c;
+  transform: translateY(-1px);
+}
+
+.change-availability-button:focus-visible,
+.edit-listing-button:focus-visible {
+  outline: 3px solid
+    rgba(47, 125, 75, 0.25);
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  .listing-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .change-availability-button,
+  .edit-listing-button {
+    width: 100%;
+  }
+}
+
+.delete-listing-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.65rem 1rem;
+  border: 1px solid #d84a4a;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #b83232;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.delete-listing-button:hover:not(:disabled) {
+  border-color: #b83232;
+  background: #fff0f0;
+  color: #992727;
+  transform: translateY(-1px);
+}
+
+.delete-listing-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.delete-listing-button:focus-visible {
+  outline: 3px solid
+    rgba(216, 74, 74, 0.25);
+  outline-offset: 2px;
+}
 /* Empty state */
 
 .items-empty-state {
