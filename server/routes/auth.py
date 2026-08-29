@@ -137,52 +137,49 @@ class Register(Resource):
 api.add_resource(Register, "/register")
 
 
-@auth_bp.post("/login")
-def login():
-    data = request.get_json(silent=True) or {}
+class Login(Resource):
+    def post(self):
+        data = request.get_json(silent=True) or {}
 
-    email = data.get("email", "").strip().lower()
-    password = data.get("password", "")
+        email = data.get("email", "").strip().lower()
+        password = data.get("password", "")
 
-    if not email or not password:
-        return jsonify(
-            {
+        if not email or not password:
+            return {
                 "error": (
                     "Email and password are "
                     "required."
                 )
-            }
-        ), 400
+            }, 400
 
-    user = db.session.scalar(
-        db.select(User).where(
-            User.email == email
+        user = db.session.scalar(
+            db.select(User).where(
+                User.email == email
+            )
         )
-    )
 
-    if (
-        user is None
-        or not user.check_password(password)
-    ):
-        return jsonify(
-            {
+        if (
+            user is None
+            or not user.check_password(password)
+        ):
+            return {
                 "error": (
                     "Invalid email or password."
                 )
-            }
-        ), 401
+            }, 401
 
-    access_token = create_access_token(
-        identity=str(user.id)
-    )
+        access_token = create_access_token(
+            identity=str(user.id)
+        )
 
-    return jsonify(
-        {
+        return {
             "message": "Login successful.",
             "access_token": access_token,
             "user": user_schema.dump(user),
-        }
-    ), 200
+        }, 200
+
+
+api.add_resource(Login, "/login")
 
 
 @auth_bp.get("/me")
