@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
 import "./Items.css";
-
-const CURRENT_USER_ID = "1";
 
 function MyListings() {
   const {
@@ -13,19 +12,27 @@ function MyListings() {
     deleteItem,
   } = useItems();
 
+  const { currentUser } = useAuth();
+
   const [notice, setNotice] = useState("");
   const [deleteError, setDeleteError] =
     useState("");
+
   const [
     deletingItemId,
     setDeletingItemId,
   ] = useState(null);
 
-  const myItems = items.filter(
-    (item) =>
-      String(item.ownerId) ===
-      CURRENT_USER_ID
+  const currentUserId = String(
+    currentUser?.id || ""
   );
+
+  const myItems = items.filter((item) => {
+    const ownerId =
+      item.ownerId ?? item.owner_id;
+
+    return String(ownerId) === currentUserId;
+  });
 
   const handleDeleteItem = async (item) => {
     setNotice("");
@@ -71,7 +78,7 @@ function MyListings() {
     return (
       <main className="dashboard-main">
         <section className="items-page">
-          <p>{itemsError}</p>
+          <p role="alert">{itemsError}</p>
         </section>
       </main>
     );
@@ -156,12 +163,13 @@ function MyListings() {
                 String(deletingItemId) ===
                 String(item.id);
 
-              const availabilityClass =
+              const availabilityClass = (
                 item.statusColor ||
-                item.availability
-                  ?.toLowerCase()
-                  .replaceAll(" ", "-") ||
-                "";
+                item.availability ||
+                ""
+              )
+                .toLowerCase()
+                .replaceAll(" ", "-");
 
               return (
                 <article
@@ -185,7 +193,8 @@ function MyListings() {
                   <div className="equipment-content">
                     <div className="equipment-heading">
                       <span className="equipment-category">
-                        {item.category}
+                        {item.category ||
+                          "Equipment"}
                       </span>
 
                       <span
@@ -205,7 +214,8 @@ function MyListings() {
                     <div className="equipment-details">
                       <span>
                         <b>Condition:</b>{" "}
-                        {item.condition}
+                        {item.condition ||
+                          "Not specified"}
                       </span>
 
                       <span>
@@ -217,21 +227,21 @@ function MyListings() {
 
                     <div className="listing-actions">
                       <Link
-  className="edit-item-button"
-  to={`/listings/${item.id}/edit`}
->
-  Edit Listing
-</Link>
-
-                      <button
-                        className="availability-button"
-                        type="button"
+                        className="change-availability-button"
+                        to={`/listings/${item.id}/availability`}
                       >
                         Change Availability
-                      </button>
+                      </Link>
+
+                      <Link
+                        className="edit-listing-button"
+                        to={`/listings/${item.id}/edit`}
+                      >
+                        Edit Listing
+                      </Link>
 
                       <button
-                        className="delete-item-button"
+                        className="delete-listing-button"
                         type="button"
                         disabled={isDeleting}
                         onClick={() =>

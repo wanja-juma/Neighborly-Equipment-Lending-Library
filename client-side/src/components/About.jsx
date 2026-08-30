@@ -59,7 +59,7 @@ export default function LandingPage1() {
       role: "DIY Enthusiast in Lavington",
       image: "SO",
       bgColor: "#8B8A84",
-      rating: 5,
+      rating: 4,
       text: "Great community! The identity check gives total peace of mind when giving out expensive drills and saws."
     }
   ];
