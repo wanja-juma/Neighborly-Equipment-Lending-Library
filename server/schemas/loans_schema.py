@@ -5,39 +5,25 @@ from models.loans import Loan
 
 
 class LoanSchema(SQLAlchemyAutoSchema):
-
     class Meta:
         model = Loan
         load_instance = True
 
     id = fields.Int(dump_only=True)
 
-    user_id = fields.Int(
-        required=True
-    )
+    item_id = fields.Int(required=True)
+    borrower_id = fields.Int(required=True)
 
-    equipment_id = fields.Int(
-        required=True
-    )
+    start_date = fields.DateTime(required=True)
+    end_date = fields.DateTime(required=True)
 
-    loan_date = fields.DateTime(
-        dump_only=True
-    )
-
-    due_date = fields.DateTime(
-        required=True
-    )
-
-    return_date = fields.DateTime(
-        allow_none=True
-    )
+    requested_at = fields.DateTime(dump_only=True)
+    approved_at = fields.DateTime(dump_only=True)
+    due_date = fields.DateTime(allow_none=True)
+    returned_at = fields.DateTime(allow_none=True)
 
     status = fields.Str(
-        validate=validate.OneOf([
-            "active",
-            "returned",
-            "overdue"
-        ]),
+        validate=validate.OneOf(["active", "returned", "overdue"]),
         load_default="active"
     )
 

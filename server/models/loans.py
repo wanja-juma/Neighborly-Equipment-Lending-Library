@@ -9,6 +9,9 @@ class Loan(db.Model):
     borrower_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     start_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     end_date = db.Column(db.DateTime, nullable=False)
+    requested_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    approved_at = db.Column(db.DateTime, nullable=True)
+    returned_at = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.String(50), default='Active')
 
     
