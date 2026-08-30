@@ -135,8 +135,8 @@ class Register(Resource):
             "user": user_schema.dump(user),
         }, 201
 
+api.add_resource(Register, "/register")   # /api/auth/register
 
-api.add_resource(Register, "/register")
 
 
 class Login(Resource):
@@ -181,7 +181,6 @@ class Login(Resource):
             "user": user_schema.dump(user),
         }, 200
 
-
 api.add_resource(Login, "/login")
 
 
@@ -204,6 +203,9 @@ class CurrentUser(Resource):
 api.add_resource(CurrentUser, "/current-user")
 
 
+
+
+
 class Logout(Resource):
     @jwt_required()
     def post(self):
@@ -215,5 +217,11 @@ class Logout(Resource):
             )
         }, 200
 
-
 api.add_resource(Logout, "/logout")
+
+
+
+    
+            
+          
+ 
