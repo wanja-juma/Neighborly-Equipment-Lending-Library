@@ -20,7 +20,7 @@ def get_loans():
 @loans_bp.post("")
 @jwt_required()
 def create_loan():
-    """Create a new loan."""
+    """Create a new loan."""""
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"error": "Request body is required."}), 400
