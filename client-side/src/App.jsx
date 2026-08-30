@@ -10,23 +10,19 @@ import PaymentBar from "./components/PaymentBar";
 import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
-
 import BrowseItems from "./Pages/BrowseItems";
-import DamageReports from "./Pages/DamageReports";
-import Loans from "./Pages/Loans";
+import AddItem from "./Pages/AddItem";
+import EditItem from "./Pages/EditItem";
 import MyListings from "./Pages/MyListings";
 import Requests from "./Pages/Requests";
-import AddItem from "./Pages/AddItem";
-import EditItem from "./Pages/EditListing.jsx";
+import Loans from "./Pages/Loans";
+import DamageReports from "./Pages/DamageReports";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider";
 import DamageReportsProvider from "./context/DamageReportsProvider";
 import AuthProvider from "./context/AuthProvider.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import ChangeAvailability from "./Pages/ChangeAvailability";
-import EditListing from "./Pages/EditListing";
-
 import "./App.css";
 
 function App() {
@@ -50,7 +46,6 @@ function App() {
     "/requests",
     "/loans",
     "/damage-reports",
-     "/paymentbar",
   ];
 
   const isDashboardRoute = dashboardRoutePrefixes.some(
@@ -74,21 +69,11 @@ function App() {
 
                   {/* About page */}
                   <Route path="/about" element={<><Home /><About /></>} />
-                  <Route path="/listings/:itemId/availability"
-                        element={<ChangeAvailability />} />
-
-                  <Route path="/listings/:itemId/edit"
-                        element={<EditListing />} />
 
                   {/* Browse tools */}
                   <Route path="/browse-tools" element={<BrowseTools />} />
                   <Route path="/tools/:id" element={<ItemDetail />} />
-       
-
-<Route
-  path="/payments/:requestId"
-  element={<PaymentBar />}
-/>
+                  <Route path="/payment/:id" element={<PaymentBar />} />
 
                   {/* Authentication */}
                   <Route path="/auth" element={<AuthPage />} />
@@ -108,7 +93,6 @@ function App() {
                     <Route path="/requests" element={<Requests />} />
                     <Route path="/loans" element={<Loans />} />
                     <Route path="/damage-reports" element={<DamageReports />} />
-                    
                   </Route>
 
                   <Route path="*" element={<Navigate to="/" replace />} />

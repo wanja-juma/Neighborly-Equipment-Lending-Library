@@ -2,7 +2,7 @@ from marshmallow import fields, validate
 
 from app.extensions import ma
 from models import Membership
-from models import Membership
+
 
 class MembershipSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
