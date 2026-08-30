@@ -10,7 +10,12 @@ class Item(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text)
+<<<<<<< HEAD
     category_id = db.Column(db.String(100), db.ForeignKey("categories.id"))
+=======
+    image = db.Column(db.String(500))
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
+>>>>>>> ce4be8f58662b5e942e1ee34609345f77ec35da6
     condition = db.Column(db.String(50))
     status = db.Column(db.String(50), default="Available")
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))

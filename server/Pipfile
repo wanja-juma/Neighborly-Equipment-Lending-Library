@@ -24,8 +24,12 @@ python-dotenv = "*"
 sqlalchemy = "==2.0.52"
 typing-extensions = "==4.16.0"
 werkzeug = "==3.1.8"
+<<<<<<< HEAD
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
+=======
+flask-restful = "*"
+>>>>>>> ce4be8f58662b5e942e1ee34609345f77ec35da6
 
 [dev-packages]
 pytest = "*"
