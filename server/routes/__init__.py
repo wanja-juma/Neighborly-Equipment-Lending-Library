@@ -6,7 +6,7 @@ from routes.item import (
     items_bp,
     users_bp,
 )
-from routes.loans_routes import loan_bp
+from routes.loans_routes import loans_bp
 from routes.membership_routes import (
     membership_bp,
 )
@@ -19,7 +19,7 @@ __all__ = [
     "auth_bp",
     "borrowing_request_bp",
     "items_bp",
-    "loan_bp",
+    "loans_bp",
     "membership_bp",
     "payment_bp",
     "profile_bp",

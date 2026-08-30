@@ -17,7 +17,7 @@ class Payment(db.Model):
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
     # FIXED LINE 20: changed 'payment' to 'payments' to match Loan.payments
-    loan = db.relationship('Loan', back_populates='payments')
+    loan = db.relationship('Loan', back_populates='payment')
 
     @validates('status')
     def validate_status(self, key, value):

@@ -16,7 +16,7 @@ class Membership(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
-    user = db.relationship('User', backref='memberships')
+    user = db.relationship('User', back_populates='memberships')
 
     @validates('status')
     def validate_status(self, key, value):

@@ -40,7 +40,7 @@ def create_app(config_class=Config):
         auth_bp,
         borrowing_request_bp,
         items_bp,
-        loan_bp,
+        loans_bp,
         membership_bp,
         payment_bp,
         profile_bp,
@@ -49,11 +49,9 @@ def create_app(config_class=Config):
 
     # Register every blueprint exactly once.
     app.register_blueprint(auth_bp)
-    app.register_blueprint(
-        borrowing_request_bp
-    )
+    app.register_blueprint(borrowing_request_bp)
     app.register_blueprint(items_bp)
-    app.register_blueprint(loan_bp)
+    app.register_blueprint(loans_bp)
     app.register_blueprint(membership_bp)
     app.register_blueprint(payment_bp)
     app.register_blueprint(profile_bp)
