@@ -13,6 +13,7 @@ class Loan(db.Model):
     approved_at = db.Column(db.DateTime, nullable=True)
     returned_at = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.String(50), default='Active')
+    
 
     
     item = db.relationship('Item', back_populates='loans')
