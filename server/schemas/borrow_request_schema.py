@@ -41,6 +41,7 @@ class BorrowingRequestSchema(SQLAlchemyAutoSchema):
     )
 
 
+
 borrowing_request_schema = BorrowingRequestSchema()
 
 borrowing_requests_schema = BorrowingRequestSchema(

@@ -21,6 +21,7 @@ class LoanSchema(SQLAlchemyAutoSchema):
     approved_at = fields.DateTime(dump_only=True)
     due_date = fields.DateTime(allow_none=True)
     returned_at = fields.DateTime(allow_none=True)
+    
 
     status = fields.Str(
         validate=validate.OneOf(["active", "returned", "overdue"]),

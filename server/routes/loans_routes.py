@@ -37,6 +37,7 @@ def create_loan():
             "error": "Validation failed.",
             "details": error.messages
         }), 400
+    
 
 
 @loans_bp.get("/<int:loan_id>")

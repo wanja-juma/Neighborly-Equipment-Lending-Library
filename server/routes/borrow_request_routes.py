@@ -106,6 +106,7 @@ def update_borrowing_request(request_id):
         }), 400
 
 
+
 @borrow_requests_bp.delete("/<int:request_id>")
 @jwt_required()
 def delete_borrowing_request(request_id):
