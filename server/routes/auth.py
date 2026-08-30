@@ -1,3 +1,4 @@
+# auth routes implementation
 from flask import Blueprint, request
 from flask_jwt_extended import (
     create_access_token,
@@ -31,6 +32,7 @@ REQUIRED_REGISTER_FIELDS = (
 
 class Register(Resource):
     def post(self):
+        # registers user to the system
         data = request.get_json(silent=True) or {}
 
         missing_fields = [
@@ -139,6 +141,7 @@ api.add_resource(Register, "/register")   # /api/auth/register
 
 class Login(Resource):
     def post(self):
+        # logs in a user into the system
         data = request.get_json(silent=True) or {}
 
         email = data.get("email", "").strip().lower()
@@ -181,9 +184,10 @@ class Login(Resource):
 api.add_resource(Login, "/login")
 
 
-class Me(Resource):
+class CurrentUser(Resource):
     @jwt_required()
     def get(self):
+        # returns the current user details
         user_id = int(get_jwt_identity())
 
         user = db.session.get(User, user_id)
@@ -195,7 +199,9 @@ class Me(Resource):
             "user": user_schema.dump(user),
         }, 200
 
-api.add_resource(Me, "/me")
+
+api.add_resource(CurrentUser, "/current-user")
+
 
 
 
@@ -203,6 +209,7 @@ api.add_resource(Me, "/me")
 class Logout(Resource):
     @jwt_required()
     def post(self):
+        #logs out a user from the system
         return {
             "message": (
                 "Logout successful. Remove the "

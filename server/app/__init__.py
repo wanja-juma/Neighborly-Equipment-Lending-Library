@@ -47,6 +47,7 @@ def create_app(config_class=Config):
         payment_bp,
         profile_bp,
         user_bp,
+        users_bp,
     )
 
     # Register every blueprint exactly once.
@@ -60,6 +61,7 @@ def create_app(config_class=Config):
     app.register_blueprint(payment_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(users_bp)
 
     @app.get("/api/health")
     def health_check():

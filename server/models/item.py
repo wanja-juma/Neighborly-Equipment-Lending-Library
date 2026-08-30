@@ -10,6 +10,7 @@ class Item(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text)
+    image = db.Column(db.String(500))
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
     condition = db.Column(db.String(50))
     status = db.Column(db.String(50), default="Available")
