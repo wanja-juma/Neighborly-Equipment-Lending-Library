@@ -185,7 +185,7 @@ class Login(Resource):
 api.add_resource(Login, "/login")
 
 
-class Me(Resource):
+class CurrentUser(Resource):
     @jwt_required()
     def get(self):
         # returns the current user details
@@ -201,7 +201,7 @@ class Me(Resource):
         }, 200
 
 
-api.add_resource(Me, "/me")
+api.add_resource(CurrentUser, "/current-user")
 
 
 class Logout(Resource):
