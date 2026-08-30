@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_restful import Api
 
 from app.config import Config
 from app.extensions import (
@@ -31,6 +32,7 @@ def create_app(config_class=Config):
         },
     )
 
+    
     # Load every model so SQLAlchemy and
     # Flask-Migrate can discover them.
     import models  # noqa: F401
