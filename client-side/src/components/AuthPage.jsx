@@ -1,11 +1,4 @@
-<<<<<<< Updated upstream
-import { useState } from 'react'
-import ToolsPanel from './ToolsPanel.jsx'
-import { registerUser, loginUser } from '../mockAuth.js'
-import './AuthPage.css'
-=======
 import { useState } from "react";
-
 import {
   useNavigate,
   useSearchParams,
@@ -13,70 +6,25 @@ import {
 
 import ToolsPanel from "./ToolsPanel.jsx";
 import useAuth from "../hooks/useAuth.js";
+
 import "./AuthPage.css";
->>>>>>> Stashed changes
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5555/api";
 
 function AuthPage() {
-<<<<<<< Updated upstream
-  const [isRegister, setIsRegister] = useState(true)
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' })
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState(''); const [success, setSuccess] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const update = (field) => (e) => setForm({ ...form, [field]: e.target.value })
-  async function handleSubmit(e) {
-    e.preventDefault()
-    if (isRegister && (!form.firstName || !form.lastName)) return setError('Please enter your first and last name')
-    if (!form.email.includes('@')) return setError('Please enter a valid email address')
-    if (!form.password || (isRegister && form.password.length < 8)) return setError('Password must be at least 8 characters')
-    setError(''); setSuccess(''); setSubmitting(true)
-    try {
-      const user = isRegister ? await registerUser(form) : await loginUser(form)
-      setSuccess(isRegister ? `Account created! Welcome, ${user.firstName}.` : `Welcome back, ${user.firstName}.`)
-    } catch (err) { setError(err.message) }
-    setSubmitting(false)
-  }
-  return (
-    <div className="auth-page"><div className="auth-card">
-      <section className="auth-form-panel">
-        <span className="brand-badge">Neighborly</span>
-        <div className="auth-heading"><h1>{isRegister ? 'Create an account' : 'Welcome back'}</h1>
-          <p>{isRegister ? 'Sign up to borrow and lend equipment with your neighbors' : 'Sign in to manage your borrowed and lent items'}</p></div>
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {isRegister && <div className="field-row">
-            <label className="field"><span>First name</span><input value={form.firstName} onChange={update('firstName')} /></label>
-            <label className="field"><span>Last name</span><input value={form.lastName} onChange={update('lastName')} /></label>
-          </div>}
-          <label className="field"><span>Email</span><input type="email" value={form.email} onChange={update('email')} placeholder="you@example.com" /></label>
-          <label className="field"><span>Password</span><div className="password-input">
-            <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={update('password')} placeholder="••••••••" />
-            <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>{showPassword ? '🙈' : '👁️'}</button>
-          </div></label>
-          {error && <p className="server-error">{error}</p>}
-          {success && <p className="server-success">{success}</p>}
-          <button type="submit" className="submit-button" disabled={submitting}>{submitting ? 'Please wait…' : isRegister ? 'Create account' : 'Sign in'}</button>
-        </form>
-        <p className="switch-mode">{isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button type="button" onClick={() => { setIsRegister(!isRegister); setError('') }}>{isRegister ? 'Sign in' : 'Sign up'}</button></p>
-      </section>
-      <section className="auth-illustration-panel"><ToolsPanel /></section>
-    </div></div>
-  )
-=======
   const navigate = useNavigate();
 
-  const [searchParams] =
-    useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const { login } = useAuth();
 
+  // We calculate the mode directly from the URL.
+  // /auth?mode=login -> login page
+  // /auth?mode=register -> registration page
   const isRegister =
-  searchParams.get("mode") !==
-  "login";
+    searchParams.get("mode") !== "login";
 
   const [form, setForm] = useState({
     firstName: "",
@@ -85,31 +33,26 @@ function AuthPage() {
     password: "",
   });
 
-  const [
-    showPassword,
-    setShowPassword,
-  ] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
 
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
   const [success, setSuccess] =
     useState("");
 
-  const [
-    submitting,
-    setSubmitting,
-  ] = useState(false);
+  const [submitting, setSubmitting] =
+    useState(false);
 
+  // Update normal form fields
+  const update = (field) => (event) => {
+    setForm((currentForm) => ({
+      ...currentForm,
+      [field]: event.target.value,
+    }));
+  };
 
-  const update =
-    (field) => (event) => {
-      setForm((currentForm) => ({
-        ...currentForm,
-        [field]: event.target.value,
-      }));
-    };
-
+  // Allow letters, spaces, apostrophes and hyphens in names
   const updateName =
     (field) => (event) => {
       const lettersOnly =
@@ -124,19 +67,16 @@ function AuthPage() {
       }));
     };
 
+  // Validate form before sending request
   const validateForm = () => {
-    const email =
-      form.email.trim();
+    const email = form.email.trim();
 
     if (
       isRegister &&
       (!form.firstName.trim() ||
         !form.lastName.trim())
     ) {
-      return (
-        "Please enter your first " +
-        "and last name."
-      );
+      return "Please enter your first and last name.";
     }
 
     const namePattern =
@@ -151,41 +91,31 @@ function AuthPage() {
           form.lastName.trim()
         ))
     ) {
-      return (
-        "Names can only contain " +
-        "letters."
-      );
+      return "Names can only contain letters.";
     }
 
     if (
       !email ||
       !email.includes("@")
     ) {
-      return (
-        "Please enter a valid " +
-        "email address."
-      );
+      return "Please enter a valid email address.";
     }
 
     if (!form.password) {
-      return (
-        "Please enter your password."
-      );
+      return "Please enter your password.";
     }
 
     if (
       isRegister &&
       form.password.length < 8
     ) {
-      return (
-        "Password must be at least " +
-        "8 characters."
-      );
+      return "Password must be at least 8 characters.";
     }
 
     return "";
   };
 
+  // Send register/login request to Flask API
   const sendAuthRequest = async () => {
     const endpoint = isRegister
       ? "/auth/register"
@@ -195,19 +125,21 @@ function AuthPage() {
       ? {
           firstName:
             form.firstName.trim(),
+
           lastName:
             form.lastName.trim(),
-          email:
-            form.email
-              .trim()
-              .toLowerCase(),
+
+          email: form.email
+            .trim()
+            .toLowerCase(),
+
           password: form.password,
         }
       : {
-          email:
-            form.email
-              .trim()
-              .toLowerCase(),
+          email: form.email
+            .trim()
+            .toLowerCase(),
+
           password: form.password,
         };
 
@@ -218,10 +150,12 @@ function AuthPage() {
         `${API_BASE_URL}${endpoint}`,
         {
           method: "POST",
+
           headers: {
             "Content-Type":
               "application/json",
           },
+
           body: JSON.stringify(
             requestBody
           ),
@@ -238,12 +172,16 @@ function AuthPage() {
         "content-type"
       );
 
-    const responseBody =
+    let responseBody = null;
+
+    if (
       contentType?.includes(
         "application/json"
       )
-        ? await response.json()
-        : null;
+    ) {
+      responseBody =
+        await response.json();
+    }
 
     if (!response.ok) {
       throw new Error(
@@ -256,6 +194,7 @@ function AuthPage() {
     return responseBody;
   };
 
+  // Handle login/register submission
   const handleSubmit = async (
     event
   ) => {
@@ -322,23 +261,30 @@ function AuthPage() {
 
       const authenticatedUser = {
         ...serverUser,
+
         id: String(serverUser.id),
+
         firstName,
+
         lastName,
+
         name:
           serverUser.name ||
           fullName ||
           serverUser.email,
+
         email:
           serverUser.email ||
           form.email
             .trim()
             .toLowerCase(),
+
         role:
           serverUser.role ||
           "Member",
       };
 
+      // Save user + token in AuthContext
       login(
         authenticatedUser,
         token
@@ -356,6 +302,7 @@ function AuthPage() {
             }.`
       );
 
+      // Redirect to dashboard after successful authentication
       navigate("/dashboard", {
         replace: true,
       });
@@ -369,39 +316,44 @@ function AuthPage() {
     }
   };
 
- const handleModeChange = () => {
-  const nextMode = isRegister
-    ? "login"
-    : "register";
+  // Switch between register and login
+  const handleModeChange = () => {
+    const nextMode = isRegister
+      ? "login"
+      : "register";
 
-  setError("");
-  setSuccess("");
-  setShowPassword(false);
+    setError("");
+    setSuccess("");
+    setShowPassword(false);
 
-  setForm({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
+    setForm({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    });
 
-  navigate(
-    `/auth?mode=${nextMode}`,
-    {
-      replace: true,
-    }
-  );
-};
+    navigate(
+      `/auth?mode=${nextMode}`,
+      {
+        replace: true,
+      }
+    );
+  };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
+
+        {/* Left side - form */}
         <section className="auth-form-panel">
+
           <span className="brand-badge">
             Neighborly
           </span>
 
           <div className="auth-heading">
+
             <h1>
               {isRegister
                 ? "Create an account"
@@ -413,6 +365,7 @@ function AuthPage() {
                 ? "Sign up to borrow and lend equipment with your neighbors."
                 : "Sign in to manage your borrowed and lent items."}
             </p>
+
           </div>
 
           <form
@@ -420,9 +373,13 @@ function AuthPage() {
             onSubmit={handleSubmit}
             noValidate
           >
+
+            {/* Name fields only appear during registration */}
             {isRegister && (
               <div className="field-row">
+
                 <label className="field">
+
                   <span>
                     First name
                   </span>
@@ -438,9 +395,11 @@ function AuthPage() {
                     autoComplete="given-name"
                     required
                   />
+
                 </label>
 
                 <label className="field">
+
                   <span>
                     Last name
                   </span>
@@ -456,11 +415,15 @@ function AuthPage() {
                     autoComplete="family-name"
                     required
                   />
+
                 </label>
+
               </div>
             )}
 
+            {/* Email */}
             <label className="field">
+
               <span>Email</span>
 
               <input
@@ -473,12 +436,16 @@ function AuthPage() {
                 autoComplete="email"
                 required
               />
+
             </label>
 
+            {/* Password */}
             <label className="field">
+
               <span>Password</span>
 
               <div className="password-input">
+
                 <input
                   type={
                     showPassword
@@ -517,9 +484,12 @@ function AuthPage() {
                     ? "🙈"
                     : "👁️"}
                 </button>
+
               </div>
+
             </label>
 
+            {/* Error message */}
             {error && (
               <p
                 className="server-error"
@@ -529,6 +499,7 @@ function AuthPage() {
               </p>
             )}
 
+            {/* Success message */}
             {success && (
               <p
                 className="server-success"
@@ -538,6 +509,7 @@ function AuthPage() {
               </p>
             )}
 
+            {/* Submit button */}
             <button
               type="submit"
               className="submit-button"
@@ -549,9 +521,12 @@ function AuthPage() {
                   ? "Create account"
                   : "Sign in"}
             </button>
+
           </form>
 
+          {/* Login/Register switch */}
           <p className="switch-mode">
+
             {isRegister
               ? "Already have an account?"
               : "Don't have an account?"}{" "}
@@ -566,15 +541,19 @@ function AuthPage() {
                 ? "Sign in"
                 : "Sign up"}
             </button>
+
           </p>
+
         </section>
 
+        {/* Right side illustration */}
         <section className="auth-illustration-panel">
           <ToolsPanel />
         </section>
+
       </div>
     </div>
   );
->>>>>>> Stashed changes
 }
-export default AuthPage
+
+export default AuthPage;
