@@ -13,6 +13,9 @@ class BorrowingRequestSchema(SQLAlchemyAutoSchema):
     id = fields.Int(
         dump_only=True
     )
+    loan_id = fields.Int(
+        required=True
+    )
 
     user_id = fields.Int(
         required=True

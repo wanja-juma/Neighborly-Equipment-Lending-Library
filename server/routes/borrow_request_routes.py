@@ -26,37 +26,26 @@ def get_borrowing_requests():
     }), 200
 
 
-@borrow_requests_bp.post("")
+@borrow_requests_bp.route('/borrowing_requests', methods=['POST'])
 @jwt_required()
 def create_borrowing_request():
-    """Create a new borrowing request."""
-    json_data = request.get_json(silent=True)
-    if not json_data:
-        return jsonify({"error": "Request body is required."}), 400
+    json_data = request.get_json()
 
-    try:
-        borrowing_request = borrowing_request_schema.load(
-            json_data, 
-            session=db.session
-        )
-        db.session.add(borrowing_request)
-        db.session.commit()
-        
-        return jsonify({
-            "borrowing_request": borrowing_request_schema.dump(
-                borrowing_request
-            )
-        }), 201
+    # Ensure loan_id exists or fetch/create corresponding loan
+    if 'loan_id' not in json_data or json_data['loan_id'] is None:
+        return jsonify({"error": "loan_id is required"}), 400
 
-    except ValidationError as error:
-        db.session.rollback()
-        return jsonify({
-            "error": "Validation failed.",
-            "details": error.messages
-        }), 400
+    borrowing_request = borrowing_request_schema.load(
+        json_data,
+        session=db.session
+    )
+    db.session.add(borrowing_request)
+    db.session.commit()
+
+    return jsonify({"borrowing_request": borrowing_request_schema.dump(borrowing_request)}), 201
 
 
-@borrow_requests_bp.get("/<int:request_id>")
+@borrow_requests_bp.get("/borrowing_requests/<int:request_id>")
 @jwt_required()
 def get_borrowing_request(request_id):
     """Get a specific borrowing request."""
@@ -71,7 +60,7 @@ def get_borrowing_request(request_id):
     }), 200
 
 
-@borrow_requests_bp.patch("/<int:request_id>")
+@borrow_requests_bp.patch("/borrowing_requests/<int:request_id>")
 @jwt_required()
 def update_borrowing_request(request_id):
     """Update a specific borrowing request."""
@@ -107,7 +96,7 @@ def update_borrowing_request(request_id):
 
 
 
-@borrow_requests_bp.delete("/<int:request_id>")
+@borrow_requests_bp.delete("/borrowing_requests/<int:request_id>")
 @jwt_required()
 def delete_borrowing_request(request_id):
     """Delete a specific borrowing request."""
