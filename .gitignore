@@ -31,4 +31,14 @@ server/.env
 
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
+yarn-error.log*__pycache__/
+*.pyc
+
+# Python virtual environment
+server/venv/
+
+# Python cache
+__pycache__/
+*.pycserver/venv/
+__pycache__/
+*.pyc
