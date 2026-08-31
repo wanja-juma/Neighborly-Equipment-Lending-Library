@@ -27,7 +27,10 @@ class BorrowingRequest(db.Model):
         db.ForeignKey("items.id"),
         nullable=False
     )
+<<<<<<< HEAD
+=======
     
+>>>>>>> ebe99d5140718ab0a26d6c0ce4f2277a0394f3f5
 
     request_date = db.Column(
         db.DateTime,

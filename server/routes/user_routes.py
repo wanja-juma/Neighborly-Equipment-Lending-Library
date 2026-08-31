@@ -154,10 +154,7 @@ class ChangePassword(Resource):
             )
         }, 200
 
-user_api.add_resource(
-    ChangePassword,
-    "/me/password",
-)
+user_api.add_resource( ChangePassword, "/me/password",)
 
 
 class DeleteAccount(Resource):

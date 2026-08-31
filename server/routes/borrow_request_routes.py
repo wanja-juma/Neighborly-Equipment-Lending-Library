@@ -95,18 +95,3 @@ def update_borrowing_request(request_id):
         }), 400
 
 
-
-@borrow_requests_bp.delete("/borrowing_requests/<int:request_id>")
-@jwt_required()
-def delete_borrowing_request(request_id):
-    """Delete a specific borrowing request."""
-    borrowing_request = db.session.get(BorrowingRequest, request_id)
-    if borrowing_request is None:
-        return jsonify({"error": "Borrowing request not found."}), 404
-
-    db.session.delete(borrowing_request)
-    db.session.commit()
-
-    return jsonify({
-        "message": "Borrowing request deleted successfully"
-    }), 200
