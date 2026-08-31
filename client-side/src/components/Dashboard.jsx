@@ -1,19 +1,13 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
 import useLoans from "../hooks/useLoans";
 import useRequests from "../hooks/useRequests";
 import getLoanStatus from "../utils/getLoanStatus";
 
 import "./Dashboard.css";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5555/api";
 
 const summaryCards = [
   {
@@ -48,14 +42,20 @@ const summaryCards = [
 
 const normalizeCollection = (
   value,
-  property
+  ...properties
 ) => {
   if (Array.isArray(value)) {
     return value;
   }
 
-  if (Array.isArray(value?.[property])) {
-    return value[property];
+  for (const property of properties) {
+    if (
+      Array.isArray(
+        value?.[property]
+      )
+    ) {
+      return value[property];
+    }
   }
 
   return [];
@@ -74,7 +74,9 @@ const getItemName = (record) => {
     return record.item.name;
   }
 
-  if (typeof record.item === "string") {
+  if (
+    typeof record.item === "string"
+  ) {
     return record.item;
   }
 
@@ -86,7 +88,10 @@ const getPersonName = (
   person,
   fallback = "Neighbour"
 ) => {
-  if (directName) {
+  if (
+    typeof directName === "string" &&
+    directName.trim()
+  ) {
     return directName;
   }
 
@@ -95,15 +100,15 @@ const getPersonName = (
   }
 
   if (person?.profile) {
-    const fullName = [
+    const profileName = [
       person.profile.first_name,
       person.profile.last_name,
     ]
       .filter(Boolean)
       .join(" ");
 
-    if (fullName) {
-      return fullName;
+    if (profileName) {
+      return profileName;
     }
   }
 
@@ -115,6 +120,8 @@ const getPersonName = (
 };
 
 function Dashboard() {
+  const { currentUser } = useAuth();
+
   const { items } = useItems();
 
   const {
@@ -133,88 +140,61 @@ function Dashboard() {
   const [notice, setNotice] =
     useState("");
 
-  const [currentUser, setCurrentUser] =
-    useState(null);
-
-  const [userLoading, setUserLoading] =
-    useState(true);
-
-  const [userError, setUserError] =
-    useState("");
-
-  const safeItems = normalizeCollection(
-    items,
-    "items"
-  );
+  const safeItems =
+    normalizeCollection(
+      items,
+      "items"
+    );
 
   const safeRequests =
     normalizeCollection(
       borrowingRequests,
-      "borrowingRequests"
+      "borrowingRequests",
+      "borrowing_requests",
+      "requests"
     );
 
-  const safeLoans = normalizeCollection(
-    loans,
-    "loans"
-  );
+  const safeLoans =
+    normalizeCollection(
+      loans,
+      "loans"
+    );
 
   const currentUserId = String(
     currentUser?.id || ""
   );
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      const token =
-        localStorage.getItem(
-          "neighborlyToken"
-        ) ||
-        localStorage.getItem(
-          "access_token"
-        );
+  const firstName =
+    currentUser?.profile?.first_name ||
+    currentUser?.firstName ||
+    currentUser?.first_name ||
+    "";
 
-      if (!token) {
-        setUserError("Please log in.");
-        setUserLoading(false);
-        return;
-      }
+  const lastName =
+    currentUser?.profile?.last_name ||
+    currentUser?.lastName ||
+    currentUser?.last_name ||
+    "";
 
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/auth/me`,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
+  const fullName = [
+    firstName,
+    lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-        const data =
-          await response.json();
+  const displayName =
+    firstName || "Neighbor";
 
-        if (!response.ok) {
-          throw new Error(
-            data.error ||
-              data.message ||
-              "Unable to load user information."
-          );
-        }
-
-        setCurrentUser(
-          data.user || data
-        );
-      } catch (error) {
-        setUserError(
-          error.message ||
-            "Unable to load user information."
-        );
-      } finally {
-        setUserLoading(false);
-      }
-    };
-
-    fetchCurrentUser();
-  }, []);
+  const initials =
+    [firstName, lastName]
+      .filter(Boolean)
+      .map((name) =>
+        name.charAt(0)
+      )
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "N";
 
   const myItems = safeItems.filter(
     (item) => {
@@ -245,7 +225,7 @@ function Dashboard() {
         request.item?.ownerId ??
         request.item?.owner_id;
 
-      const direction = String(
+      const requestType = String(
         request.requestType ??
         request.direction ??
         request.type ??
@@ -256,17 +236,19 @@ function Dashboard() {
         status === "pending" &&
         (String(ownerId) ===
           currentUserId ||
-          direction === "incoming")
+          requestType === "incoming")
       );
     });
 
   const recentPendingRequests =
     pendingRequests.slice(0, 3);
 
-  const activeLoans = safeLoans.filter(
-    (loan) =>
-      getLoanStatus(loan) !== "Returned"
-  );
+  const activeLoans =
+    safeLoans.filter(
+      (loan) =>
+        getLoanStatus(loan) !==
+        "Returned"
+    );
 
   const borrowedLoans =
     activeLoans.filter((loan) => {
@@ -278,7 +260,8 @@ function Dashboard() {
       return (
         String(borrowerId) ===
           currentUserId ||
-        loan.loanType === "borrowed"
+        loan.loanType ===
+          "borrowed"
       );
     });
 
@@ -321,22 +304,24 @@ function Dashboard() {
         dueDate.getTime()
       );
     })
-    .sort((firstLoan, secondLoan) => {
-      const firstDueDate = new Date(
-        firstLoan.dueDate ??
-          firstLoan.due_date
-      );
+    .sort(
+      (
+        firstLoan,
+        secondLoan
+      ) => {
+        const firstDate = new Date(
+          firstLoan.dueDate ??
+            firstLoan.due_date
+        );
 
-      const secondDueDate = new Date(
-        secondLoan.dueDate ??
-          secondLoan.due_date
-      );
+        const secondDate = new Date(
+          secondLoan.dueDate ??
+            secondLoan.due_date
+        );
 
-      return (
-        firstDueDate -
-        secondDueDate
-      );
-    })[0];
+        return firstDate - secondDate;
+      }
+    )[0];
 
   const getReturnReminderText = (
     loan
@@ -516,33 +501,6 @@ function Dashboard() {
     }
   };
 
-  const firstName =
-    currentUser?.profile?.first_name ||
-    currentUser?.firstName ||
-    currentUser?.first_name ||
-    "Neighbor";
-
-  const lastName =
-    currentUser?.profile?.last_name ||
-    currentUser?.lastName ||
-    currentUser?.last_name ||
-    "";
-
-  const fullName = [
-    firstName,
-    lastName,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const initials =
-    [firstName, lastName]
-      .filter(Boolean)
-      .map((name) => name.charAt(0))
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "N";
-
   return (
     <main className="dashboard-main">
       <header className="top-navigation">
@@ -575,7 +533,11 @@ function Dashboard() {
             </span>
 
             <div className="profile-details">
-              <strong>{fullName}</strong>
+              <strong>
+                {fullName ||
+                  "Neighbor"}
+              </strong>
+
               <small>Member</small>
             </div>
 
@@ -596,7 +558,9 @@ function Dashboard() {
 
             <button
               type="button"
-              onClick={() => setNotice("")}
+              onClick={() =>
+                setNotice("")
+              }
               aria-label="Dismiss notification"
             >
               ×
@@ -611,19 +575,8 @@ function Dashboard() {
             </p>
 
             <h1>
-              {userLoading
-                ? "Welcome back"
-                : `Welcome back, ${firstName}`}
+              Welcome back, {displayName}
             </h1>
-
-            {userError && (
-              <p
-                className="user-error"
-                role="alert"
-              >
-                {userError}
-              </p>
-            )}
 
             <p className="welcome-description">
               Here is what is happening in your
@@ -647,30 +600,34 @@ function Dashboard() {
           className="summary-grid"
           aria-label="Dashboard summary"
         >
-          {dashboardSummary.map((card) => (
-            <article
-              className="summary-card"
-              key={card.id}
-            >
-              <span
-                className={`summary-icon ${card.color}`}
+          {dashboardSummary.map(
+            (card) => (
+              <article
+                className="summary-card"
+                key={card.id}
               >
-                {card.icon}
-              </span>
+                <span
+                  className={`summary-icon ${card.color}`}
+                >
+                  {card.icon}
+                </span>
 
-              <div className="summary-information">
-                <strong>
-                  {card.value}
-                </strong>
+                <div className="summary-information">
+                  <strong>
+                    {card.value}
+                  </strong>
 
-                <span>{card.title}</span>
-              </div>
+                  <span>
+                    {card.title}
+                  </span>
+                </div>
 
-              <span className="summary-arrow">
-                ›
-              </span>
-            </article>
-          ))}
+                <span className="summary-arrow">
+                  ›
+                </span>
+              </article>
+            )
+          )}
         </section>
 
         <div className="dashboard-panels">
@@ -705,7 +662,9 @@ function Dashboard() {
                 </div>
               ) : requestsError ? (
                 <div className="requests-empty-state error">
-                  <p>{requestsError}</p>
+                  <p>
+                    {requestsError}
+                  </p>
                 </div>
               ) : recentPendingRequests.length >
                 0 ? (
@@ -724,7 +683,8 @@ function Dashboard() {
                         .split(" ")
                         .filter(Boolean)
                         .map(
-                          (name) => name[0]
+                          (name) =>
+                            name[0]
                         )
                         .join("")
                         .slice(0, 2)
@@ -854,102 +814,106 @@ function Dashboard() {
               </div>
             ) : recentActiveLoans.length >
               0 ? (
-              recentActiveLoans.map((loan) => {
-                const currentStatus =
-                  getLoanStatus(loan);
+              recentActiveLoans.map(
+                (loan) => {
+                  const currentStatus =
+                    getLoanStatus(loan);
 
-                const borrowerId =
-                  loan.borrowerId ??
-                  loan.borrower_id ??
-                  loan.borrower?.id;
+                  const borrowerId =
+                    loan.borrowerId ??
+                    loan.borrower_id ??
+                    loan.borrower?.id;
 
-                const isBorrowed =
-                  String(borrowerId) ===
-                    currentUserId ||
-                  loan.loanType ===
-                    "borrowed";
+                  const isBorrowed =
+                    String(
+                      borrowerId
+                    ) === currentUserId ||
+                    loan.loanType ===
+                      "borrowed";
 
-                const ownerName =
-                  getPersonName(
-                    loan.ownerName ??
-                      loan.owner_name,
-                    loan.owner
-                  );
+                  const ownerName =
+                    getPersonName(
+                      loan.ownerName ??
+                        loan.owner_name,
+                      loan.owner
+                    );
 
-                const borrowerName =
-                  getPersonName(
-                    loan.borrowerName ??
-                      loan.borrower_name,
-                    loan.borrower
-                  );
+                  const borrowerName =
+                    getPersonName(
+                      loan.borrowerName ??
+                        loan.borrower_name,
+                      loan.borrower
+                    );
 
-                const personName =
-                  getPersonName(
-                    loan.person,
-                    null
-                  );
+                  const personName =
+                    getPersonName(
+                      loan.person,
+                      null
+                    );
 
-                const loanItemName =
-                  getItemName(loan);
+                  const loanItemName =
+                    getItemName(loan);
 
-                const dueDate =
-                  loan.dueDate ??
-                  loan.due_date ??
-                  "date not provided";
+                  const dueDate =
+                    loan.dueDate ??
+                    loan.due_date ??
+                    "date not provided";
 
-                return (
-                  <article
-                    className="loan-card"
-                    key={loan.id}
-                  >
-                    <span className="loan-item-icon">
-                      {loan.icon || "🧰"}
-                    </span>
-
-                    <div className="loan-information">
-                      <strong>
-                        {loanItemName}
-                      </strong>
-
-                      <span className="loan-person">
-                        {isBorrowed
-                          ? `Borrowed from ${
-                              ownerName !==
-                              "Neighbour"
-                                ? ownerName
-                                : personName
-                            }`
-                          : `Lent to ${
-                              borrowerName !==
-                              "Neighbour"
-                                ? borrowerName
-                                : personName
-                            }`}
+                  return (
+                    <article
+                      className="loan-card"
+                      key={loan.id}
+                    >
+                      <span className="loan-item-icon">
+                        {loan.icon ||
+                          "🧰"}
                       </span>
 
-                      <small className="loan-due-date">
-                        Due {dueDate}
-                      </small>
-                    </div>
+                      <div className="loan-information">
+                        <strong>
+                          {loanItemName}
+                        </strong>
 
-                    <span
-                      className={`loan-status ${getLoanStatusClass(
-                        currentStatus
-                      )}`}
-                    >
-                      {currentStatus}
-                    </span>
+                        <span className="loan-person">
+                          {isBorrowed
+                            ? `Borrowed from ${
+                                ownerName !==
+                                "Neighbour"
+                                  ? ownerName
+                                  : personName
+                              }`
+                            : `Lent to ${
+                                borrowerName !==
+                                "Neighbour"
+                                  ? borrowerName
+                                  : personName
+                              }`}
+                        </span>
 
-                    <Link
-                      className="loan-options-button"
-                      to="/loans"
-                      aria-label={`View details for ${loanItemName}`}
-                    >
-                      •••
-                    </Link>
-                  </article>
-                );
-              })
+                        <small className="loan-due-date">
+                          Due {dueDate}
+                        </small>
+                      </div>
+
+                      <span
+                        className={`loan-status ${getLoanStatusClass(
+                          currentStatus
+                        )}`}
+                      >
+                        {currentStatus}
+                      </span>
+
+                      <Link
+                        className="loan-options-button"
+                        to="/loans"
+                        aria-label={`View details for ${loanItemName}`}
+                      >
+                        •••
+                      </Link>
+                    </article>
+                  );
+                }
+              )
             ) : (
               <div className="loans-empty-state">
                 <span className="empty-state-icon">
@@ -993,58 +957,64 @@ function Dashboard() {
 
             <div className="listings-grid">
               {recentListings.length > 0 ? (
-                recentListings.map((item) => (
-                  <article
-                    className="listing-card"
-                    key={item.id}
-                  >
-                    <div className="listing-image">
-                      <span>
-                        {item.icon || "🧰"}
-                      </span>
+                recentListings.map(
+                  (item) => (
+                    <article
+                      className="listing-card"
+                      key={item.id}
+                    >
+                      <div className="listing-image">
+                        <span>
+                          {item.icon ||
+                            "🧰"}
+                        </span>
 
-                      <Link
-                        className="listing-options-button"
-                        to="/listings"
-                        aria-label={`View options for ${item.name}`}
-                      >
-                        •••
-                      </Link>
-                    </div>
+                        <Link
+                          className="listing-options-button"
+                          to="/listings"
+                          aria-label={`View options for ${
+                            item.name ||
+                            "equipment"
+                          }`}
+                        >
+                          •••
+                        </Link>
+                      </div>
 
-                    <div className="listing-information">
-                      <strong>
-                        {item.name ||
-                          "Equipment"}
-                      </strong>
+                      <div className="listing-information">
+                        <strong>
+                          {item.name ||
+                            "Equipment"}
+                        </strong>
 
-                      <span className="item-condition">
-                        {item.condition ||
-                          "Unknown"}
-                      </span>
+                        <span className="item-condition">
+                          {item.condition ||
+                            "Unknown"}
+                        </span>
 
-                      <small
-                        className={`availability-status ${
-                          item.statusColor ||
-                          String(
-                            item.availability ||
-                              ""
-                          )
-                            .toLowerCase()
-                            .replaceAll(
-                              " ",
-                              "-"
+                        <small
+                          className={`availability-status ${
+                            item.statusColor ||
+                            String(
+                              item.availability ||
+                                ""
                             )
-                        }`}
-                      >
-                        <span className="status-dot" />
+                              .toLowerCase()
+                              .replaceAll(
+                                " ",
+                                "-"
+                              )
+                          }`}
+                        >
+                          <span className="status-dot" />
 
-                        {item.availability ||
-                          "Unknown"}
-                      </small>
-                    </div>
-                  </article>
-                ))
+                          {item.availability ||
+                            "Unknown"}
+                        </small>
+                      </div>
+                    </article>
+                  )
+                )
               ) : (
                 <div className="listings-empty-state">
                   <p>

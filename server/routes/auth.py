@@ -181,7 +181,7 @@ class Login(Resource):
 api.add_resource(Login, "/login")
 
 
-class Me(Resource):
+class CurrentUser(Resource):
     @jwt_required()
     def get(self):
         user_id = int(get_jwt_identity())
@@ -195,7 +195,7 @@ class Me(Resource):
             "user": user_schema.dump(user),
         }, 200
 
-api.add_resource(Me, "/me")
+api.add_resource(CurrentUser, "/current-user")
 
 
 
