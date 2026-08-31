@@ -1,12 +1,17 @@
-import { useState } from "react";
-import useLoans from "../hooks/useLoans";
-import useItems from "../hooks/useItems";
-import getLoanStatus from "../utils/getLoanStatus";
-import "./BrowseItems.css";
+import {
+  useMemo,
+  useState,
+} from "react";
 
-const CURRENT_USER_ID = "1";
+import useAuth from "../hooks/useAuth";
+import useItems from "../hooks/useItems";
+import useLoans from "../hooks/useLoans";
+import getLoanStatus from "../utils/getLoanStatus";
+import "./Loans.css";
 
 function Loans() {
+  const { currentUser } = useAuth();
+
   const {
     loans,
     loansLoading,
@@ -16,96 +21,266 @@ function Loans() {
 
   const { updateItem } = useItems();
 
-  const [notice, setNotice] = useState("");
+  const [activeTab, setActiveTab] =
+    useState("borrowed");
+
+  const [notice, setNotice] =
+    useState("");
+
   const [actionError, setActionError] =
     useState("");
-  const [updatingLoanId, setUpdatingLoanId] =
-    useState(null);
 
-  const borrowedLoans = loans.filter(
-    (loan) =>
-      String(loan.borrowerId) ===
-      CURRENT_USER_ID
+  const [
+    updatingLoanId,
+    setUpdatingLoanId,
+  ] = useState(null);
+
+  const currentUserId = String(
+    currentUser?.id || "1"
   );
 
-  const lentLoans = loans.filter(
-    (loan) =>
-      String(loan.ownerId) ===
-      CURRENT_USER_ID
+  const safeLoans = useMemo(
+    () =>
+      Array.isArray(loans)
+        ? loans
+        : [],
+    [loans]
   );
 
-  const getStatusClass = (status) => {
-    return (status || "On Track")
+  const borrowedLoans = useMemo(
+    () =>
+      safeLoans.filter((loan) => {
+        const borrowerId =
+          loan.borrowerId ??
+          loan.borrower_id ??
+          loan.borrower?.id;
+
+        return (
+          String(borrowerId) ===
+          currentUserId
+        );
+      }),
+    [safeLoans, currentUserId]
+  );
+
+  const lentLoans = useMemo(
+    () =>
+      safeLoans.filter((loan) => {
+        const ownerId =
+          loan.ownerId ??
+          loan.owner_id ??
+          loan.owner?.id ??
+          loan.item?.ownerId ??
+          loan.item?.owner_id;
+
+        return (
+          String(ownerId) ===
+          currentUserId
+        );
+      }),
+    [safeLoans, currentUserId]
+  );
+
+  const displayedLoans =
+    activeTab === "borrowed"
+      ? borrowedLoans
+      : lentLoans;
+
+  const getStatusClass = (status) =>
+    String(status || "On Track")
       .toLowerCase()
       .replaceAll(" ", "-");
+
+  const getItemName = (loan) => {
+    if (
+      loan.item &&
+      typeof loan.item === "object"
+    ) {
+      return (
+        loan.item.name ||
+        "Equipment"
+      );
+    }
+
+    return (
+      loan.itemName ||
+      loan.item_name ||
+      loan.item ||
+      "Equipment"
+    );
+  };
+
+  const getItemId = (loan) =>
+    loan.itemId ??
+    loan.item_id ??
+    loan.item?.id;
+
+  const getPersonName = (
+    loan,
+    type
+  ) => {
+    if (loan.person) {
+      return loan.person;
+    }
+
+    const person =
+      type === "borrowed"
+        ? loan.owner
+        : loan.borrower;
+
+    if (
+      person &&
+      typeof person === "object"
+    ) {
+      const firstName =
+        person.firstName ||
+        person.first_name ||
+        "";
+
+      const lastName =
+        person.lastName ||
+        person.last_name ||
+        "";
+
+      return (
+        person.name ||
+        [firstName, lastName]
+          .filter(Boolean)
+          .join(" ") ||
+        "Neighbour"
+      );
+    }
+
+    if (type === "borrowed") {
+      return (
+        loan.ownerName ||
+        loan.owner_name ||
+        "Neighbour"
+      );
+    }
+
+    return (
+      loan.borrowerName ||
+      loan.borrower_name ||
+      "Neighbour"
+    );
+  };
+
+  const formatDate = (date) => {
+    if (!date) {
+      return "Not provided";
+    }
+
+    const parsedDate = new Date(date);
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+      return date;
+    }
+
+    return parsedDate.toLocaleDateString();
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setNotice("");
+    setActionError("");
   };
 
   const handleMarkReturned = async (
-  loanId
-) => {
-  setNotice("");
-  setActionError("");
-  setUpdatingLoanId(loanId);
+    loanId
+  ) => {
+    setNotice("");
+    setActionError("");
+    setUpdatingLoanId(loanId);
 
-  const selectedLoan = loans.find(
-    (loan) =>
-      String(loan.id) === String(loanId)
-  );
+    const selectedLoan =
+      safeLoans.find(
+        (loan) =>
+          String(loan.id) ===
+          String(loanId)
+      );
 
-  if (!selectedLoan) {
-    setActionError(
-      "The selected loan could not be found."
-    );
-    setUpdatingLoanId(null);
-    return;
-  }
+    if (!selectedLoan) {
+      setActionError(
+        "The selected loan could not be found."
+      );
 
-  const loanResult = await updateLoanStatus(
-    loanId,
-    "Returned"
-  );
+      setUpdatingLoanId(null);
+      return;
+    }
 
-  if (!loanResult.success) {
-    setActionError(loanResult.message);
-    setUpdatingLoanId(null);
-    return;
-  }
+    try {
+      const loanResult =
+        await updateLoanStatus(
+          loanId,
+          "Returned"
+        );
 
-  if (!selectedLoan.itemId) {
-    setActionError(
-      "The loan was returned, but it is not linked to an item."
-    );
-    setUpdatingLoanId(null);
-    return;
-  }
+      if (
+        loanResult &&
+        loanResult.success === false
+      ) {
+        throw new Error(
+          loanResult.message ||
+            "The loan could not be updated."
+        );
+      }
 
-  try {
-    await updateItem(selectedLoan.itemId, {
-      availability: "Available",
-    });
+      const itemId =
+        getItemId(selectedLoan);
 
-    setNotice(
-      "Loan marked as returned and item made available."
-    );
-  } catch (error) {
-    setActionError(
-      error.message ||
-        "The loan was returned, but the item availability could not be updated."
-    );
-  } finally {
-    setUpdatingLoanId(null);
-  }
-};
+      if (!itemId) {
+        setNotice(
+          "The loan was marked as returned."
+        );
 
-  const renderLoanCard = (loan, type) => {
+        return;
+      }
+
+      await updateItem(itemId, {
+        availability: "Available",
+      });
+
+      setNotice(
+        "Loan marked as returned and the item is available again."
+      );
+    } catch (error) {
+      setActionError(
+        error.message ||
+          "The loan could not be marked as returned."
+      );
+    } finally {
+      setUpdatingLoanId(null);
+    }
+  };
+
+  const renderLoanCard = (
+    loan,
+    type
+  ) => {
     const currentStatus =
-  getLoanStatus(loan);
+      getLoanStatus(loan);
 
-const isReturned =
-  currentStatus === "Returned";
+    const isReturned =
+      String(currentStatus)
+        .toLowerCase() ===
+      "returned";
 
     const isUpdating =
-      updatingLoanId === loan.id;
+      String(updatingLoanId) ===
+      String(loan.id);
+
+    const dueDate =
+      loan.dueDate ||
+      loan.due_date;
+
+    const returnedAt =
+      loan.returnedAt ||
+      loan.returned_at;
 
     return (
       <article
@@ -115,7 +290,9 @@ const isReturned =
         <div className="loan-page-card-top">
           <div className="loan-page-item">
             <span className="loan-page-icon">
-              {loan.icon || "🧰"}
+              {loan.icon ||
+                loan.item?.icon ||
+                "🧰"}
             </span>
 
             <div>
@@ -126,9 +303,7 @@ const isReturned =
               </span>
 
               <h3>
-                {loan.item ||
-                  loan.itemName ||
-                  "Equipment"}
+                {getItemName(loan)}
               </h3>
             </div>
           </div>
@@ -149,24 +324,21 @@ const isReturned =
                 ? "Borrowed from:"
                 : "Lent to:"}
             </strong>{" "}
-            {loan.person ||
-              (type === "borrowed"
-                ? loan.ownerName
-                : loan.borrowerName) ||
-              "Neighbour"}
+            {getPersonName(
+              loan,
+              type
+            )}
           </p>
 
           <p>
             <strong>Due date:</strong>{" "}
-            {loan.dueDate || "Not provided"}
+            {formatDate(dueDate)}
           </p>
 
-          {loan.returnedAt && (
+          {returnedAt && (
             <p>
               <strong>Returned:</strong>{" "}
-              {new Date(
-                loan.returnedAt
-              ).toLocaleDateString()}
+              {formatDate(returnedAt)}
             </p>
           )}
         </div>
@@ -178,7 +350,9 @@ const isReturned =
               type="button"
               disabled={isUpdating}
               onClick={() =>
-                handleMarkReturned(loan.id)
+                handleMarkReturned(
+                  loan.id
+                )
               }
             >
               {isUpdating
@@ -223,97 +397,154 @@ const isReturned =
             <h1>Active Loans</h1>
 
             <p>
-              View borrowed, lent, returned and
-              overdue items.
+              View borrowed, lent,
+              returned and overdue items.
             </p>
-          </div>
-
-          <div className="loans-page-summary">
-            <div>
-              <strong>
-                {borrowedLoans.length}
-              </strong>
-              <span>Borrowed</span>
-            </div>
-
-            <div>
-              <strong>{lentLoans.length}</strong>
-              <span>Lent Out</span>
-            </div>
           </div>
         </header>
 
         {notice && (
-          <p
+          <div
             className="loan-action-notice success"
             role="status"
           >
-            {notice}
-          </p>
+            <span>{notice}</span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setNotice("")
+              }
+              aria-label="Dismiss notification"
+            >
+              ×
+            </button>
+          </div>
         )}
 
         {actionError && (
-          <p
+          <div
             className="loan-action-notice error"
             role="alert"
           >
-            {actionError}
-          </p>
+            <span>{actionError}</span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setActionError("")
+              }
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
         )}
 
-        <section className="loan-page-section">
+        <div
+          className="loans-tab-switcher"
+          role="tablist"
+          aria-label="Loan categories"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={
+              activeTab === "borrowed"
+            }
+            className={`loans-tab-button ${
+              activeTab === "borrowed"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              handleTabChange(
+                "borrowed"
+              )
+            }
+          >
+            Items I Borrowed
+
+            <span className="loans-tab-count">
+              {borrowedLoans.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={
+              activeTab === "lent"
+            }
+            className={`loans-tab-button ${
+              activeTab === "lent"
+                ? "active"
+                : ""
+            }`}
+            onClick={() =>
+              handleTabChange("lent")
+            }
+          >
+            Items I Lent Out
+
+            <span className="loans-tab-count">
+              {lentLoans.length}
+            </span>
+          </button>
+        </div>
+
+        <section
+          className="loan-page-section"
+          role="tabpanel"
+        >
           <div className="loan-section-heading">
             <div>
-              <h2>Items I Borrowed</h2>
+              <h2>
+                {activeTab === "borrowed"
+                  ? "Items I Borrowed"
+                  : "Items I Lent Out"}
+              </h2>
+
               <p>
-                Equipment you borrowed from your
-                neighbours.
+                {activeTab === "borrowed"
+                  ? "Equipment you borrowed from your neighbours."
+                  : "Equipment currently borrowed from you."}
               </p>
             </div>
 
-            <span>{borrowedLoans.length}</span>
+            <span>
+              {displayedLoans.length}
+            </span>
           </div>
 
           <div className="loan-page-grid">
-            {borrowedLoans.length > 0 ? (
-              borrowedLoans.map((loan) =>
-                renderLoanCard(
-                  loan,
+            {displayedLoans.length >
+            0 ? (
+              displayedLoans.map(
+                (loan) =>
+                  renderLoanCard(
+                    loan,
+                    activeTab
+                  )
+              )
+            ) : (
+              <div className="loan-page-empty">
+                <span>🧰</span>
+
+                <h3>
+                  No{" "}
+                  {activeTab ===
                   "borrowed"
-                )
-              )
-            ) : (
-              <div className="loan-page-empty">
+                    ? "borrowed"
+                    : "lent"}{" "}
+                  items
+                </h3>
+
                 <p>
-                  You have not borrowed any items.
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="loan-page-section">
-          <div className="loan-section-heading">
-            <div>
-              <h2>Items I Lent Out</h2>
-              <p>
-                Equipment currently borrowed from
-                you.
-              </p>
-            </div>
-
-            <span>{lentLoans.length}</span>
-          </div>
-
-          <div className="loan-page-grid">
-            {lentLoans.length > 0 ? (
-              lentLoans.map((loan) =>
-                renderLoanCard(loan, "lent")
-              )
-            ) : (
-              <div className="loan-page-empty">
-                <p>
-                  You have not lent out any items.
+                  {activeTab ===
+                  "borrowed"
+                    ? "You have not borrowed any items."
+                    : "You have not lent out any items."}
                 </p>
               </div>
             )}
