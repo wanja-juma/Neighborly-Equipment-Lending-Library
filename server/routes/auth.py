@@ -29,13 +29,11 @@ REQUIRED_REGISTER_FIELDS = (
     "password",
 )
 
-REQUIRED_REGISTER_FIELDS = ["username", "email", "password"]
+REQUIRED_REGISTER_FIELDS = ["firstname","lastname", "email", "password"]
 class Register(Resource):
     def post(self):
         """Register a new user."""
 
-<<<<<<< HEAD
-=======
         data = (
             request.get_json(
                 silent=True
@@ -43,7 +41,6 @@ class Register(Resource):
             or {}
         )
 
->>>>>>> dev
         missing_fields = [
             field
             for field
@@ -320,7 +317,4 @@ api.add_resource(
             
           
  
-<<<<<<< HEAD
-=======
 
->>>>>>> dev
