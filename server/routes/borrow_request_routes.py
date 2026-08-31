@@ -106,6 +106,10 @@ def update_borrowing_request(request_id):
         }), 400
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ebe99d5140718ab0a26d6c0ce4f2277a0394f3f5
 @borrow_requests_bp.delete("/<int:request_id>")
 @jwt_required()
 def delete_borrowing_request(request_id):

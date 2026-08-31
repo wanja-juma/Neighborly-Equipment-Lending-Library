@@ -1,46 +1,35 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
 import useLoans from "../hooks/useLoans";
 import useRequests from "../hooks/useRequests";
 import getLoanStatus from "../utils/getLoanStatus";
-
 import "./Dashboard.css";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5555/api";
 
 const summaryCards = [
   {
     id: 1,
     title: "My Listings",
-    value: 0,
     icon: "▦",
     color: "green",
   },
   {
     id: 2,
     title: "Pending Requests",
-    value: 0,
     icon: "◷",
     color: "orange",
   },
   {
     id: 3,
     title: "Items Borrowed",
-    value: 0,
     icon: "↓",
     color: "blue",
   },
   {
     id: 4,
     title: "Items Lent Out",
-    value: 0,
     icon: "↑",
     color: "purple",
   },
@@ -48,37 +37,42 @@ const summaryCards = [
 
 const normalizeCollection = (
   value,
-  property
+  ...properties
 ) => {
   if (Array.isArray(value)) {
     return value;
   }
 
-  if (Array.isArray(value?.[property])) {
-    return value[property];
+  for (const property of properties) {
+    if (
+      Array.isArray(
+        value?.[property]
+      )
+    ) {
+      return value[property];
+    }
   }
 
   return [];
 };
 
 const getItemName = (record) => {
-  if (record.itemName) {
-    return record.itemName;
+  if (
+    record?.item &&
+    typeof record.item === "object"
+  ) {
+    return (
+      record.item.name ||
+      "Equipment"
+    );
   }
 
-  if (record.item_name) {
-    return record.item_name;
-  }
-
-  if (record.item?.name) {
-    return record.item.name;
-  }
-
-  if (typeof record.item === "string") {
-    return record.item;
-  }
-
-  return "Equipment";
+  return (
+    record?.itemName ||
+    record?.item_name ||
+    record?.item ||
+    "Equipment"
+  );
 };
 
 const getPersonName = (
@@ -86,35 +80,168 @@ const getPersonName = (
   person,
   fallback = "Neighbour"
 ) => {
-  if (directName) {
-    return directName;
+  if (
+    typeof directName === "string" &&
+    directName.trim()
+  ) {
+    return directName.trim();
   }
 
-  if (person?.name) {
-    return person.name;
+  if (
+    typeof person === "string" &&
+    person.trim()
+  ) {
+    return person.trim();
   }
 
-  if (person?.profile) {
-    const fullName = [
-      person.profile.first_name,
-      person.profile.last_name,
+  if (
+    person &&
+    typeof person === "object"
+  ) {
+    if (person.name) {
+      return person.name;
+    }
+
+    const profile =
+      person.profile || person;
+
+    const firstName =
+      profile.firstName ||
+      profile.first_name ||
+      "";
+
+    const lastName =
+      profile.lastName ||
+      profile.last_name ||
+      "";
+
+    const profileName = [
+      firstName,
+      lastName,
     ]
       .filter(Boolean)
       .join(" ");
 
-    if (fullName) {
-      return fullName;
+    if (profileName) {
+      return profileName;
     }
-  }
-
-  if (typeof person === "string") {
-    return person;
   }
 
   return fallback;
 };
 
+const getRecordOwnerId = (record) =>
+  record?.ownerId ??
+  record?.owner_id ??
+  record?.owner?.id ??
+  record?.item?.ownerId ??
+  record?.item?.owner_id ??
+  record?.item?.owner?.id;
+
+const getRecordBorrowerId = (record) =>
+  record?.borrowerId ??
+  record?.borrower_id ??
+  record?.borrower?.id ??
+  record?.userId ??
+  record?.user_id;
+
+const getDueDate = (loan) =>
+  loan?.dueDate ??
+  loan?.due_date ??
+  loan?.endDate ??
+  loan?.end_date;
+
+const formatDate = (date) => {
+  if (!date) {
+    return "Date unavailable";
+  }
+
+  const parsedDate = new Date(date);
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+    return date;
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-GB",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }
+  ).format(parsedDate);
+};
+
+const getReturnReminderText = (
+  loan
+) => {
+  const dueDateValue =
+    getDueDate(loan);
+
+  if (!dueDateValue) {
+    return "";
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const dueDate = new Date(
+    dueDateValue
+  );
+
+  if (
+    Number.isNaN(
+      dueDate.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  dueDate.setHours(0, 0, 0, 0);
+
+  const millisecondsPerDay =
+    1000 * 60 * 60 * 24;
+
+  const daysRemaining = Math.round(
+    (dueDate.getTime() -
+      today.getTime()) /
+      millisecondsPerDay
+  );
+
+  if (daysRemaining < 0) {
+    const overdueDays =
+      Math.abs(daysRemaining);
+
+    return `${overdueDays} ${
+      overdueDays === 1
+        ? "day"
+        : "days"
+    } overdue`;
+  }
+
+  if (daysRemaining === 0) {
+    return "Due today";
+  }
+
+  if (daysRemaining === 1) {
+    return "Due tomorrow";
+  }
+
+  return `Due in ${daysRemaining} days`;
+};
+
+const getStatusClass = (status) =>
+  String(status || "On Track")
+    .toLowerCase()
+    .replaceAll(" ", "-");
+
 function Dashboard() {
+  const { currentUser } = useAuth();
+
   const { items } = useItems();
 
   const {
@@ -133,101 +260,96 @@ function Dashboard() {
   const [notice, setNotice] =
     useState("");
 
-  const [currentUser, setCurrentUser] =
-    useState(null);
+  const [
+    actionError,
+    setActionError,
+  ] = useState("");
 
-  const [userLoading, setUserLoading] =
-    useState(true);
+  const [
+    updatingRequestId,
+    setUpdatingRequestId,
+  ] = useState(null);
 
-  const [userError, setUserError] =
-    useState("");
-
-  const safeItems = normalizeCollection(
-    items,
-    "items"
-  );
+  const safeItems =
+    normalizeCollection(
+      items,
+      "items"
+    );
 
   const safeRequests =
     normalizeCollection(
       borrowingRequests,
-      "borrowingRequests"
+      "borrowingRequests",
+      "borrowing_requests",
+      "requests"
     );
 
-  const safeLoans = normalizeCollection(
-    loans,
-    "loans"
-  );
+  const safeLoans =
+    normalizeCollection(
+      loans,
+      "loans"
+    );
 
   const currentUserId = String(
     currentUser?.id || ""
   );
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      const token =
-        localStorage.getItem(
-          "neighborlyToken"
-        ) ||
-        localStorage.getItem(
-          "access_token"
-        );
+  const firstName =
+    currentUser?.firstName ||
+    currentUser?.first_name ||
+    currentUser?.profile
+      ?.first_name ||
+    currentUser?.profile
+      ?.firstName ||
+    "";
 
-      if (!token) {
-        setUserError("Please log in.");
-        setUserLoading(false);
-        return;
-      }
+  const lastName =
+    currentUser?.lastName ||
+    currentUser?.last_name ||
+    currentUser?.profile
+      ?.last_name ||
+    currentUser?.profile
+      ?.lastName ||
+    "";
 
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/auth/me`,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
+  const fullName =
+    currentUser?.name ||
+    [firstName, lastName]
+      .filter(Boolean)
+      .join(" ") ||
+    currentUser?.email ||
+    "Neighbour";
 
-        const data =
-          await response.json();
+  const displayName =
+    firstName ||
+    fullName.split(" ")[0] ||
+    "Neighbour";
 
-        if (!response.ok) {
-          throw new Error(
-            data.error ||
-              data.message ||
-              "Unable to load user information."
-          );
-        }
-
-        setCurrentUser(
-          data.user || data
-        );
-      } catch (error) {
-        setUserError(
-          error.message ||
-            "Unable to load user information."
-        );
-      } finally {
-        setUserLoading(false);
-      }
-    };
-
-    fetchCurrentUser();
-  }, []);
+  const initials =
+    [firstName, lastName]
+      .filter(Boolean)
+      .map((name) =>
+        name.charAt(0)
+      )
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() ||
+    fullName
+      .split(" ")
+      .filter(Boolean)
+      .map((name) =>
+        name.charAt(0)
+      )
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() ||
+    "N";
 
   const myItems = safeItems.filter(
-    (item) => {
-      const ownerId =
-        item.ownerId ??
-        item.owner_id ??
-        item.owner?.id;
-
-      return (
-        String(ownerId) ===
-        currentUserId
-      );
-    }
+    (item) =>
+      String(
+        getRecordOwnerId(item)
+      ) === currentUserId
   );
 
   const recentListings =
@@ -239,13 +361,7 @@ function Dashboard() {
         request.status || ""
       ).toLowerCase();
 
-      const ownerId =
-        request.ownerId ??
-        request.owner_id ??
-        request.item?.ownerId ??
-        request.item?.owner_id;
-
-      const direction = String(
+      const requestType = String(
         request.requestType ??
         request.direction ??
         request.type ??
@@ -254,230 +370,139 @@ function Dashboard() {
 
       return (
         status === "pending" &&
-        (String(ownerId) ===
-          currentUserId ||
-          direction === "incoming")
+        (
+          String(
+            getRecordOwnerId(
+              request
+            )
+          ) === currentUserId ||
+          requestType === "incoming"
+        )
       );
     });
 
   const recentPendingRequests =
     pendingRequests.slice(0, 3);
 
-  const activeLoans = safeLoans.filter(
-    (loan) =>
-      getLoanStatus(loan) !== "Returned"
-  );
+  const activeLoans =
+    safeLoans.filter((loan) => {
+      const status = String(
+        getLoanStatus(loan) || ""
+      ).toLowerCase();
+
+      return status !== "returned";
+    });
 
   const borrowedLoans =
     activeLoans.filter((loan) => {
-      const borrowerId =
-        loan.borrowerId ??
-        loan.borrower_id ??
-        loan.borrower?.id;
+      const loanType = String(
+        loan.loanType ??
+        loan.loan_type ??
+        ""
+      ).toLowerCase();
 
       return (
-        String(borrowerId) ===
-          currentUserId ||
-        loan.loanType === "borrowed"
+        String(
+          getRecordBorrowerId(
+            loan
+          )
+        ) === currentUserId ||
+        loanType === "borrowed"
       );
     });
 
   const lentLoans =
     activeLoans.filter((loan) => {
-      const ownerId =
-        loan.ownerId ??
-        loan.owner_id ??
-        loan.owner?.id ??
-        loan.item?.ownerId ??
-        loan.item?.owner_id;
+      const loanType = String(
+        loan.loanType ??
+        loan.loan_type ??
+        ""
+      ).toLowerCase();
 
       return (
-        String(ownerId) ===
-          currentUserId ||
-        loan.loanType === "lent"
+        String(
+          getRecordOwnerId(loan)
+        ) === currentUserId ||
+        loanType === "lent"
       );
     });
 
+  const currentUserActiveLoans =
+    activeLoans.filter(
+      (loan) =>
+        borrowedLoans.includes(loan) ||
+        lentLoans.includes(loan)
+    );
+
   const recentActiveLoans =
-    activeLoans.slice(0, 3);
+    currentUserActiveLoans.slice(0, 3);
 
-  const returnReminderLoan = [
-    ...borrowedLoans,
-  ]
-    .filter((loan) => {
-      const dueDateValue =
-        loan.dueDate ??
-        loan.due_date;
+  const returnReminderLoan =
+    [...borrowedLoans]
+      .filter((loan) => {
+        const dueDateValue =
+          getDueDate(loan);
 
-      if (!dueDateValue) {
-        return false;
-      }
+        if (!dueDateValue) {
+          return false;
+        }
 
-      const dueDate = new Date(
-        dueDateValue
-      );
+        const dueDate = new Date(
+          dueDateValue
+        );
 
-      return !Number.isNaN(
-        dueDate.getTime()
-      );
-    })
-    .sort((firstLoan, secondLoan) => {
-      const firstDueDate = new Date(
-        firstLoan.dueDate ??
-          firstLoan.due_date
-      );
-
-      const secondDueDate = new Date(
-        secondLoan.dueDate ??
-          secondLoan.due_date
-      );
-
-      return (
-        firstDueDate -
-        secondDueDate
-      );
-    })[0];
-
-  const getReturnReminderText = (
-    loan
-  ) => {
-    const dueDateValue =
-      loan?.dueDate ??
-      loan?.due_date;
-
-    if (!dueDateValue) {
-      return "";
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const dueDate = new Date(
-      dueDateValue
-    );
-
-    if (
-      Number.isNaN(
-        dueDate.getTime()
-      )
-    ) {
-      return "";
-    }
-
-    dueDate.setHours(0, 0, 0, 0);
-
-    const millisecondsPerDay =
-      1000 * 60 * 60 * 24;
-
-    const daysRemaining =
-      Math.round(
-        (dueDate - today) /
-          millisecondsPerDay
-      );
-
-    if (daysRemaining < 0) {
-      const overdueDays =
-        Math.abs(daysRemaining);
-
-      return `${overdueDays} ${
-        overdueDays === 1
-          ? "day"
-          : "days"
-      } overdue`;
-    }
-
-    if (daysRemaining === 0) {
-      return "due today";
-    }
-
-    if (daysRemaining === 1) {
-      return "due tomorrow";
-    }
-
-    return `due in ${daysRemaining} days`;
-  };
-
-  const formatReminderDate = (
-    dueDateValue
-  ) => {
-    if (!dueDateValue) {
-      return "Date unavailable";
-    }
-
-    const dueDate = new Date(
-      dueDateValue
-    );
-
-    if (
-      Number.isNaN(
-        dueDate.getTime()
-      )
-    ) {
-      return "Date unavailable";
-    }
-
-    return new Intl.DateTimeFormat(
-      "en-GB",
-      {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }
-    ).format(dueDate);
-  };
-
-  const getLoanStatusClass = (
-    status
-  ) => {
-    return String(
-      status || "On Track"
-    )
-      .toLowerCase()
-      .replaceAll(" ", "-");
-  };
+        return !Number.isNaN(
+          dueDate.getTime()
+        );
+      })
+      .sort(
+        (
+          firstLoan,
+          secondLoan
+        ) =>
+          new Date(
+            getDueDate(firstLoan)
+          ) -
+          new Date(
+            getDueDate(secondLoan)
+          )
+      )[0];
 
   const dashboardSummary =
     summaryCards.map((card) => {
-      if (
-        card.title === "My Listings"
-      ) {
-        return {
-          ...card,
-          value: myItems.length,
-        };
-      }
+      switch (card.title) {
+        case "My Listings":
+          return {
+            ...card,
+            value: myItems.length,
+          };
 
-      if (
-        card.title ===
-        "Pending Requests"
-      ) {
-        return {
-          ...card,
-          value: pendingRequests.length,
-        };
-      }
+        case "Pending Requests":
+          return {
+            ...card,
+            value:
+              pendingRequests.length,
+          };
 
-      if (
-        card.title ===
-        "Items Borrowed"
-      ) {
-        return {
-          ...card,
-          value: borrowedLoans.length,
-        };
-      }
+        case "Items Borrowed":
+          return {
+            ...card,
+            value:
+              borrowedLoans.length,
+          };
 
-      if (
-        card.title ===
-        "Items Lent Out"
-      ) {
-        return {
-          ...card,
-          value: lentLoans.length,
-        };
-      }
+        case "Items Lent Out":
+          return {
+            ...card,
+            value: lentLoans.length,
+          };
 
-      return card;
+        default:
+          return {
+            ...card,
+            value: 0,
+          };
+      }
     });
 
   const currentDate =
@@ -496,6 +521,10 @@ function Dashboard() {
     newStatus
   ) => {
     setNotice("");
+    setActionError("");
+    setUpdatingRequestId(
+      requestId
+    );
 
     try {
       const result =
@@ -504,44 +533,29 @@ function Dashboard() {
           newStatus
         );
 
+      if (
+        result &&
+        result.success === false
+      ) {
+        throw new Error(
+          result.message ||
+            "The request could not be updated."
+        );
+      }
+
       setNotice(
         result?.message ||
           `Request ${newStatus.toLowerCase()} successfully.`
       );
     } catch (error) {
-      setNotice(
+      setActionError(
         error.message ||
-          "Unable to update request."
+          "The request could not be updated."
       );
+    } finally {
+      setUpdatingRequestId(null);
     }
   };
-
-  const firstName =
-    currentUser?.profile?.first_name ||
-    currentUser?.firstName ||
-    currentUser?.first_name ||
-    "Neighbor";
-
-  const lastName =
-    currentUser?.profile?.last_name ||
-    currentUser?.lastName ||
-    currentUser?.last_name ||
-    "";
-
-  const fullName = [
-    firstName,
-    lastName,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const initials =
-    [firstName, lastName]
-      .filter(Boolean)
-      .map((name) => name.charAt(0))
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "N";
 
   return (
     <main className="dashboard-main">
@@ -575,8 +589,14 @@ function Dashboard() {
             </span>
 
             <div className="profile-details">
-              <strong>{fullName}</strong>
-              <small>Member</small>
+              <strong>
+                {fullName}
+              </strong>
+
+              <small>
+                {currentUser?.role ||
+                  "Member"}
+              </small>
             </div>
 
             <span className="profile-arrow">
@@ -596,8 +616,29 @@ function Dashboard() {
 
             <button
               type="button"
-              onClick={() => setNotice("")}
+              onClick={() =>
+                setNotice("")
+              }
               aria-label="Dismiss notification"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {actionError && (
+          <div
+            className="request-notice error"
+            role="alert"
+          >
+            <span>{actionError}</span>
+
+            <button
+              type="button"
+              onClick={() =>
+                setActionError("")
+              }
+              aria-label="Dismiss error"
             >
               ×
             </button>
@@ -611,23 +652,13 @@ function Dashboard() {
             </p>
 
             <h1>
-              {userLoading
-                ? "Welcome back"
-                : `Welcome back, ${firstName}`}
+              Welcome back,{" "}
+              {displayName}
             </h1>
 
-            {userError && (
-              <p
-                className="user-error"
-                role="alert"
-              >
-                {userError}
-              </p>
-            )}
-
             <p className="welcome-description">
-              Here is what is happening in your
-              community today.
+              Here is what is happening
+              in your community today.
             </p>
           </div>
 
@@ -647,30 +678,34 @@ function Dashboard() {
           className="summary-grid"
           aria-label="Dashboard summary"
         >
-          {dashboardSummary.map((card) => (
-            <article
-              className="summary-card"
-              key={card.id}
-            >
-              <span
-                className={`summary-icon ${card.color}`}
+          {dashboardSummary.map(
+            (card) => (
+              <article
+                className="summary-card"
+                key={card.id}
               >
-                {card.icon}
-              </span>
+                <span
+                  className={`summary-icon ${card.color}`}
+                >
+                  {card.icon}
+                </span>
 
-              <div className="summary-information">
-                <strong>
-                  {card.value}
-                </strong>
+                <div className="summary-information">
+                  <strong>
+                    {card.value}
+                  </strong>
 
-                <span>{card.title}</span>
-              </div>
+                  <span>
+                    {card.title}
+                  </span>
+                </div>
 
-              <span className="summary-arrow">
-                ›
-              </span>
-            </article>
-          ))}
+                <span className="summary-arrow">
+                  ›
+                </span>
+              </article>
+            )
+          )}
         </section>
 
         <div className="dashboard-panels">
@@ -682,8 +717,9 @@ function Dashboard() {
                 </h2>
 
                 <p>
-                  Review requests from neighbours
-                  who want to borrow your items.
+                  Review requests from
+                  neighbours who want to
+                  borrow your items.
                 </p>
               </div>
 
@@ -707,8 +743,8 @@ function Dashboard() {
                 <div className="requests-empty-state error">
                   <p>{requestsError}</p>
                 </div>
-              ) : recentPendingRequests.length >
-                0 ? (
+              ) : recentPendingRequests
+                  .length > 0 ? (
                 recentPendingRequests.map(
                   (request) => {
                     const borrowerName =
@@ -723,12 +759,27 @@ function Dashboard() {
                       borrowerName
                         .split(" ")
                         .filter(Boolean)
-                        .map(
-                          (name) => name[0]
+                        .map((name) =>
+                          name.charAt(0)
                         )
                         .join("")
                         .slice(0, 2)
-                        .toUpperCase();
+                        .toUpperCase() ||
+                      "N";
+
+                    const startDate =
+                      request.startDate ??
+                      request.start_date;
+
+                    const endDate =
+                      request.endDate ??
+                      request.end_date;
+
+                    const isUpdating =
+                      String(
+                        updatingRequestId
+                      ) ===
+                      String(request.id);
 
                     return (
                       <article
@@ -750,7 +801,7 @@ function Dashboard() {
                           </strong>
 
                           <span className="request-description">
-                            wants to borrow{" "}
+                            Wants to borrow{" "}
                             <b>
                               {getItemName(
                                 request
@@ -759,13 +810,13 @@ function Dashboard() {
                           </span>
 
                           <small className="request-dates">
-                            {request.startDate ??
-                              request.start_date ??
-                              "Date not provided"}{" "}
+                            {formatDate(
+                              startDate
+                            )}{" "}
                             –{" "}
-                            {request.endDate ??
-                              request.end_date ??
-                              "Date not provided"}
+                            {formatDate(
+                              endDate
+                            )}
                           </small>
                         </div>
 
@@ -773,6 +824,9 @@ function Dashboard() {
                           <button
                             className="decline-button"
                             type="button"
+                            disabled={
+                              isUpdating
+                            }
                             onClick={() =>
                               handleRequest(
                                 request.id,
@@ -780,12 +834,17 @@ function Dashboard() {
                               )
                             }
                           >
-                            Decline
+                            {isUpdating
+                              ? "Updating..."
+                              : "Decline"}
                           </button>
 
                           <button
                             className="approve-button"
                             type="button"
+                            disabled={
+                              isUpdating
+                            }
                             onClick={() =>
                               handleRequest(
                                 request.id,
@@ -793,7 +852,9 @@ function Dashboard() {
                               )
                             }
                           >
-                            Approve
+                            {isUpdating
+                              ? "Updating..."
+                              : "Approve"}
                           </button>
                         </div>
                       </article>
@@ -828,8 +889,8 @@ function Dashboard() {
               <h2>Active Loans</h2>
 
               <p>
-                Items you are currently borrowing
-                or lending.
+                Items you are currently
+                borrowing or lending.
               </p>
             </div>
 
@@ -854,102 +915,113 @@ function Dashboard() {
               </div>
             ) : recentActiveLoans.length >
               0 ? (
-              recentActiveLoans.map((loan) => {
-                const currentStatus =
-                  getLoanStatus(loan);
+              recentActiveLoans.map(
+                (loan) => {
+                  const currentStatus =
+                    getLoanStatus(loan);
 
-                const borrowerId =
-                  loan.borrowerId ??
-                  loan.borrower_id ??
-                  loan.borrower?.id;
+                  const borrowerId =
+                    getRecordBorrowerId(
+                      loan
+                    );
 
-                const isBorrowed =
-                  String(borrowerId) ===
-                    currentUserId ||
-                  loan.loanType ===
-                    "borrowed";
+                  const loanType = String(
+                    loan.loanType ??
+                    loan.loan_type ??
+                    ""
+                  ).toLowerCase();
 
-                const ownerName =
-                  getPersonName(
-                    loan.ownerName ??
-                      loan.owner_name,
-                    loan.owner
-                  );
+                  const isBorrowed =
+                    String(borrowerId) ===
+                      currentUserId ||
+                    loanType ===
+                      "borrowed";
 
-                const borrowerName =
-                  getPersonName(
-                    loan.borrowerName ??
-                      loan.borrower_name,
-                    loan.borrower
-                  );
+                  const ownerName =
+                    getPersonName(
+                      loan.ownerName ??
+                        loan.owner_name,
+                      loan.owner
+                    );
 
-                const personName =
-                  getPersonName(
-                    loan.person,
-                    null
-                  );
+                  const borrowerName =
+                    getPersonName(
+                      loan.borrowerName ??
+                        loan.borrower_name,
+                      loan.borrower
+                    );
 
-                const loanItemName =
-                  getItemName(loan);
+                  const fallbackPerson =
+                    getPersonName(
+                      loan.person,
+                      null
+                    );
 
-                const dueDate =
-                  loan.dueDate ??
-                  loan.due_date ??
-                  "date not provided";
+                  const personName =
+                    isBorrowed
+                      ? ownerName !==
+                        "Neighbour"
+                        ? ownerName
+                        : fallbackPerson
+                      : borrowerName !==
+                          "Neighbour"
+                        ? borrowerName
+                        : fallbackPerson;
 
-                return (
-                  <article
-                    className="loan-card"
-                    key={loan.id}
-                  >
-                    <span className="loan-item-icon">
-                      {loan.icon || "🧰"}
-                    </span>
+                  const loanItemName =
+                    getItemName(loan);
 
-                    <div className="loan-information">
-                      <strong>
-                        {loanItemName}
-                      </strong>
-
-                      <span className="loan-person">
-                        {isBorrowed
-                          ? `Borrowed from ${
-                              ownerName !==
-                              "Neighbour"
-                                ? ownerName
-                                : personName
-                            }`
-                          : `Lent to ${
-                              borrowerName !==
-                              "Neighbour"
-                                ? borrowerName
-                                : personName
-                            }`}
+                  return (
+                    <article
+                      className="loan-card"
+                      key={loan.id}
+                    >
+                      <span className="loan-item-icon">
+                        {loan.icon ||
+                          loan.item?.icon ||
+                          "🧰"}
                       </span>
 
-                      <small className="loan-due-date">
-                        Due {dueDate}
-                      </small>
-                    </div>
+                      <div className="loan-information">
+                        <strong>
+                          {loanItemName}
+                        </strong>
 
-                    <span
-                      className={`loan-status ${getLoanStatusClass(
-                        currentStatus
-                      )}`}
-                    >
-                      {currentStatus}
-                    </span>
+                        <span className="loan-person">
+                          {isBorrowed
+                            ? `Borrowed from ${personName}`
+                            : `Lent to ${personName}`}
+                        </span>
 
-                    <Link
-                      className="loan-options-button"
-                      to="/loans"
-                      aria-label={`View details for ${loanItemName}`}
-                    >
-                      •••
-                    </Link>
-                  </article>
-                );
-              })
+                        <small className="loan-due-date">
+                          Due{" "}
+                          {formatDate(
+                            getDueDate(
+                              loan
+                            )
+                          )}
+                        </small>
+                      </div>
+
+                      <span
+                        className={`loan-status ${getStatusClass(
+                          currentStatus
+                        )}`}
+                      >
+                        {currentStatus}
+                      </span>
+
+                      <Link
+                        className="loan-options-button"
+                        to="/loans"
+                        aria-label={`View details for ${loanItemName}`}
+                      >
+                        •••
+                      </Link>
+                    </article>
+                  );
+                }
+              )
             ) : (
               <div className="loans-empty-state">
                 <span className="empty-state-icon">
@@ -962,8 +1034,9 @@ function Dashboard() {
                   </strong>
 
                   <p>
-                    You have no borrowed or lent
-                    items at the moment.
+                    You have no borrowed
+                    or lent items at the
+                    moment.
                   </p>
                 </div>
               </div>
@@ -978,8 +1051,8 @@ function Dashboard() {
                 <h2>My Listings</h2>
 
                 <p>
-                  Your recently added tools and
-                  equipment.
+                  Your recently added
+                  tools and equipment.
                 </p>
               </div>
 
@@ -992,64 +1065,74 @@ function Dashboard() {
             </div>
 
             <div className="listings-grid">
-              {recentListings.length > 0 ? (
-                recentListings.map((item) => (
-                  <article
-                    className="listing-card"
-                    key={item.id}
-                  >
-                    <div className="listing-image">
-                      <span>
-                        {item.icon || "🧰"}
-                      </span>
+              {recentListings.length >
+              0 ? (
+                recentListings.map(
+                  (item) => {
+                    const statusClass =
+                      item.statusColor ||
+                      String(
+                        item.availability ||
+                          ""
+                      )
+                        .toLowerCase()
+                        .replaceAll(
+                          " ",
+                          "-"
+                        );
 
-                      <Link
-                        className="listing-options-button"
-                        to="/listings"
-                        aria-label={`View options for ${item.name}`}
+                    return (
+                      <article
+                        className="listing-card"
+                        key={item.id}
                       >
-                        •••
-                      </Link>
-                    </div>
+                        <div className="listing-image">
+                          <span>
+                            {item.icon ||
+                              "🧰"}
+                          </span>
 
-                    <div className="listing-information">
-                      <strong>
-                        {item.name ||
-                          "Equipment"}
-                      </strong>
+                          <Link
+                            className="listing-options-button"
+                            to="/listings"
+                            aria-label={`View options for ${
+                              item.name ||
+                              "equipment"
+                            }`}
+                          >
+                            •••
+                          </Link>
+                        </div>
 
-                      <span className="item-condition">
-                        {item.condition ||
-                          "Unknown"}
-                      </span>
+                        <div className="listing-information">
+                          <strong>
+                            {item.name ||
+                              "Equipment"}
+                          </strong>
 
-                      <small
-                        className={`availability-status ${
-                          item.statusColor ||
-                          String(
-                            item.availability ||
-                              ""
-                          )
-                            .toLowerCase()
-                            .replaceAll(
-                              " ",
-                              "-"
-                            )
-                        }`}
-                      >
-                        <span className="status-dot" />
+                          <span className="item-condition">
+                            {item.condition ||
+                              "Unknown"}
+                          </span>
 
-                        {item.availability ||
-                          "Unknown"}
-                      </small>
-                    </div>
-                  </article>
-                ))
+                          <small
+                            className={`availability-status ${statusClass}`}
+                          >
+                            <span className="status-dot" />
+
+                            {item.availability ||
+                              "Unknown"}
+                          </small>
+                        </div>
+                      </article>
+                    );
+                  }
+                )
               ) : (
                 <div className="listings-empty-state">
                   <p>
-                    You have not added any items
-                    yet.
+                    You have not added any
+                    items yet.
                   </p>
 
                   <Link
@@ -1065,7 +1148,7 @@ function Dashboard() {
 
           {returnReminderLoan ? (
             <aside
-              className={`return-reminder ${getLoanStatusClass(
+              className={`return-reminder ${getStatusClass(
                 getLoanStatus(
                   returnReminderLoan
                 )
@@ -1089,17 +1172,20 @@ function Dashboard() {
                 <p>
                   Return to{" "}
                   {getPersonName(
-                    returnReminderLoan.ownerName ??
-                      returnReminderLoan.owner_name,
+                    returnReminderLoan
+                      .ownerName ??
+                      returnReminderLoan
+                        .owner_name,
                     returnReminderLoan.owner,
                     returnReminderLoan.person ||
                       "the item owner"
                   )}{" "}
                   by{" "}
                   <b>
-                    {formatReminderDate(
-                      returnReminderLoan.dueDate ??
-                        returnReminderLoan.due_date
+                    {formatDate(
+                      getDueDate(
+                        returnReminderLoan
+                      )
                     )}
                   </b>
                   .
@@ -1135,8 +1221,8 @@ function Dashboard() {
                 </strong>
 
                 <p>
-                  You have no borrowed items to
-                  return.
+                  You have no borrowed
+                  items to return.
                 </p>
               </div>
 
