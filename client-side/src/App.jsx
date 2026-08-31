@@ -15,10 +15,19 @@ import AddItem from "./pages/AddItem";
 import EditItem from "./pages/EditItem";
 
 import ItemsProvider from "./context/ItemsProvider";
+<<<<<<< Updated upstream
 import RequestProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 
+=======
+import RequestsProvider from "./context/RequestsProvider";
+import LoansProvider from "./context/LoansProvider";
+import DamageReportsProvider from "./context/DamageReportsProvider";
+import AuthProvider from "./context/AuthProvider.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ChangeAvailability from "./Pages/ChangeAvailability";
+>>>>>>> Stashed changes
 import "./App.css";
 
 function App() {
@@ -68,6 +77,7 @@ function App() {
                   <Route path="/damage-reports" element={<DamageReports />} />
                 </Route>
 
+<<<<<<< Updated upstream
                 {/* 404 - Not Found */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
@@ -77,6 +87,50 @@ function App() {
         </LoansProvider>
       </RequestProvider>
     </ItemsProvider>
+=======
+                  {/* About page */}
+                  <Route path="/about" element={<><Home /><About /></>} />
+
+                  {/* Browse tools */}
+                  <Route path="/browse-tools" element={<BrowseTools />} />
+                  <Route path="/tools/:id" element={<ItemDetail />} />
+                  <Route path="/payment/:id" element={<PaymentBar />} />
+                  <Route
+  path="/listings/:itemId/availability"
+  element={<ChangeAvailability />}
+/>
+
+                  {/* Authentication */}
+                  <Route path="/auth" element={<AuthPage />} />
+
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/items" element={<BrowseItems />} />
+                    <Route path="/items/new" element={<AddItem />} />
+                    <Route path="/listings" element={<MyListings />} />
+                    <Route path="/listings/:itemId/edit" element={<EditItem />} />
+                    <Route path="/requests" element={<Requests />} />
+                    <Route path="/loans" element={<Loans />} />
+                    <Route path="/damage-reports" element={<DamageReports />} />
+                  </Route>
+
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </div>
+
+              {!isDashboardRoute && <Footer />}
+            </DamageReportsProvider>
+          </LoansProvider>
+        </RequestsProvider>
+      </ItemsProvider>
+    </AuthProvider>
+>>>>>>> Stashed changes
   );
 }
 

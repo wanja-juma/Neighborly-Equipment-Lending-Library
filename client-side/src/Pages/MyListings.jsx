@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+
+import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
 import "./Items.css";
 
-const CURRENT_USER_ID = "1";
-
 function MyListings() {
+  const { currentUser } = useAuth();
+
   const {
     items,
     itemsLoading,
@@ -13,21 +15,62 @@ function MyListings() {
     deleteItem,
   } = useItems();
 
-  const [notice, setNotice] = useState("");
-  const [deleteError, setDeleteError] =
+  const [notice, setNotice] =
     useState("");
+
+  const [
+    deleteError,
+    setDeleteError,
+  ] = useState("");
+
   const [
     deletingItemId,
     setDeletingItemId,
   ] = useState(null);
 
-  const myItems = items.filter(
-    (item) =>
-      String(item.ownerId) ===
-      CURRENT_USER_ID
+  const currentUserId = String(
+    currentUser?.id || "1"
   );
 
-  const handleDeleteItem = async (item) => {
+  const safeItems = Array.isArray(items)
+    ? items
+    : [];
+
+  const myItems = safeItems.filter(
+    (item) => {
+      const ownerId =
+        item.ownerId ??
+        item.owner_id ??
+        item.owner?.id;
+
+      return (
+        String(ownerId) ===
+        currentUserId
+      );
+    }
+  );
+
+  const getCategoryName = (item) => {
+    if (
+      item.category &&
+      typeof item.category === "object"
+    ) {
+      return (
+        item.category.name ||
+        "Other"
+      );
+    }
+
+    return (
+      item.category ||
+      item.category_name ||
+      "Other"
+    );
+  };
+
+  const handleDeleteItem = async (
+    item
+  ) => {
     setNotice("");
     setDeleteError("");
 
@@ -42,7 +85,18 @@ function MyListings() {
     setDeletingItemId(item.id);
 
     try {
-      await deleteItem(item.id);
+      const result =
+        await deleteItem(item.id);
+
+      if (
+        result &&
+        result.success === false
+      ) {
+        throw new Error(
+          result.message ||
+            "The item could not be deleted."
+        );
+      }
 
       setNotice(
         `${item.name} was deleted successfully.`
@@ -61,7 +115,9 @@ function MyListings() {
     return (
       <main className="dashboard-main">
         <section className="items-page">
-          <p>Loading your listings...</p>
+          <p>
+            Loading your listings...
+          </p>
         </section>
       </main>
     );
@@ -89,8 +145,8 @@ function MyListings() {
             <h1>My Listings</h1>
 
             <p>
-              Manage the tools and equipment you
-              have listed.
+              Manage the tools and
+              equipment you have listed.
             </p>
           </div>
 
@@ -99,6 +155,7 @@ function MyListings() {
             to="/items/new"
           >
             <span>+</span>
+
             Add New Item
           </Link>
         </header>
@@ -112,7 +169,9 @@ function MyListings() {
 
             <button
               type="button"
-              onClick={() => setNotice("")}
+              onClick={() =>
+                setNotice("")
+              }
               aria-label="Dismiss notification"
             >
               ×
@@ -141,11 +200,13 @@ function MyListings() {
 
         <div className="listings-summary">
           <span>
-            <strong>{myItems.length}</strong>
+            <strong>
+              {myItems.length}
+            </strong>{" "}
 
             {myItems.length === 1
-              ? " item listed"
-              : " items listed"}
+              ? "item listed"
+              : "items listed"}
           </span>
         </div>
 
@@ -153,15 +214,20 @@ function MyListings() {
           <div className="items-page-grid">
             {myItems.map((item) => {
               const isDeleting =
-                String(deletingItemId) ===
-                String(item.id);
+                String(
+                  deletingItemId
+                ) === String(item.id);
+
+              const availability =
+                item.availability ||
+                item.status ||
+                "Unknown";
 
               const availabilityClass =
                 item.statusColor ||
-                item.availability
-                  ?.toLowerCase()
-                  .replaceAll(" ", "-") ||
-                "";
+                String(availability)
+                  .toLowerCase()
+                  .replaceAll(" ", "-");
 
               return (
                 <article
@@ -170,13 +236,17 @@ function MyListings() {
                 >
                   <div className="equipment-image">
                     <span>
-                      {item.icon || "🧰"}
+                      {item.icon ||
+                        "🧰"}
                     </span>
 
                     <button
                       className="equipment-options"
                       type="button"
-                      aria-label={`Options for ${item.name}`}
+                      aria-label={`Options for ${
+                        item.name ||
+                        "equipment"
+                      }`}
                     >
                       •••
                     </button>
@@ -185,27 +255,33 @@ function MyListings() {
                   <div className="equipment-content">
                     <div className="equipment-heading">
                       <span className="equipment-category">
-                        {item.category}
+                        {getCategoryName(
+                          item
+                        )}
                       </span>
 
                       <span
                         className={`equipment-availability ${availabilityClass}`}
                       >
-                        {item.availability ||
-                          "Unknown"}
+                        {availability}
                       </span>
                     </div>
 
-                    <h2>{item.name}</h2>
+                    <h2>
+                      {item.name ||
+                        "Equipment"}
+                    </h2>
 
                     <p className="equipment-description">
-                      {item.description}
+                      {item.description ||
+                        "No description provided."}
                     </p>
 
                     <div className="equipment-details">
                       <span>
                         <b>Condition:</b>{" "}
-                        {item.condition}
+                        {item.condition ||
+                          "Not specified"}
                       </span>
 
                       <span>
@@ -217,25 +293,29 @@ function MyListings() {
 
                     <div className="listing-actions">
                       <Link
-  className="edit-item-button"
-  to={`/listings/${item.id}/edit`}
->
-  Edit Listing
-</Link>
+                        className="edit-item-button"
+                        to={`/listings/${item.id}/edit`}
+                      >
+                        Edit Listing
+                      </Link>
 
-                      <button
-                        className="availability-button"
-                        type="button"
+                      <Link
+                        className="change-availability-button"
+                        to={`/listings/${item.id}/availability`}
                       >
                         Change Availability
-                      </button>
+                      </Link>
 
                       <button
                         className="delete-item-button"
                         type="button"
-                        disabled={isDeleting}
+                        disabled={
+                          isDeleting
+                        }
                         onClick={() =>
-                          handleDeleteItem(item)
+                          handleDeleteItem(
+                            item
+                          )
                         }
                       >
                         {isDeleting
@@ -252,11 +332,15 @@ function MyListings() {
           <div className="items-empty-state">
             <span>🧰</span>
 
-            <h2>No items listed yet</h2>
+            <h2>
+              No items listed yet
+            </h2>
 
             <p>
-              Add your first tool or equipment item
-              to start sharing with your community.
+              Add your first tool or
+              equipment item to start
+              sharing with your
+              community.
             </p>
 
             <Link to="/items/new">
