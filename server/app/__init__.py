@@ -63,6 +63,19 @@ def create_app(config_class=Config):
 
     # Register each blueprint exactly once.
     app.register_blueprint(auth_bp)
+    from routes import (
+    auth_bp,
+    profile_bp,
+    user_bp,
+)
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(user_bp)
+
+    # Register blueprints
+    from routes import profile_bp, user_bp
+
     app.register_blueprint(user_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(item_bp)

@@ -27,6 +27,8 @@ from routes.profile_routes import (
 from routes.user_routes import (
     user_bp,
 )
+from routes.profile_routes import profile_bp
+from routes.user_routes import user_bp
 
 
 __all__ = [

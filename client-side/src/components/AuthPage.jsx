@@ -16,43 +16,52 @@ const API_BASE_URL =
 function AuthPage() {
   const navigate = useNavigate();
 
-  const [searchParams] = useSearchParams();
+  const [searchParams] =
+    useSearchParams();
 
   const { login } = useAuth();
 
-  // We calculate the mode directly from the URL.
   // /auth?mode=login -> login page
   // /auth?mode=register -> registration page
   const isRegister =
-    searchParams.get("mode") !== "login";
+    searchParams.get("mode") !==
+    "login";
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
+  const [form, setForm] =
+    useState({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    });
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
   const [success, setSuccess] =
     useState("");
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
 
-  // Update normal form fields
-  const update = (field) => (event) => {
-    setForm((currentForm) => ({
-      ...currentForm,
-      [field]: event.target.value,
-    }));
-  };
+  const update =
+    (field) => (event) => {
+      setForm(
+        (currentForm) => ({
+          ...currentForm,
+          [field]:
+            event.target.value,
+        })
+      );
+    };
 
-  // Allow letters, spaces, apostrophes and hyphens in names
   const updateName =
     (field) => (event) => {
       const lettersOnly =
@@ -61,22 +70,27 @@ function AuthPage() {
           ""
         );
 
-      setForm((currentForm) => ({
-        ...currentForm,
-        [field]: lettersOnly,
-      }));
+      setForm(
+        (currentForm) => ({
+          ...currentForm,
+          [field]: lettersOnly,
+        })
+      );
     };
 
-  // Validate form before sending request
   const validateForm = () => {
-    const email = form.email.trim();
+    const email =
+      form.email.trim();
 
     if (
       isRegister &&
       (!form.firstName.trim() ||
         !form.lastName.trim())
     ) {
-      return "Please enter your first and last name.";
+      return (
+        "Please enter your first " +
+        "and last name."
+      );
     }
 
     const namePattern =
@@ -91,269 +105,290 @@ function AuthPage() {
           form.lastName.trim()
         ))
     ) {
-      return "Names can only contain letters.";
+      return (
+        "Names can only contain " +
+        "letters."
+      );
     }
 
     if (
       !email ||
       !email.includes("@")
     ) {
-      return "Please enter a valid email address.";
+      return (
+        "Please enter a valid " +
+        "email address."
+      );
     }
 
     if (!form.password) {
-      return "Please enter your password.";
+      return (
+        "Please enter your password."
+      );
     }
 
     if (
       isRegister &&
       form.password.length < 8
     ) {
-      return "Password must be at least 8 characters.";
+      return (
+        "Password must be at least " +
+        "8 characters."
+      );
     }
 
     return "";
   };
 
-  // Send register/login request to Flask API
-  const sendAuthRequest = async () => {
-    const endpoint = isRegister
-      ? "/auth/register"
-      : "/auth/login";
+  const sendAuthRequest =
+    async () => {
+      const endpoint = isRegister
+        ? "/auth/register"
+        : "/auth/login";
 
-    const requestBody = isRegister
-      ? {
-          firstName:
-            form.firstName.trim(),
-
-          lastName:
-            form.lastName.trim(),
-
-          email: form.email
-            .trim()
-            .toLowerCase(),
-
-          password: form.password,
-        }
-      : {
-          email: form.email
-            .trim()
-            .toLowerCase(),
-
-          password: form.password,
-        };
-
-    let response;
-
-    try {
-      response = await fetch(
-        `${API_BASE_URL}${endpoint}`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify(
-            requestBody
-          ),
-        }
-      );
-    } catch {
-      throw new Error(
-        "Unable to connect to the server. Make sure Flask is running."
-      );
-    }
-
-    const contentType =
-      response.headers.get(
-        "content-type"
-      );
-
-    let responseBody = null;
-
-    if (
-      contentType?.includes(
-        "application/json"
-      )
-    ) {
-      responseBody =
-        await response.json();
-    }
-
-    if (!response.ok) {
-      throw new Error(
-        responseBody?.error ||
-          responseBody?.message ||
-          "Authentication failed."
-      );
-    }
-
-    return responseBody;
-  };
-
-  // Handle login/register submission
-  const handleSubmit = async (
-    event
-  ) => {
-    event.preventDefault();
-
-    const validationError =
-      validateForm();
-
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    setError("");
-    setSuccess("");
-    setSubmitting(true);
-
-    try {
-      const responseBody =
-        await sendAuthRequest();
-
-      const serverUser =
-        responseBody?.user;
-
-      const token =
-        responseBody?.access_token ||
-        responseBody?.accessToken;
-
-      if (!serverUser) {
-        throw new Error(
-          "The server did not return user information."
-        );
-      }
-
-      if (!token) {
-        throw new Error(
-          "The server did not return an access token."
-        );
-      }
-
-      const profile =
-        serverUser.profile || {};
-
-      const firstName =
-        profile.first_name ||
-        profile.firstName ||
-        serverUser.first_name ||
-        serverUser.firstName ||
-        form.firstName.trim();
-
-      const lastName =
-        profile.last_name ||
-        profile.lastName ||
-        serverUser.last_name ||
-        serverUser.lastName ||
-        form.lastName.trim();
-
-      const fullName = [
-        firstName,
-        lastName,
-      ]
-        .filter(Boolean)
-        .join(" ");
-
-      const authenticatedUser = {
-        ...serverUser,
-
-        id: String(serverUser.id),
-
-        firstName,
-
-        lastName,
-
-        name:
-          serverUser.name ||
-          fullName ||
-          serverUser.email,
-
-        email:
-          serverUser.email ||
-          form.email
-            .trim()
-            .toLowerCase(),
-
-        role:
-          serverUser.role ||
-          "Member",
-      };
-
-      // Save user + token in AuthContext
-      login(
-        authenticatedUser,
-        token
-      );
-
-      setSuccess(
+      const requestBody =
         isRegister
-          ? `Account created! Welcome, ${
-              firstName ||
-              authenticatedUser.name
-            }.`
-          : `Welcome back, ${
-              firstName ||
-              authenticatedUser.name
-            }.`
-      );
+          ? {
+              firstName:
+                form.firstName.trim(),
 
-      // Redirect to dashboard after successful authentication
-      navigate("/dashboard", {
-        replace: true,
-      });
-    } catch (requestError) {
-      setError(
-        requestError.message ||
-          "Authentication failed. Please try again."
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
+              lastName:
+                form.lastName.trim(),
 
-  // Switch between register and login
-  const handleModeChange = () => {
-    const nextMode = isRegister
-      ? "login"
-      : "register";
+              email:
+                form.email
+                  .trim()
+                  .toLowerCase(),
 
-    setError("");
-    setSuccess("");
-    setShowPassword(false);
+              password:
+                form.password,
+            }
+          : {
+              email:
+                form.email
+                  .trim()
+                  .toLowerCase(),
 
-    setForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-    });
+              password:
+                form.password,
+            };
 
-    navigate(
-      `/auth?mode=${nextMode}`,
-      {
-        replace: true,
+      let response;
+
+      try {
+        response = await fetch(
+          `${API_BASE_URL}${endpoint}`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify(
+              requestBody
+            ),
+          }
+        );
+      } catch {
+        throw new Error(
+          "Unable to connect to the server. Make sure Flask is running."
+        );
       }
-    );
-  };
+
+      const contentType =
+        response.headers.get(
+          "content-type"
+        );
+
+      let responseBody = null;
+
+      if (
+        contentType?.includes(
+          "application/json"
+        )
+      ) {
+        responseBody =
+          await response.json();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          responseBody?.error ||
+            responseBody?.message ||
+            "Authentication failed."
+        );
+      }
+
+      return responseBody;
+    };
+
+  const handleSubmit =
+    async (event) => {
+      event.preventDefault();
+
+      const validationError =
+        validateForm();
+
+      if (validationError) {
+        setError(
+          validationError
+        );
+        return;
+      }
+
+      setError("");
+      setSuccess("");
+      setSubmitting(true);
+
+      try {
+        const responseBody =
+          await sendAuthRequest();
+
+        const serverUser =
+          responseBody?.user;
+
+        const token =
+          responseBody?.access_token ||
+          responseBody?.accessToken;
+
+        if (!serverUser) {
+          throw new Error(
+            "The server did not return user information."
+          );
+        }
+
+        if (!token) {
+          throw new Error(
+            "The server did not return an access token."
+          );
+        }
+
+        const profile =
+          serverUser.profile || {};
+
+        const firstName =
+          profile.first_name ||
+          profile.firstName ||
+          serverUser.first_name ||
+          serverUser.firstName ||
+          form.firstName.trim();
+
+        const lastName =
+          profile.last_name ||
+          profile.lastName ||
+          serverUser.last_name ||
+          serverUser.lastName ||
+          form.lastName.trim();
+
+        const fullName = [
+          firstName,
+          lastName,
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        const authenticatedUser =
+          {
+            ...serverUser,
+
+            id: String(
+              serverUser.id
+            ),
+
+            firstName,
+
+            lastName,
+
+            name:
+              serverUser.name ||
+              fullName ||
+              serverUser.email,
+
+            email:
+              serverUser.email ||
+              form.email
+                .trim()
+                .toLowerCase(),
+
+            role:
+              serverUser.role ||
+              "Member",
+
+            profile:
+              serverUser.profile ||
+              null,
+          };
+
+        login(
+          authenticatedUser,
+          token
+        );
+
+        setSuccess(
+          isRegister
+            ? `Account created! Welcome, ${
+                firstName ||
+                authenticatedUser.name
+              }.`
+            : `Welcome back, ${
+                firstName ||
+                authenticatedUser.name
+              }.`
+        );
+
+        navigate(
+          "/dashboard",
+          {
+            replace: true,
+          }
+        );
+      } catch (requestError) {
+        setError(
+          requestError.message ||
+            "Authentication failed. Please try again."
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+  const handleModeChange =
+    () => {
+      const nextMode =
+        isRegister
+          ? "login"
+          : "register";
+
+      setError("");
+      setSuccess("");
+      setShowPassword(false);
+
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+      });
+
+      navigate(
+        `/auth?mode=${nextMode}`,
+        {
+          replace: true,
+        }
+      );
+    };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-
-        {/* Left side - form */}
         <section className="auth-form-panel">
-
           <span className="brand-badge">
             Neighborly
           </span>
 
           <div className="auth-heading">
-
             <h1>
               {isRegister
                 ? "Create an account"
@@ -365,21 +400,18 @@ function AuthPage() {
                 ? "Sign up to borrow and lend equipment with your neighbors."
                 : "Sign in to manage your borrowed and lent items."}
             </p>
-
           </div>
 
           <form
             className="auth-form"
-            onSubmit={handleSubmit}
+            onSubmit={
+              handleSubmit
+            }
             noValidate
           >
-
-            {/* Name fields only appear during registration */}
             {isRegister && (
               <div className="field-row">
-
                 <label className="field">
-
                   <span>
                     First name
                   </span>
@@ -395,11 +427,9 @@ function AuthPage() {
                     autoComplete="given-name"
                     required
                   />
-
                 </label>
 
                 <label className="field">
-
                   <span>
                     Last name
                   </span>
@@ -415,15 +445,11 @@ function AuthPage() {
                     autoComplete="family-name"
                     required
                   />
-
                 </label>
-
               </div>
             )}
 
-            {/* Email */}
             <label className="field">
-
               <span>Email</span>
 
               <input
@@ -436,23 +462,21 @@ function AuthPage() {
                 autoComplete="email"
                 required
               />
-
             </label>
 
-            {/* Password */}
             <label className="field">
-
               <span>Password</span>
 
               <div className="password-input">
-
                 <input
                   type={
                     showPassword
                       ? "text"
                       : "password"
                   }
-                  value={form.password}
+                  value={
+                    form.password
+                  }
                   onChange={update(
                     "password"
                   )}
@@ -470,7 +494,9 @@ function AuthPage() {
                   className="password-toggle"
                   onClick={() =>
                     setShowPassword(
-                      (currentValue) =>
+                      (
+                        currentValue
+                      ) =>
                         !currentValue
                     )
                   }
@@ -484,12 +510,9 @@ function AuthPage() {
                     ? "🙈"
                     : "👁️"}
                 </button>
-
               </div>
-
             </label>
 
-            {/* Error message */}
             {error && (
               <p
                 className="server-error"
@@ -499,7 +522,6 @@ function AuthPage() {
               </p>
             )}
 
-            {/* Success message */}
             {success && (
               <p
                 className="server-success"
@@ -509,11 +531,12 @@ function AuthPage() {
               </p>
             )}
 
-            {/* Submit button */}
             <button
               type="submit"
               className="submit-button"
-              disabled={submitting}
+              disabled={
+                submitting
+              }
             >
               {submitting
                 ? "Please wait…"
@@ -521,12 +544,9 @@ function AuthPage() {
                   ? "Create account"
                   : "Sign in"}
             </button>
-
           </form>
 
-          {/* Login/Register switch */}
           <p className="switch-mode">
-
             {isRegister
               ? "Already have an account?"
               : "Don't have an account?"}{" "}
@@ -541,16 +561,12 @@ function AuthPage() {
                 ? "Sign in"
                 : "Sign up"}
             </button>
-
           </p>
-
         </section>
 
-        {/* Right side illustration */}
         <section className="auth-illustration-panel">
           <ToolsPanel />
         </section>
-
       </div>
     </div>
   );

@@ -96,8 +96,8 @@ function AuthProvider({ children }) {
       token
     );
 
-    // Remove the older token key so that
-    // the application uses one consistent key.
+    // Remove the older token key so the app
+    // uses one consistent storage key.
     localStorage.removeItem(
       "access_token"
     );
@@ -128,10 +128,12 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     const restoreSession = async () => {
-      const token = getStoredToken();
+      const token =
+        getStoredToken();
 
       if (!token) {
-        logout();
+        setCurrentUser(null);
+        setAuthLoading(false);
         return;
       }
 
@@ -188,10 +190,8 @@ function AuthProvider({ children }) {
 
         saveUser(restoredUser);
 
-        /*
-         * If the token was stored under the
-         * older key, move it to the current key.
-         */
+        // Move an older token key to the
+        // current token storage key.
         localStorage.setItem(
           TOKEN_STORAGE_KEY,
           token
@@ -207,9 +207,8 @@ function AuthProvider({ children }) {
         );
 
         /*
-         * A network error should not immediately
-         * remove a locally saved user. An invalid
-         * token is handled by the 401/403 block.
+         * Do not remove the locally stored
+         * user for a temporary network error.
          */
       } finally {
         setAuthLoading(false);

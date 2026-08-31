@@ -34,17 +34,13 @@ class Register(Resource):
     def post(self):
         """Register a new user."""
 
-        data = (
-            request.get_json(
-                silent=True
-            )
-            or {}
-        )
+        data = request.get_json(
+            silent=True
+        ) or {}
 
         missing_fields = [
             field
-            for field
-            in REQUIRED_REGISTER_FIELDS
+            for field in REQUIRED_REGISTER_FIELDS
             if not data.get(field)
         ]
 
@@ -168,8 +164,6 @@ class Register(Resource):
                 "Account created "
                 "successfully."
             ),
-            # Keep both names temporarily
-            # for frontend compatibility.
             "access_token": access_token,
             "accessToken": access_token,
             "user": user_schema.dump(
@@ -180,20 +174,24 @@ class Register(Resource):
 
 class Login(Resource):
     def post(self):
-        
-        data = (
-            request.get_json(
-                silent=True
-            )
-            or {}
-        )
+        """Log in an existing user."""
+
+        data = request.get_json(
+            silent=True
+        ) or {}
 
         email = str(
-            data.get("email", "")
+            data.get(
+                "email",
+                "",
+            )
         ).strip().lower()
 
         password = str(
-            data.get("password", "")
+            data.get(
+                "password",
+                "",
+            )
         )
 
         if not email or not password:
@@ -244,13 +242,16 @@ class Login(Resource):
 class CurrentUser(Resource):
     @jwt_required()
     def get(self):
-        
+        """Return the currently logged-in user."""
 
         try:
             user_id = int(
                 get_jwt_identity()
             )
-        except (TypeError, ValueError):
+        except (
+            TypeError,
+            ValueError,
+        ):
             return {
                 "error": (
                     "Invalid user identity."
@@ -279,7 +280,13 @@ class CurrentUser(Resource):
 class Logout(Resource):
     @jwt_required()
     def post(self):
-        
+        """
+        Log out the current user.
+
+        JWTs are stored client-side, so
+        the frontend should remove the
+        access token after this request.
+        """
 
         return {
             "message": (
@@ -290,18 +297,23 @@ class Logout(Resource):
         }, 200
 
 
-api.add_resource( Register, "/register")
+api.add_resource(
+    Register,
+    "/register",
+)
 
-api.add_resource(Login, "/login")
+api.add_resource(
+    Login,
+    "/login",
+)
 
-api.add_resource(CurrentUser, "/current-user", "/me")
+api.add_resource(
+    CurrentUser,
+    "/current-user",
+    "/me",
+)
 
-api.add_resource(Logout, "/logout")
-
-
-
-    
-            
-          
- 
-
+api.add_resource(
+    Logout,
+    "/logout",
+)
