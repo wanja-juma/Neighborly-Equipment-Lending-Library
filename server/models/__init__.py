@@ -6,6 +6,8 @@ from models.membership import Membership
 from models.payments import Payment
 from models.categories import Category
 from models.damage_reports import DamageReport
+from models.borrow_request import BorrowingRequest
+
 
 __all__ = [
     "User",
@@ -16,4 +18,5 @@ __all__ = [
     "Loan",
     "Category",
     "DamageReport",
+    "BorrowingRequest",
 ]

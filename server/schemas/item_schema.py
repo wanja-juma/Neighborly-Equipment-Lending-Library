@@ -29,6 +29,11 @@ class ItemSchema(ma.SQLAlchemyAutoSchema):
         allow_none=True,
     )
 
+    image = fields.String(
+        allow_none=True,
+        validate=validate.Length(max=500),
+    )
+
     category_id = fields.String(
         allow_none=True,
         validate=validate.Length(max=100),
