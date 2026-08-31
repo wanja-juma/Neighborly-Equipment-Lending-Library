@@ -6,6 +6,7 @@ import useRequests from "../hooks/useRequests";
 
 import "./Requests.css";
 
+
 function getPersonName(person) {
   if (!person) {
     return "";
@@ -36,6 +37,7 @@ function getPersonName(person) {
     `${firstName} ${lastName}`.trim()
   );
 }
+
 
 function Requests() {
   const [activeTab, setActiveTab] =
@@ -73,6 +75,7 @@ function Requests() {
     ? borrowingRequests
     : [];
 
+
   const getBorrowerId = (request) => {
     return (
       request.borrowerId ??
@@ -86,6 +89,7 @@ function Requests() {
       request.loan?.borrower?.id
     );
   };
+
 
   const getOwnerId = (request) => {
     return (
@@ -101,6 +105,7 @@ function Requests() {
     );
   };
 
+
   const getRequestDirection = (
     request
   ) => {
@@ -112,6 +117,7 @@ function Requests() {
         ""
     ).toLowerCase();
   };
+
 
   const incomingRequests =
     safeRequests.filter((request) => {
@@ -128,6 +134,7 @@ function Requests() {
       );
     });
 
+
   const outgoingRequests =
     safeRequests.filter((request) => {
       const borrowerId =
@@ -143,16 +150,19 @@ function Requests() {
       );
     });
 
+
   const displayedRequests =
     activeTab === "incoming"
       ? incomingRequests
       : outgoingRequests;
+
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setActionError("");
     setNotice("");
   };
+
 
   const handleRequestAction = async (
     requestId,
@@ -183,6 +193,7 @@ function Requests() {
     }
   };
 
+
   const getItem = (request) => {
     return (
       request.item ||
@@ -190,6 +201,7 @@ function Requests() {
       null
     );
   };
+
 
   const getItemName = (request) => {
     const item = getItem(request);
@@ -205,6 +217,7 @@ function Requests() {
       "Equipment"
     );
   };
+
 
   const getPerson = (request) => {
     if (activeTab === "incoming") {
@@ -223,6 +236,7 @@ function Requests() {
       null
     );
   };
+
 
   const getDisplayedPersonName = (
     request
@@ -245,6 +259,7 @@ function Requests() {
     );
   };
 
+
   const getStartDate = (request) => {
     return (
       request.startDate ||
@@ -254,6 +269,7 @@ function Requests() {
       "Start date unavailable"
     );
   };
+
 
   const getEndDate = (request) => {
     return (
@@ -269,6 +285,7 @@ function Requests() {
     );
   };
 
+
   const formatDate = (value) => {
     if (
       !value ||
@@ -279,12 +296,15 @@ function Requests() {
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+      Number.isNaN(date.getTime())
+    ) {
       return value;
     }
 
     return date.toLocaleDateString();
   };
+
 
   const getInitials = (name) => {
     return name
@@ -296,297 +316,342 @@ function Requests() {
       .toUpperCase();
   };
 
+
   if (requestsLoading) {
     return (
-      <main className="requests-page">
-        <section className="requests-state">
-          <p>Loading requests...</p>
+      <main className="dashboard-main">
+        <section className="requests-page">
+          <div className="requests-state">
+            <p>Loading requests...</p>
+          </div>
         </section>
       </main>
     );
   }
+
 
   if (requestsError) {
     return (
-      <main className="requests-page">
-        <section
-          className="requests-state error"
-          role="alert"
-        >
-          <p>{requestsError}</p>
+      <main className="dashboard-main">
+        <section className="requests-page">
+          <div
+            className="requests-state error"
+            role="alert"
+          >
+            <p>{requestsError}</p>
+          </div>
         </section>
       </main>
     );
   }
 
+
   return (
-    <main className="requests-page">
-      <header className="requests-heading">
-        <h1>Borrowing Requests</h1>
+    <main className="dashboard-main">
+      <section className="requests-page">
 
-        <p>
-          Manage requests for borrowing and
-          lending equipment.
-        </p>
-      </header>
-
-      <div
-        className="requests-tab-switcher"
-        role="tablist"
-        aria-label="Borrowing request type"
-      >
-        <button
-          type="button"
-          role="tab"
-          className={`requests-tab-button ${
-            activeTab === "incoming"
-              ? "active"
-              : ""
-          }`}
-          aria-selected={
-            activeTab === "incoming"
-          }
-          onClick={() =>
-            handleTabChange("incoming")
-          }
-        >
-          Incoming
-
-          <span className="tab-count">
-            {incomingRequests.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          role="tab"
-          className={`requests-tab-button ${
-            activeTab === "outgoing"
-              ? "active"
-              : ""
-          }`}
-          aria-selected={
-            activeTab === "outgoing"
-          }
-          onClick={() =>
-            handleTabChange("outgoing")
-          }
-        >
-          Outgoing
-
-          <span className="tab-count">
-            {outgoingRequests.length}
-          </span>
-        </button>
-      </div>
-
-      {notice && (
-        <p
-          className="request-action-notice success"
-          role="status"
-        >
-          {notice}
-        </p>
-      )}
-
-      {actionError && (
-        <p
-          className="request-action-notice error"
-          role="alert"
-        >
-          {actionError}
-        </p>
-      )}
-
-      <section
-        className="requests-panel"
-        role="tabpanel"
-      >
-        <div className="requests-panel-heading">
+        <header className="requests-heading">
           <div>
-            <h2>
-              {activeTab === "incoming"
-                ? "Incoming Requests"
-                : "Outgoing Requests"}
-            </h2>
+            <h1>
+              Borrowing Requests
+            </h1>
 
             <p>
-              {activeTab === "incoming"
-                ? "Requests from neighbours who want to borrow your items."
-                : "Requests you have sent to borrow your neighbours’ items."}
+              Manage requests for borrowing
+              and lending equipment.
             </p>
           </div>
+        </header>
 
-          <span className="request-count">
-            {displayedRequests.length}
-          </span>
+
+        <div
+          className="requests-tab-switcher"
+          role="tablist"
+          aria-label="Borrowing request type"
+        >
+          <button
+            type="button"
+            role="tab"
+            className={`requests-tab-button ${
+              activeTab === "incoming"
+                ? "active"
+                : ""
+            }`}
+            aria-selected={
+              activeTab === "incoming"
+            }
+            onClick={() =>
+              handleTabChange("incoming")
+            }
+          >
+            Incoming
+
+            <span className="tab-count">
+              {incomingRequests.length}
+            </span>
+          </button>
+
+
+          <button
+            type="button"
+            role="tab"
+            className={`requests-tab-button ${
+              activeTab === "outgoing"
+                ? "active"
+                : ""
+            }`}
+            aria-selected={
+              activeTab === "outgoing"
+            }
+            onClick={() =>
+              handleTabChange("outgoing")
+            }
+          >
+            Outgoing
+
+            <span className="tab-count">
+              {outgoingRequests.length}
+            </span>
+          </button>
         </div>
 
-        {displayedRequests.length === 0 ? (
-          <div className="requests-state">
-            <span className="empty-icon">
-              ✓
+
+        {notice && (
+          <p
+            className="request-action-notice success"
+            role="status"
+          >
+            {notice}
+          </p>
+        )}
+
+
+        {actionError && (
+          <p
+            className="request-action-notice error"
+            role="alert"
+          >
+            {actionError}
+          </p>
+        )}
+
+
+        <section
+          className="requests-panel"
+          role="tabpanel"
+        >
+          <div className="requests-panel-heading">
+
+            <div>
+              <h2>
+                {activeTab === "incoming"
+                  ? "Incoming Requests"
+                  : "Outgoing Requests"}
+              </h2>
+
+              <p>
+                {activeTab === "incoming"
+                  ? "Requests from neighbours who want to borrow your items."
+                  : "Requests you have sent to borrow your neighbours’ items."}
+              </p>
+            </div>
+
+            <span className="request-count">
+              {displayedRequests.length}
             </span>
 
-            <h3>
-              No {activeTab} requests
-            </h3>
-
-            <p>
-              {activeTab === "incoming"
-                ? "You have no incoming borrowing requests."
-                : "You have not sent any borrowing requests."}
-            </p>
           </div>
-        ) : (
-          <div className="requests-list">
-            {displayedRequests.map(
-              (request) => {
-                const requestId =
-                  request.id;
 
-                const status = String(
-                  request.status ||
-                    "pending"
-                ).toLowerCase();
 
-                const statusClass =
-                  status.replace(
-                    /\s+/g,
-                    "-"
-                  );
+          {displayedRequests.length === 0 ? (
+            <div className="requests-state">
 
-                const isPending =
-                  status === "pending";
+              <span className="empty-icon">
+                ✓
+              </span>
 
-                const isUpdating =
-                  String(
-                    updatingRequestId
-                  ) ===
-                  String(requestId);
+              <h3>
+                No {activeTab} requests
+              </h3>
 
-                const canPay =
-                  activeTab ===
-                    "outgoing" &&
-                  status === "approved";
+              <p>
+                {activeTab === "incoming"
+                  ? "You have no incoming borrowing requests."
+                  : "You have not sent any borrowing requests."}
+              </p>
 
-                const personName =
-                  getDisplayedPersonName(
-                    request
-                  );
+            </div>
+          ) : (
+            <div className="requests-list">
 
-                const itemName =
-                  getItemName(request);
+              {displayedRequests.map(
+                (request) => {
+                  const requestId =
+                    request.id;
 
-                return (
-                  <article
-                    className="request-list-card"
-                    key={requestId}
-                  >
-                    <span className="request-avatar">
-                      {getInitials(
-                        personName
-                      ) || "N"}
-                    </span>
+                  const status = String(
+                    request.status ||
+                      "pending"
+                  ).toLowerCase();
 
-                    <div className="request-details">
-                      <strong>
-                        {personName}
-                      </strong>
+                  const statusClass =
+                    status.replace(
+                      /\s+/g,
+                      "-"
+                    );
 
-                      <p>
-                        {activeTab ===
-                        "incoming"
-                          ? "Wants to borrow "
-                          : "Request to borrow "}
+                  const isPending =
+                    status === "pending";
 
-                        <b>{itemName}</b>
-                      </p>
+                  const isUpdating =
+                    String(
+                      updatingRequestId
+                    ) ===
+                    String(requestId);
 
-                      <small>
-                        {formatDate(
-                          getStartDate(
-                            request
-                          )
-                        )}
+                  const canPay =
+                    activeTab ===
+                      "outgoing" &&
+                    status === "approved";
 
-                        {" – "}
+                  const personName =
+                    getDisplayedPersonName(
+                      request
+                    );
 
-                        {formatDate(
-                          getEndDate(
-                            request
-                          )
-                        )}
-                      </small>
-                    </div>
+                  const itemName =
+                    getItemName(request);
 
-                    <span
-                      className={`request-status ${statusClass}`}
+
+                  return (
+                    <article
+                      className="request-list-card"
+                      key={requestId}
                     >
-                      {status}
-                    </span>
 
-                    {activeTab ===
-                      "incoming" &&
-                      isPending && (
-                        <div className="request-actions">
-                          <button
-                            type="button"
-                            className="decline-request-button"
-                            disabled={
-                              isUpdating
-                            }
-                            onClick={() =>
-                              handleRequestAction(
-                                requestId,
-                                "declined"
-                              )
-                            }
-                          >
-                            {isUpdating
-                              ? "Updating..."
-                              : "Decline"}
-                          </button>
+                      <span className="request-avatar">
+                        {getInitials(
+                          personName
+                        ) || "N"}
+                      </span>
 
-                          <button
-                            type="button"
-                            className="approve-request-button"
-                            disabled={
-                              isUpdating
-                            }
-                            onClick={() =>
-                              handleRequestAction(
-                                requestId,
-                                "approved"
-                              )
-                            }
+
+                      <div className="request-details">
+
+                        <strong>
+                          {personName}
+                        </strong>
+
+                        <p>
+                          {activeTab ===
+                          "incoming"
+                            ? "Wants to borrow "
+                            : "Request to borrow "}
+
+                          <b>
+                            {itemName}
+                          </b>
+                        </p>
+
+                        <small>
+                          {formatDate(
+                            getStartDate(
+                              request
+                            )
+                          )}
+
+                          {" – "}
+
+                          {formatDate(
+                            getEndDate(
+                              request
+                            )
+                          )}
+                        </small>
+
+                      </div>
+
+
+                      <span
+                        className={`request-status ${statusClass}`}
+                      >
+                        {status}
+                      </span>
+
+
+                      {activeTab ===
+                        "incoming" &&
+                        isPending && (
+                          <div className="request-actions">
+
+                            <button
+                              type="button"
+                              className="decline-request-button"
+                              disabled={
+                                isUpdating
+                              }
+                              onClick={() =>
+                                handleRequestAction(
+                                  requestId,
+                                  "declined"
+                                )
+                              }
+                            >
+                              {isUpdating
+                                ? "Updating..."
+                                : "Decline"}
+                            </button>
+
+
+                            <button
+                              type="button"
+                              className="approve-request-button"
+                              disabled={
+                                isUpdating
+                              }
+                              onClick={() =>
+                                handleRequestAction(
+                                  requestId,
+                                  "approved"
+                                )
+                              }
+                            >
+                              {isUpdating
+                                ? "Updating..."
+                                : "Approve"}
+                            </button>
+
+                          </div>
+                        )}
+
+
+                      {canPay && (
+                        <div className="request-payment-action">
+
+                          <Link
+                            className="pay-request-button"
+                            to={`/payments/${requestId}`}
                           >
-                            {isUpdating
-                              ? "Updating..."
-                              : "Approve"}
-                          </button>
+                            Pay Now
+                          </Link>
+
                         </div>
                       )}
 
-                    {canPay && (
-                      <div className="request-payment-action">
-                        <Link
-                          className="pay-request-button"
-                          to={`/payments/${requestId}`}
-                        >
-                          Pay Now
-                        </Link>
-                      </div>
-                    )}
-                  </article>
-                );
-              }
-            )}
-          </div>
-        )}
+                    </article>
+                  );
+                }
+              )}
+
+            </div>
+          )}
+
+        </section>
+
       </section>
     </main>
   );
 }
+
 
 export default Requests;

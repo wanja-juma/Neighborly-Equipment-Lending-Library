@@ -1,17 +1,15 @@
 from routes.auth import auth_bp
 
 from routes.borrow_request_routes import (
-    borrow_requests_bp
-    as borrowing_request_bp,
+    borrow_requests_bp as borrowing_request_bp,
 )
 
-from routes.item import (
-    items_bp,
-    users_bp,
+from routes.items_routes import (
+    item_bp,
 )
 
 from routes.loans_routes import (
-    loans_bp as loan_bp,
+    loan_bp,
 )
 
 from routes.membership_routes import (
@@ -34,8 +32,7 @@ from routes.user_routes import (
 __all__ = [
     "auth_bp",
     "borrowing_request_bp",
-    "items_bp",
-    "users_bp",
+    "item_bp",
     "loan_bp",
     "membership_bp",
     "payment_bp",
