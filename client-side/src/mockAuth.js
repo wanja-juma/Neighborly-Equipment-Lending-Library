@@ -1,56 +1,43 @@
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5555/api";
+const STORAGE_KEY = 'neighborly_mock_users'
 
-async function handleResponse(response) {
-  const data = await response.json();
+function getUsers() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+}
 
-  if (!response.ok) {
-    throw new Error(
-      data.error || data.message || "Authentication request failed."
-    );
-  }
-
-  return data;
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export async function registerUser({ firstName, lastName, email, password }) {
-  const response = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ firstName, lastName, email, password }),
-  });
-
-  return handleResponse(response);
+  await delay(500)
+  const users = getUsers()
+  if (users.some((u) => u.email === email)) {
+    throw new Error('An account with that email already exists')
+  }
+  users.push({ firstName, lastName, email, password })
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(users))
+  return { firstName, lastName, email }
 }
 
 export async function loginUser({ email, password }) {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
-
-  return handleResponse(response);
+  await delay(500)
+  const user = getUsers().find((u) => u.email === email && u.password === password)
+  if (!user) {
+    throw new Error('Invalid email or password')
+  }
+  return { firstName: user.firstName, lastName: user.lastName, email: user.email }
 }
 
-export async function logoutUser() {
-  const token = localStorage.getItem("access_token");
+const LOGIN_KEY = 'neighborly_logged_in'
 
-  if (token) {
-    const response = await fetch(`${API_URL}/auth/logout`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+export function setLoggedIn(user) {
+  localStorage.setItem(LOGIN_KEY, JSON.stringify(user))
+}
 
-    await handleResponse(response);
-  }
+export function getLoggedInUser() {
+  return JSON.parse(localStorage.getItem(LOGIN_KEY) || 'null')
+}
 
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("neighborlyUser");
+export function logoutUser() {
+  localStorage.removeItem(LOGIN_KEY)
 }

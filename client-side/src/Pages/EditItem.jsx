@@ -1,8 +1,16 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import {
+  useEffect,
+  useState,
+} from "react";
+import {
+  Link,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import useItems from "../hooks/useItems";
 import "./Items.css";
+
+const CURRENT_USER_ID = "1";
 
 const categories = [
   "Power Tools",
@@ -14,9 +22,23 @@ const categories = [
   "Other",
 ];
 
-const conditions = ["New", "Excellent", "Good", "Fair"];
+const conditions = [
+  "New",
+  "Excellent",
+  "Good",
+  "Fair",
+];
 
-const itemIcons = ["🔨", "🔧", "🪛", "🪚", "🧹", "🪜", "🌱", "🧰"];
+const itemIcons = [
+  "🔨",
+  "🔧",
+  "🪛",
+  "🪚",
+  "🧹",
+  "🪜",
+  "🌱",
+  "🧰",
+];
 
 const initialFormData = {
   name: "",
@@ -31,17 +53,23 @@ function EditItem() {
   const { itemId } = useParams();
   const navigate = useNavigate();
 
-  const { items, itemsLoading, itemsError, updateItem } = useItems();
-  const { currentUser } = useAuth();
+  const {
+    items,
+    itemsLoading,
+    itemsError,
+    updateItem,
+  } = useItems();
 
-  const currentUserId = String(currentUser?.id || "");
-
-  const [formData, setFormData] = useState(initialFormData);
-  const [formErrors, setFormErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] =
+    useState(initialFormData);
+  const [formErrors, setFormErrors] =
+    useState({});
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
 
   const selectedItem = items.find(
-    (item) => String(item.id) === String(itemId)
+    (item) =>
+      String(item.id) === String(itemId)
   );
 
   useEffect(() => {
@@ -51,11 +79,16 @@ function EditItem() {
 
     setFormData({
       name: selectedItem.name || "",
-      category: selectedItem.category || "",
-      condition: selectedItem.condition || "",
-      description: selectedItem.description || "",
+      category:
+        selectedItem.category || "",
+      condition:
+        selectedItem.condition || "",
+      description:
+        selectedItem.description || "",
       icon: selectedItem.icon || "🧰",
-      availability: selectedItem.availability || "Available",
+      availability:
+        selectedItem.availability ||
+        "Available",
     });
   }, [selectedItem]);
 
@@ -78,31 +111,41 @@ function EditItem() {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Item name is required.";
+      newErrors.name =
+        "Item name is required.";
     }
 
     if (!formData.category) {
-      newErrors.category = "Please select a category.";
+      newErrors.category =
+        "Please select a category.";
     }
 
     if (!formData.condition) {
-      newErrors.condition = "Please select the condition.";
+      newErrors.condition =
+        "Please select the condition.";
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = "Description is required.";
-    } else if (formData.description.trim().length < 10) {
+      newErrors.description =
+        "Description is required.";
+    } else if (
+      formData.description.trim().length <
+      10
+    ) {
       newErrors.description =
         "Description must contain at least 10 characters.";
     }
 
     if (!formData.availability) {
-      newErrors.availability = "Please select the availability.";
+      newErrors.availability =
+        "Please select the availability.";
     }
 
     setFormErrors(newErrors);
 
-    return Object.keys(newErrors).length === 0;
+    return (
+      Object.keys(newErrors).length === 0
+    );
   };
 
   const handleSubmit = async (event) => {
@@ -119,19 +162,29 @@ function EditItem() {
         name: formData.name.trim(),
         category: formData.category,
         condition: formData.condition,
-        description: formData.description.trim(),
+        description:
+          formData.description.trim(),
         icon: formData.icon,
-        availability: formData.availability,
+        availability:
+          formData.availability,
+
         statusColor:
-          formData.availability === "Available" ? "available" : "unavailable",
-        updatedAt: new Date().toISOString(),
+          formData.availability ===
+          "Available"
+            ? "available"
+            : "unavailable",
+
+        updatedAt:
+          new Date().toISOString(),
       });
 
       navigate("/listings");
     } catch (error) {
       setFormErrors((currentErrors) => ({
         ...currentErrors,
-        submit: error.message || "Failed to update the listing.",
+        submit:
+          error.message ||
+          "Failed to update the listing.",
       }));
 
       setIsSubmitting(false);
@@ -164,24 +217,38 @@ function EditItem() {
         <section className="edit-item-page">
           <div className="edit-item-empty">
             <h1>Listing Not Found</h1>
-            <p>The listing may have been deleted or does not exist.</p>
-            <Link to="/listings">Return to My Listings</Link>
+
+            <p>
+              The listing may have been deleted or
+              does not exist.
+            </p>
+
+            <Link to="/listings">
+              Return to My Listings
+            </Link>
           </div>
         </section>
       </main>
     );
   }
 
-  const ownerId = selectedItem.ownerId ?? selectedItem.owner_id;
-
-  if (String(ownerId) !== currentUserId) {
+  if (
+    String(selectedItem.ownerId) !==
+    CURRENT_USER_ID
+  ) {
     return (
       <main className="dashboard-main">
         <section className="edit-item-page">
           <div className="edit-item-empty">
             <h1>Permission Denied</h1>
-            <p>You can only edit your own listings.</p>
-            <Link to="/listings">Return to My Listings</Link>
+
+            <p>
+              You can only edit your own listings.
+            </p>
+
+            <Link to="/listings">
+              Return to My Listings
+            </Link>
           </div>
         </section>
       </main>
@@ -193,18 +260,32 @@ function EditItem() {
       <section className="edit-item-page">
         <header className="edit-item-header">
           <div>
-            <p className="page-label">OWNER INVENTORY</p>
+            <p className="page-label">
+              OWNER INVENTORY
+            </p>
+
             <h1>Edit Listing</h1>
-            <p>Update the item's information, condition and availability.</p>
+
+            <p>
+              Update the item’s information,
+              condition and availability.
+            </p>
           </div>
 
-          <Link className="back-to-listings" to="/listings">
+          <Link
+            className="back-to-listings"
+            to="/listings"
+          >
             ← Back to My Listings
           </Link>
         </header>
 
         <div className="edit-item-layout">
-          <form className="edit-item-form" onSubmit={handleSubmit} noValidate>
+          <form
+            className="edit-item-form"
+            onSubmit={handleSubmit}
+            noValidate
+          >
             <label className="edit-form-field">
               <span>
                 Item Name <b>*</b>
@@ -215,11 +296,17 @@ function EditItem() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={formErrors.name ? "input-error" : ""}
+                className={
+                  formErrors.name
+                    ? "input-error"
+                    : ""
+                }
               />
 
               {formErrors.name && (
-                <small className="field-error">{formErrors.name}</small>
+                <small className="field-error">
+                  {formErrors.name}
+                </small>
               )}
             </label>
 
@@ -233,15 +320,26 @@ function EditItem() {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className={formErrors.category ? "input-error" : ""}
+                  className={
+                    formErrors.category
+                      ? "input-error"
+                      : ""
+                  }
                 >
-                  <option value="">Select category</option>
+                  <option value="">
+                    Select category
+                  </option>
 
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
+                  {categories.map(
+                    (category) => (
+                      <option
+                        key={category}
+                        value={category}
+                      >
+                        {category}
+                      </option>
+                    )
+                  )}
                 </select>
 
                 {formErrors.category && (
@@ -260,15 +358,26 @@ function EditItem() {
                   name="condition"
                   value={formData.condition}
                   onChange={handleChange}
-                  className={formErrors.condition ? "input-error" : ""}
+                  className={
+                    formErrors.condition
+                      ? "input-error"
+                      : ""
+                  }
                 >
-                  <option value="">Select condition</option>
+                  <option value="">
+                    Select condition
+                  </option>
 
-                  {conditions.map((condition) => (
-                    <option key={condition} value={condition}>
-                      {condition}
-                    </option>
-                  ))}
+                  {conditions.map(
+                    (condition) => (
+                      <option
+                        key={condition}
+                        value={condition}
+                      >
+                        {condition}
+                      </option>
+                    )
+                  )}
                 </select>
 
                 {formErrors.condition && (
@@ -290,7 +399,11 @@ function EditItem() {
                 onChange={handleChange}
                 rows="5"
                 maxLength="300"
-                className={formErrors.description ? "input-error" : ""}
+                className={
+                  formErrors.description
+                    ? "input-error"
+                    : ""
+                }
               />
 
               <div className="edit-description-help">
@@ -299,10 +412,15 @@ function EditItem() {
                     {formErrors.description}
                   </small>
                 ) : (
-                  <small>Describe the item clearly.</small>
+                  <small>
+                    Describe the item clearly.
+                  </small>
                 )}
 
-                <small>{formData.description.length}/300</small>
+                <small>
+                  {formData.description.length}
+                  /300
+                </small>
               </div>
             </label>
 
@@ -315,10 +433,19 @@ function EditItem() {
                 name="availability"
                 value={formData.availability}
                 onChange={handleChange}
-                className={formErrors.availability ? "input-error" : ""}
+                className={
+                  formErrors.availability
+                    ? "input-error"
+                    : ""
+                }
               >
-                <option value="Available">Available</option>
-                <option value="Unavailable">Unavailable</option>
+                <option value="Available">
+                  Available
+                </option>
+
+                <option value="Unavailable">
+                  Unavailable
+                </option>
               </select>
 
               {formErrors.availability && (
@@ -345,7 +472,9 @@ function EditItem() {
                       type="radio"
                       name="icon"
                       value={icon}
-                      checked={formData.icon === icon}
+                      checked={
+                        formData.icon === icon
+                      }
                       onChange={handleChange}
                     />
 
@@ -356,13 +485,19 @@ function EditItem() {
             </fieldset>
 
             {formErrors.submit && (
-              <p className="edit-submit-error" role="alert">
+              <p
+                className="edit-submit-error"
+                role="alert"
+              >
                 {formErrors.submit}
               </p>
             )}
 
             <div className="edit-form-actions">
-              <Link className="cancel-edit-button" to="/listings">
+              <Link
+                className="cancel-edit-button"
+                to="/listings"
+              >
                 Cancel
               </Link>
 
@@ -371,31 +506,46 @@ function EditItem() {
                 type="submit"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting
+                  ? "Saving..."
+                  : "Save Changes"}
               </button>
             </div>
           </form>
 
           <aside className="edit-item-preview">
-            <p className="page-label">LISTING PREVIEW</p>
+            <p className="page-label">
+              LISTING PREVIEW
+            </p>
 
-            <div className="edit-preview-icon">{formData.icon}</div>
+            <div className="edit-preview-icon">
+              {formData.icon}
+            </div>
 
             <span className="equipment-category">
-              {formData.category || "Category"}
+              {formData.category ||
+                "Category"}
             </span>
 
-            <h2>{formData.name || "Item Name"}</h2>
+            <h2>
+              {formData.name || "Item Name"}
+            </h2>
 
-            <p>{formData.description || "Item description"}</p>
+            <p>
+              {formData.description ||
+                "Item description"}
+            </p>
 
             <div className="edit-preview-details">
               <span>
-                <b>Condition:</b> {formData.condition || "Not selected"}
+                <b>Condition:</b>{" "}
+                {formData.condition ||
+                  "Not selected"}
               </span>
 
               <span>
-                <b>Availability:</b> {formData.availability}
+                <b>Availability:</b>{" "}
+                {formData.availability}
               </span>
             </div>
           </aside>
