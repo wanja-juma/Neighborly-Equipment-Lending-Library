@@ -21,6 +21,7 @@ borrow_requests_bp = Blueprint(
 def get_borrowing_requests():
     """Get all borrowing requests."""
     requests = BorrowingRequest.query.all()
+    requests = BorrowRequest.query.all()
     return jsonify({
         "borrowing_requests": borrowing_requests_schema.dump(requests)
     }), 200

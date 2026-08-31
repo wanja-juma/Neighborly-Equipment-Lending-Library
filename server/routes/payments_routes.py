@@ -7,6 +7,7 @@ from models import Loan, Payment
 from schemas.payments_schemas import (
     PaymentSchema,
 )
+from schemas import PaymentSchema
 
 payment_bp = Blueprint(
     "payments",

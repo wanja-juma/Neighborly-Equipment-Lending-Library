@@ -17,7 +17,11 @@ from sqlalchemy.exc import (
 
 from app.extensions import db
 from models import User
+
 from schemas import UserSchema
+
+from schemas import UserSchema
+
 
 
 user_bp = Blueprint(

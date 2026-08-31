@@ -4,7 +4,7 @@ from routes.borrow_request_routes import (
     borrow_requests_bp as borrowing_request_bp,
 )
 
-from routes.items_routes import (
+from routes.item_routes import (
     item_bp,
 )
 
@@ -40,4 +40,6 @@ __all__ = [
     "payment_bp",
     "profile_bp",
     "user_bp",
+    "user_bp",
+    "profile_bp",
 ]

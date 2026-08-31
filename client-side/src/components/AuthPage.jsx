@@ -15,25 +15,18 @@ const API_BASE_URL =
 
 function AuthPage() {
   const navigate = useNavigate();
-
-  const [searchParams] =
-    useSearchParams();
-
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
 
-  // /auth?mode=login -> login page
-  // /auth?mode=register -> registration page
   const isRegister =
-    searchParams.get("mode") !==
-    "login";
+    searchParams.get("mode") !== "login";
 
-  const [form, setForm] =
-    useState({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-    });
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
 
   const [
     showPassword,
@@ -53,13 +46,10 @@ function AuthPage() {
 
   const update =
     (field) => (event) => {
-      setForm(
-        (currentForm) => ({
-          ...currentForm,
-          [field]:
-            event.target.value,
-        })
-      );
+      setForm((currentForm) => ({
+        ...currentForm,
+        [field]: event.target.value,
+      }));
     };
 
   const updateName =
@@ -70,12 +60,10 @@ function AuthPage() {
           ""
         );
 
-      setForm(
-        (currentForm) => ({
-          ...currentForm,
-          [field]: lettersOnly,
-        })
-      );
+      setForm((currentForm) => ({
+        ...currentForm,
+        [field]: lettersOnly,
+      }));
     };
 
   const validateForm = () => {
@@ -84,8 +72,10 @@ function AuthPage() {
 
     if (
       isRegister &&
-      (!form.firstName.trim() ||
-        !form.lastName.trim())
+      (
+        !form.firstName.trim() ||
+        !form.lastName.trim()
+      )
     ) {
       return (
         "Please enter your first " +
@@ -98,12 +88,14 @@ function AuthPage() {
 
     if (
       isRegister &&
-      (!namePattern.test(
-        form.firstName.trim()
-      ) ||
+      (
+        !namePattern.test(
+          form.firstName.trim()
+        ) ||
         !namePattern.test(
           form.lastName.trim()
-        ))
+        )
+      )
     ) {
       return (
         "Names can only contain " +
@@ -142,9 +134,10 @@ function AuthPage() {
 
   const sendAuthRequest =
     async () => {
-      const endpoint = isRegister
-        ? "/auth/register"
-        : "/auth/login";
+      const endpoint =
+        isRegister
+          ? "/auth/register"
+          : "/auth/login";
 
       const requestBody =
         isRegister
@@ -289,37 +282,35 @@ function AuthPage() {
           .filter(Boolean)
           .join(" ");
 
-        const authenticatedUser =
-          {
-            ...serverUser,
+        const authenticatedUser = {
+          ...serverUser,
 
-            id: String(
-              serverUser.id
-            ),
+          id: String(
+            serverUser.id
+          ),
 
-            firstName,
+          firstName,
+          lastName,
 
-            lastName,
+          name:
+            serverUser.name ||
+            fullName ||
+            serverUser.email,
 
-            name:
-              serverUser.name ||
-              fullName ||
-              serverUser.email,
+          email:
+            serverUser.email ||
+            form.email
+              .trim()
+              .toLowerCase(),
 
-            email:
-              serverUser.email ||
-              form.email
-                .trim()
-                .toLowerCase(),
+          role:
+            serverUser.role ||
+            "Member",
 
-            role:
-              serverUser.role ||
-              "Member",
-
-            profile:
-              serverUser.profile ||
-              null,
-          };
+          profile:
+            serverUser.profile ||
+            null,
+        };
 
         login(
           authenticatedUser,
@@ -404,9 +395,7 @@ function AuthPage() {
 
           <form
             className="auth-form"
-            onSubmit={
-              handleSubmit
-            }
+            onSubmit={handleSubmit}
             noValidate
           >
             {isRegister && (
@@ -494,9 +483,7 @@ function AuthPage() {
                   className="password-toggle"
                   onClick={() =>
                     setShowPassword(
-                      (
-                        currentValue
-                      ) =>
+                      (currentValue) =>
                         !currentValue
                     )
                   }
@@ -573,3 +560,4 @@ function AuthPage() {
 }
 
 export default AuthPage;
+

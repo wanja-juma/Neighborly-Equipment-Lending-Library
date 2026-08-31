@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -15,7 +16,80 @@ const USER_STORAGE_KEY =
 const TOKEN_STORAGE_KEY =
   "neighborlyToken";
 
-const getStoredUser = () => {
+const clearStoredAuthentication = () => {
+  localStorage.removeItem(
+    USER_STORAGE_KEY
+  );
+
+  localStorage.removeItem(
+    TOKEN_STORAGE_KEY
+  );
+
+  localStorage.removeItem(
+    "neighborlyRefreshToken"
+  );
+
+  localStorage.removeItem(
+    "access_token"
+  );
+};
+
+const normalizeUser = (user) => {
+  if (!user) {
+    return null;
+  }
+
+  const profile =
+    user.profile || {};
+
+  const firstName =
+    user.firstName ||
+    user.first_name ||
+    profile.firstName ||
+    profile.first_name ||
+    "";
+
+  const lastName =
+    user.lastName ||
+    user.last_name ||
+    profile.lastName ||
+    profile.last_name ||
+    "";
+
+  const fullName = [
+    firstName,
+    lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return {
+    ...user,
+
+    id:
+      user.id !== undefined &&
+      user.id !== null
+        ? String(user.id)
+        : "",
+
+    firstName,
+
+    lastName,
+
+    name:
+      user.name ||
+      fullName ||
+      user.email ||
+      "Neighbour",
+
+    role:
+      user.role ||
+      profile.role ||
+      "Member",
+  };
+};
+
+const getSavedUser = () => {
   const savedUser =
     localStorage.getItem(
       USER_STORAGE_KEY
@@ -26,7 +100,12 @@ const getStoredUser = () => {
   }
 
   try {
-    return JSON.parse(savedUser);
+    const parsedUser =
+      JSON.parse(savedUser);
+
+    return normalizeUser(
+      parsedUser
+    );
   } catch {
     localStorage.removeItem(
       USER_STORAGE_KEY
@@ -47,183 +126,191 @@ const getStoredToken = () => {
   );
 };
 
-function AuthProvider({ children }) {
+function AuthProvider({
+  children,
+}) {
   const [
     currentUser,
     setCurrentUser,
-  ] = useState(getStoredUser);
+  ] = useState(getSavedUser);
 
   const [
     authLoading,
     setAuthLoading,
   ] = useState(true);
 
-  const saveUser = (user) => {
-    setCurrentUser(user);
+  const saveUser =
+    useCallback((user) => {
+      const normalizedUser =
+        normalizeUser(user);
 
-    if (user) {
-      localStorage.setItem(
-        USER_STORAGE_KEY,
-        JSON.stringify(user)
+      setCurrentUser(
+        normalizedUser
       );
-    } else {
-      localStorage.removeItem(
-        USER_STORAGE_KEY
-      );
-    }
-  };
 
-  const login = (
-    user,
-    token
-  ) => {
-    if (!user) {
-      throw new Error(
-        "User information is required."
-      );
-    }
-
-    if (!token) {
-      throw new Error(
-        "An access token was not returned by the server."
-      );
-    }
-
-    saveUser(user);
-
-    localStorage.setItem(
-      TOKEN_STORAGE_KEY,
-      token
-    );
-
-    // Remove the older token key so the app
-    // uses one consistent storage key.
-    localStorage.removeItem(
-      "access_token"
-    );
-
-    setAuthLoading(false);
-  };
-
-  const logout = () => {
-    setCurrentUser(null);
-    setAuthLoading(false);
-
-    localStorage.removeItem(
-      USER_STORAGE_KEY
-    );
-
-    localStorage.removeItem(
-      TOKEN_STORAGE_KEY
-    );
-
-    localStorage.removeItem(
-      "access_token"
-    );
-
-    localStorage.removeItem(
-      "neighborlyRefreshToken"
-    );
-  };
-
-  useEffect(() => {
-    const restoreSession = async () => {
-      const token =
-        getStoredToken();
-
-      if (!token) {
-        setCurrentUser(null);
-        setAuthLoading(false);
-        return;
+      if (normalizedUser) {
+        localStorage.setItem(
+          USER_STORAGE_KEY,
+          JSON.stringify(
+            normalizedUser
+          )
+        );
+      } else {
+        localStorage.removeItem(
+          USER_STORAGE_KEY
+        );
       }
 
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/auth/current-user`,
-          {
-            method: "GET",
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-              Accept:
-                "application/json",
-            },
-          }
+      return normalizedUser;
+    }, []);
+
+  const login = useCallback(
+    (user, token) => {
+      if (!user) {
+        throw new Error(
+          "User information is required."
         );
+      }
 
-        const contentType =
-          response.headers.get(
-            "content-type"
-          );
+      if (!token) {
+        throw new Error(
+          "An access token was not returned by the server."
+        );
+      }
 
-        const responseBody =
-          contentType?.includes(
-            "application/json"
-          )
-            ? await response.json()
-            : null;
+      saveUser(user);
 
-        if (
-          response.status === 401 ||
-          response.status === 403
-        ) {
-          logout();
+      localStorage.setItem(
+        TOKEN_STORAGE_KEY,
+        token
+      );
+
+      localStorage.removeItem(
+        "access_token"
+      );
+
+      setAuthLoading(false);
+    },
+    [saveUser]
+  );
+
+  const logout =
+    useCallback(() => {
+      setCurrentUser(null);
+
+      clearStoredAuthentication();
+
+      setAuthLoading(false);
+    }, []);
+
+  useEffect(() => {
+    const restoreSession =
+      async () => {
+        const token =
+          getStoredToken();
+
+        if (!token) {
+          setCurrentUser(null);
+          setAuthLoading(false);
           return;
         }
 
-        if (!response.ok) {
-          throw new Error(
-            responseBody?.error ||
-              responseBody?.message ||
-              "Unable to restore the session."
+        try {
+          const response =
+            await fetch(
+              `${API_BASE_URL}/auth/current-user`,
+              {
+                method: "GET",
+
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`,
+
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
+
+          const contentType =
+            response.headers.get(
+              "content-type"
+            );
+
+          const responseBody =
+            contentType?.includes(
+              "application/json"
+            )
+              ? await response.json()
+              : null;
+
+          if (
+            response.status ===
+              401 ||
+            response.status ===
+              403
+          ) {
+            logout();
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error(
+              responseBody?.error ||
+                responseBody?.message ||
+                "Unable to restore the session."
+            );
+          }
+
+          const restoredUser =
+            responseBody?.user;
+
+          if (!restoredUser) {
+            throw new Error(
+              "The current-user response does not contain a user."
+            );
+          }
+
+          saveUser(
+            restoredUser
           );
-        }
 
-        const restoredUser =
-          responseBody?.user;
-
-        if (!restoredUser) {
-          throw new Error(
-            "The server response did not contain user information."
+          localStorage.setItem(
+            TOKEN_STORAGE_KEY,
+            token
           );
+
+          localStorage.removeItem(
+            "access_token"
+          );
+        } catch (error) {
+          console.error(
+            "Unable to restore session:",
+            error
+          );
+
+          logout();
+        } finally {
+          setAuthLoading(false);
         }
-
-        saveUser(restoredUser);
-
-        // Move an older token key to the
-        // current token storage key.
-        localStorage.setItem(
-          TOKEN_STORAGE_KEY,
-          token
-        );
-
-        localStorage.removeItem(
-          "access_token"
-        );
-      } catch (error) {
-        console.error(
-          "Unable to restore session:",
-          error
-        );
-
-        /*
-         * Do not remove the locally stored
-         * user for a temporary network error.
-         */
-      } finally {
-        setAuthLoading(false);
-      }
-    };
+      };
 
     restoreSession();
-  }, []);
+  }, [
+    logout,
+    saveUser,
+  ]);
 
   const value = {
     currentUser,
+
     isAuthenticated:
       Boolean(currentUser),
+
     authLoading,
+
     login,
+
     logout,
   };
 

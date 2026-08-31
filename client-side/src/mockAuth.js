@@ -2,7 +2,9 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5555/api";
 
-async function handleResponse(response) {
+async function handleResponse(
+  response
+) {
   let data = {};
 
   const contentType =
@@ -39,20 +41,32 @@ export async function registerUser({
     `${API_URL}/auth/register`,
     {
       method: "POST",
+
       headers: {
         "Content-Type":
           "application/json",
       },
+
       body: JSON.stringify({
-        firstName,
-        lastName,
-        email,
+        firstName:
+          firstName.trim(),
+
+        lastName:
+          lastName.trim(),
+
+        email:
+          email
+            .trim()
+            .toLowerCase(),
+
         password,
       }),
     }
   );
 
-  return handleResponse(response);
+  return handleResponse(
+    response
+  );
 }
 
 export async function loginUser({
@@ -63,18 +77,26 @@ export async function loginUser({
     `${API_URL}/auth/login`,
     {
       method: "POST",
+
       headers: {
         "Content-Type":
           "application/json",
       },
+
       body: JSON.stringify({
-        email,
+        email:
+          email
+            .trim()
+            .toLowerCase(),
+
         password,
       }),
     }
   );
 
-  return handleResponse(response);
+  return handleResponse(
+    response
+  );
 }
 
 export async function logoutUser() {
@@ -92,9 +114,11 @@ export async function logoutUser() {
         `${API_URL}/auth/logout`,
         {
           method: "POST",
+
           headers: {
             Authorization:
               `Bearer ${token}`,
+
             Accept:
               "application/json",
           },
@@ -121,6 +145,12 @@ export async function logoutUser() {
     localStorage.removeItem(
       "neighborlyRefreshToken"
     );
+
+    // Remove the old authentication
+    // key if it still exists.
+    localStorage.removeItem(
+      "neighborly_logged_in"
+    );
   }
 
   return {
@@ -128,4 +158,3 @@ export async function logoutUser() {
       "Logged out successfully.",
   };
 }
-

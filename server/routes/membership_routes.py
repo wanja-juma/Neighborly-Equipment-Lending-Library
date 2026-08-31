@@ -7,6 +7,7 @@ from models import Membership
 from schemas.membership_schemas import (
     MembershipSchema,
 )
+from schemas import MembershipSchema
 
 membership_bp = Blueprint(
     "memberships",
