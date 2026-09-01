@@ -52,3 +52,14 @@ function PaymentBar() {
       setSubmitting(false);
     }
   }
+    if (loading) {
+    return <p className="payment-bar">Loading loan details…</p>;
+  }
+  if (error && !loan) {
+    return (
+      <div className="payment-bar">
+        <p>Couldn't load this loan: {error}</p>
+        <Link to="/loans">Back to My Loans</Link>
+      </div>
+    );
+  }
