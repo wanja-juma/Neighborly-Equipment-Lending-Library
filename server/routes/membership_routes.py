@@ -54,3 +54,21 @@ class MembershipResource(Resource):
             return {"error": "You are not authorized to view this membership."}, 403
  
         return {"membership": membership_schema.dump(membership)}, 200
+
+    def patch(self, membership_id):
+        membership = db.session.get(Membership, membership_id)
+ 
+        if membership is None:
+            return {"error": "Membership not found."}, 404
+ 
+        current_user_id = int(get_jwt_identity())
+        if membership.user_id != current_user_id:
+            return {"error": "You are not authorized to update this membership."}, 403
+ 
+        json_data = request.get_json(silent=True)
+        if not json_data:
+            return {"error": "Request body is required."}, 400
+ 
+        protected_fields = {"id", "user_id"}
+        if protected_fields.intersection(json_data.keys()):
+            return {"error": "The id and user_id fields cannot be updated."}, 400
