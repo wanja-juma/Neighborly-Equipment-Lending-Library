@@ -5,16 +5,14 @@ import './PaymentBar.css';
 
 function PaymentBar() {
   const { loanId } = useParams();
-}
-
-export default PaymentBar;
-function PaymentBar() {
-  const { loanId } = useParams();
   const [loan, setLoan] = useState(null);
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-}
+  const [amount, setAmount] = useState('500.00');
+  const [submitting, setSubmitting] = useState(false);
+  const [payment, setPayment] = useState(null);
+
   useEffect(() => {
     setLoading(true);
     getLoan(loanId)
@@ -32,10 +30,8 @@ function PaymentBar() {
         setLoading(false);
       });
   }, [loanId]);
-    const [amount, setAmount] = useState('500.00');
-  const [submitting, setSubmitting] = useState(false);
-  const [payment, setPayment] = useState(null);
-    async function handleSubmit(e) {
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
@@ -52,7 +48,8 @@ function PaymentBar() {
       setSubmitting(false);
     }
   }
-    if (loading) {
+
+  if (loading) {
     return <p className="payment-bar">Loading loan details…</p>;
   }
   if (error && !loan) {
@@ -63,14 +60,16 @@ function PaymentBar() {
       </div>
     );
   }
-    if (payment) {
+
+  if (payment) {
     return (
       <div className="payment-bar payment-success">
         <p>Deposit of Ksh{payment.amount} confirmed for {item?.name}. Enjoy your borrow!</p>
       </div>
     );
   }
-    return (
+
+  return (
     <form className="payment-bar" onSubmit={handleSubmit}>
       <h3>Pay Deposit — {item?.name}</h3>
       {error && <p className="payment-error">{error}</p>}
@@ -91,3 +90,6 @@ function PaymentBar() {
     </form>
   );
 }
+
+
+export default PaymentBar;
