@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
 import { getTools } from '../services/tools';
 import './BrowseTools.css';
 
@@ -28,7 +27,7 @@ function BrowseTools() {
   if (error) {
     return (
       <p className="browse-tools__status browse-tools__status--error">
-        Couldn't load tools. Is json-server running on port 3000?
+        Couldn't load tools. Make sure the Flask server is running.
       </p>
     );
   }
@@ -41,21 +40,17 @@ function BrowseTools() {
           <Link to={`/tools/${tool.id}`} key={tool.id} className="tool-card">
             <div className="tool-card__image-wrap">
               <img
-                src={tool.imageUrl}
+                src={tool.image}
                 alt={tool.name}
                 className="tool-card__image"
               />
-              {!tool.available && (
-                <span className="tool-card__badge">Unavailable</span>
+              {tool.status !== 'Available' && (
+                <span className="tool-card__badge">{tool.status}</span>
               )}
             </div>
             <div className="tool-card__body">
               <p className="tool-card__name">{tool.name}</p>
-              <p className="tool-card__price">KSh {tool.pricePerDay} / day</p>
               <p className="tool-card__condition">{tool.condition}</p>
-              <p className="tool-card__distance">
-                <MapPin size={14} /> {tool.distanceKm} km away
-              </p>
             </div>
           </Link>
         ))}

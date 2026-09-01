@@ -5,9 +5,31 @@ import {
   getItems,
   updateItem as updateItemRequest,
 } from "../services/api";
+import useAuth from "../hooks/useAuth";
 import ItemsContext from "./ItemsContext";
 
+// The backend expects categoryId/status; older parts of the UI still
+// collect them as category/availability. Translate here, in one place,
+// so every caller (AddItem, EditItem, ChangeAvailability...) can keep
+// using the field names they already have.
+const toBackendFields = (data) => {
+  const backendData = { ...data };
+
+  if ("category" in backendData) {
+    backendData.categoryId = backendData.category;
+    delete backendData.category;
+  }
+
+  if ("availability" in backendData) {
+    backendData.status = backendData.availability;
+    delete backendData.availability;
+  }
+
+  return backendData;
+};
+
 function ItemsProvider({ children }) {
+  const { currentUser } = useAuth();
   const [items, setItems] = useState([]);
   const [itemsLoading, setItemsLoading] =
     useState(true);
@@ -37,17 +59,11 @@ function ItemsProvider({ children }) {
   }, []);
 
   const addItem = async (itemData) => {
-    const newItemData = {
-      ...itemData,
-      ownerId: "1",
-      owner: "Wanja Juma",
-      location: "Greenview Estate",
-      availability: "Available",
-      statusColor: "available",
-    };
-
     const savedItem = await createItem(
-      newItemData
+      toBackendFields({
+        ...itemData,
+        ownerId: Number(currentUser?.id),
+      })
     );
 
     setItems((currentItems) => [
@@ -64,7 +80,7 @@ function ItemsProvider({ children }) {
   ) => {
     const updatedItem = await updateItemRequest(
       itemId,
-      updates
+      toBackendFields(updates)
     );
 
     setItems((currentItems) =>

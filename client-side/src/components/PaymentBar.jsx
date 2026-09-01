@@ -1,14 +1,38 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import tools from '../data/tools';
+import { getItem } from '../services/api';
 import './PaymentBar.css';
 
 function PaymentBar() {
   const { id } = useParams();
-  const tool = tools.find((t) => t.id === id);
+  const [tool, setTool] = useState(undefined);
   const [duration, setDuration] = useState(1);
   const [method, setMethod] = useState('mpesa');
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getItem(id)
+      .then((data) => {
+        if (!cancelled) setTool(data);
+      })
+      .catch(() => {
+        if (!cancelled) setTool(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (tool === undefined) {
+    return (
+      <div className="payment-bar">
+        <p>Loading…</p>
+      </div>
+    );
+  }
 
   if (!tool) {
     return (
@@ -19,8 +43,6 @@ function PaymentBar() {
     );
   }
 
-  const total = duration * tool.dailyRate;
-
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
@@ -29,7 +51,7 @@ function PaymentBar() {
   if (submitted) {
     return (
       <div className="payment-bar payment-success">
-        <p>Payment of Ksh{total} confirmed for {tool.name}. Enjoy your borrow!</p>
+        <p>Borrow request sent for {tool.name}. The owner will confirm shortly.</p>
       </div>
     );
   }
@@ -57,11 +79,7 @@ function PaymentBar() {
         </select>
       </label>
 
-      <div className="payment-total">
-        Total: <strong>Ksh{total}</strong>
-      </div>
-
-      <button type="submit">Pay Now</button>
+      <button type="submit">Send Borrow Request</button>
     </form>
   );
 }

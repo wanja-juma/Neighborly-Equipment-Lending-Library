@@ -3,11 +3,10 @@ import {
   useState,
 } from "react";
 
+import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
 import useRequests from "../hooks/useRequests";
 import "./Items.css";
-
-const CURRENT_USER_ID = "1";
 
 const DEFAULT_CATEGORIES = [
   "Power Tools",
@@ -52,6 +51,8 @@ const getItemCategory = (item) => {
     item?.category ||
     item?.category_name ||
     item?.categoryName ||
+    item?.categoryId ||
+    item?.category_id ||
     ""
   );
 };
@@ -100,6 +101,12 @@ const getItemAvailability = (item) =>
   "Available";
 
 function BrowseItems() {
+  const { currentUser } = useAuth();
+
+  const currentUserId = String(
+    currentUser?.id || ""
+  );
+
   const {
     items,
     itemsLoading,
@@ -150,9 +157,9 @@ function BrowseItems() {
       safeItems.filter(
         (item) =>
           String(getItemOwnerId(item)) !==
-          CURRENT_USER_ID
+          currentUserId
       ),
-    [safeItems]
+    [safeItems, currentUserId]
   );
 
   /*
@@ -370,8 +377,10 @@ function BrowseItems() {
               selectedItem
             ),
           borrowerId:
-            CURRENT_USER_ID,
-          borrowerName: "Wanja Juma",
+            currentUserId,
+          borrowerName:
+            currentUser?.name ||
+            "Neighbour",
           startDate:
             borrowDates.startDate,
           endDate:

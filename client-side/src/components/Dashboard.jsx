@@ -1184,11 +1184,15 @@ function Dashboard() {
               0 ? (
                 recentListings.map(
                   (item) => {
+                    const availability =
+                      item.availability ||
+                      item.status ||
+                      "Unknown";
+
                     const statusClass =
                       item.statusColor ||
                       String(
-                        item.availability ||
-                          ""
+                        availability
                       )
                         .toLowerCase()
                         .replaceAll(
@@ -1237,8 +1241,7 @@ function Dashboard() {
                           >
                             <span className="status-dot" />
 
-                            {item.availability ||
-                              "Unknown"}
+                            {availability}
                           </small>
                         </div>
                       </article>

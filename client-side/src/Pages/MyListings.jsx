@@ -64,6 +64,8 @@ function MyListings() {
     return (
       item.category ||
       item.category_name ||
+      item.categoryId ||
+      item.category_id ||
       "Other"
     );
   };

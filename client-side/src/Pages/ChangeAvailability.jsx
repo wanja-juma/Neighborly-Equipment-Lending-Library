@@ -50,7 +50,7 @@ function ChangeAvailability() {
   useEffect(() => {
     const fetchItem = async () => {
       const token = localStorage.getItem(
-        "access_token"
+        "neighborlyToken"
       );
 
       try {
@@ -78,7 +78,7 @@ function ChangeAvailability() {
         setItem(loadedItem);
 
         setAvailability(
-          loadedItem.availability ||
+          loadedItem.status ||
             "Available"
         );
       } catch (requestError) {
@@ -95,7 +95,7 @@ function ChangeAvailability() {
     event.preventDefault();
 
     const token = localStorage.getItem(
-      "access_token"
+      "neighborlyToken"
     );
 
     setSaving(true);
@@ -112,7 +112,7 @@ function ChangeAvailability() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            availability,
+            status: availability,
           }),
         }
       );
