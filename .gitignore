@@ -17,3 +17,6 @@ node_modules/
 
 # Vite build
 dist/
+
+# local database
+instance/
