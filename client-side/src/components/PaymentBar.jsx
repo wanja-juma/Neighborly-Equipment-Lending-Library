@@ -15,3 +15,20 @@ function PaymentBar() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 }
+  useEffect(() => {
+    setLoading(true);
+    getLoan(loanId)
+      .then((loanData) => {
+        setLoan(loanData);
+        // LoanSchema only returns item_id, not a nested item — fetch it separately
+        return getItem(loanData.item_id);
+      })
+      .then((itemData) => {
+        setItem(itemData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [loanId]);
