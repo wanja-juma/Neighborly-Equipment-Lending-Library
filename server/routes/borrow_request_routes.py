@@ -20,7 +20,8 @@ borrow_requests_bp = Blueprint(
 @jwt_required()
 def get_borrowing_requests():
     """Get all borrowing requests."""
-    requests = BorrowRequest.query.all()
+    requests = BorrowingRequest.query.all()
+    requests = BorrowingRequest.query.all()
     return jsonify({
         "borrowing_requests": borrowing_requests_schema.dump(requests)
     }), 200

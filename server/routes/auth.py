@@ -168,8 +168,6 @@ class Register(Resource):
                 "Account created "
                 "successfully."
             ),
-            # Keep both names temporarily
-            # for frontend compatibility.
             "access_token": access_token,
             "accessToken": access_token,
             "user": user_schema.dump(
@@ -180,7 +178,8 @@ class Register(Resource):
 
 class Login(Resource):
     def post(self):
-        
+        """Log in an existing user."""
+
         data = (
             request.get_json(
                 silent=True
@@ -189,11 +188,17 @@ class Login(Resource):
         )
 
         email = str(
-            data.get("email", "")
+            data.get(
+                "email",
+                "",
+            )
         ).strip().lower()
 
         password = str(
-            data.get("password", "")
+            data.get(
+                "password",
+                "",
+            )
         )
 
         if not email or not password:
@@ -245,12 +250,15 @@ class CurrentUser(Resource):
     @jwt_required()
     def get(self):
         
-
         try:
             user_id = int(
                 get_jwt_identity()
             )
-        except (TypeError, ValueError):
+
+        except (
+            TypeError,
+            ValueError,
+        ):
             return {
                 "error": (
                     "Invalid user identity."
@@ -279,7 +287,7 @@ class CurrentUser(Resource):
 class Logout(Resource):
     @jwt_required()
     def post(self):
-        
+        """Log out the current user."""
 
         return {
             "message": (
@@ -290,26 +298,13 @@ class Logout(Resource):
         }, 200
 
 
-api.add_resource(
-    Register,
-    "/register",
-)
+api.add_resource(Register, "/register")
 
-api.add_resource(
-    Login,
-    "/login",
-)
+api.add_resource(Login, "/login" )
 
-api.add_resource(
-    CurrentUser,
-    "/current-user",
-    "/me",
-)
+api.add_resource(CurrentUser, "/current-user", "/me")
 
-api.add_resource(
-    Logout,
-    "/logout",
-)
+api.add_resource(Logout, "/logout" )
 
 
 

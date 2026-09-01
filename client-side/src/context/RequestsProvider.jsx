@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+
 import {
   createBorrowingRequest,
   getBorrowingRequests,
   updateBorrowingRequest,
 } from "../services/api";
+
 import RequestsContext from "./RequestsContext";
+
 
 function RequestsProvider({ children }) {
   const [
@@ -17,8 +20,11 @@ function RequestsProvider({ children }) {
     setRequestsLoading,
   ] = useState(true);
 
-  const [requestsError, setRequestsError] =
-    useState("");
+  const [
+    requestsError,
+    setRequestsError,
+  ] = useState("");
+
 
   useEffect(() => {
     const loadRequests = async () => {
@@ -29,8 +35,23 @@ function RequestsProvider({ children }) {
         const data =
           await getBorrowingRequests();
 
-        setBorrowingRequests(data);
+        const requests =
+          Array.isArray(data)
+            ? data
+            : data?.borrowing_requests ||
+              data?.borrowingRequests ||
+              data?.requests ||
+              [];
+
+        setBorrowingRequests(
+          requests
+        );
       } catch (error) {
+        console.error(
+          "Failed to load borrowing requests:",
+          error
+        );
+
         setRequestsError(
           error.message ||
             "Failed to load borrowing requests."
@@ -43,16 +64,33 @@ function RequestsProvider({ children }) {
     loadRequests();
   }, []);
 
+
   const addBorrowingRequest = async (
     requestData
   ) => {
     const duplicateRequest =
       borrowingRequests.find(
         (request) =>
-          request.itemId === requestData.itemId &&
-          request.borrowerId ===
-            requestData.borrowerId &&
-          request.status === "Pending"
+          String(
+            request.itemId ??
+              request.item_id
+          ) ===
+            String(
+              requestData.itemId ??
+                requestData.item_id
+            ) &&
+          String(
+            request.borrowerId ??
+              request.borrower_id
+          ) ===
+            String(
+              requestData.borrowerId ??
+                requestData.borrower_id
+            ) &&
+          String(
+            request.status
+          ).toLowerCase() ===
+            "pending"
       );
 
     if (duplicateRequest) {
@@ -67,13 +105,18 @@ function RequestsProvider({ children }) {
       const newRequestData = {
         ...requestData,
         status: "Pending",
-        createdAt: new Date().toISOString(),
       };
 
-      const savedRequest =
+      const data =
         await createBorrowingRequest(
           newRequestData
         );
+
+      const savedRequest =
+        data?.borrowing_request ||
+        data?.borrowingRequest ||
+        data?.request ||
+        data;
 
       setBorrowingRequests(
         (currentRequests) => [
@@ -89,6 +132,11 @@ function RequestsProvider({ children }) {
           "Borrowing request submitted successfully.",
       };
     } catch (error) {
+      console.error(
+        "Failed to create borrowing request:",
+        error
+      );
+
       return {
         success: false,
         message:
@@ -97,6 +145,7 @@ function RequestsProvider({ children }) {
       };
     }
   };
+
 
   const updateRequestStatus = async (
     requestId,
@@ -109,15 +158,20 @@ function RequestsProvider({ children }) {
       "Cancelled",
     ];
 
-    if (!allowedStatuses.includes(newStatus)) {
+    if (
+      !allowedStatuses.includes(
+        newStatus
+      )
+    ) {
       return {
         success: false,
-        message: "Invalid request status.",
+        message:
+          "Invalid request status.",
       };
     }
 
     try {
-      const updatedRequest =
+      const data =
         await updateBorrowingRequest(
           requestId,
           {
@@ -125,21 +179,35 @@ function RequestsProvider({ children }) {
           }
         );
 
+      const updatedRequest =
+        data?.borrowing_request ||
+        data?.borrowingRequest ||
+        data?.request ||
+        data;
+
       setBorrowingRequests(
         (currentRequests) =>
-          currentRequests.map((request) =>
-            request.id === requestId
-              ? updatedRequest
-              : request
+          currentRequests.map(
+            (request) =>
+              String(request.id) ===
+              String(requestId)
+                ? updatedRequest
+                : request
           )
       );
 
       return {
         success: true,
         request: updatedRequest,
-        message: `Request ${newStatus.toLowerCase()}.`,
+        message:
+          `Request ${newStatus.toLowerCase()}.`,
       };
     } catch (error) {
+      console.error(
+        "Failed to update request:",
+        error
+      );
+
       return {
         success: false,
         message:
@@ -148,6 +216,7 @@ function RequestsProvider({ children }) {
       };
     }
   };
+
 
   const cancelBorrowingRequest = (
     requestId
@@ -158,6 +227,7 @@ function RequestsProvider({ children }) {
     );
   };
 
+
   const value = {
     borrowingRequests,
     requestsLoading,
@@ -167,11 +237,15 @@ function RequestsProvider({ children }) {
     cancelBorrowingRequest,
   };
 
+
   return (
-    <RequestsContext.Provider value={value}>
+    <RequestsContext.Provider
+      value={value}
+    >
       {children}
     </RequestsContext.Provider>
   );
 }
+
 
 export default RequestsProvider;

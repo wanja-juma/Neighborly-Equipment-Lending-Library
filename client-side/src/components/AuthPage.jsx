@@ -1,16 +1,25 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import ToolsPanel from "./ToolsPanel.jsx";
 import {
-  registerUser,
-  loginUser,
-} from "../mockAuth.js";
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+
+import ToolsPanel from "./ToolsPanel.jsx";
 import useAuth from "../hooks/useAuth.js";
+
 import "./AuthPage.css";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5555/api";
+
 function AuthPage() {
-  const [isRegister, setIsRegister] =
-    useState(true);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login } = useAuth();
+
+  const isRegister =
+    searchParams.get("mode") !== "login";
 
   const [form, setForm] = useState({
     firstName: "",
@@ -19,155 +28,348 @@ function AuthPage() {
     password: "",
   });
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [
+    showPassword,
+    setShowPassword,
+  ] = useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
+
   const [success, setSuccess] =
     useState("");
-  const [submitting, setSubmitting] =
-    useState(false);
 
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
 
-  const update = (field) => (event) => {
-    setForm((currentForm) => ({
-      ...currentForm,
-      [field]: event.target.value,
-    }));
-  };
+  const update =
+    (field) => (event) => {
+      setForm((currentForm) => ({
+        ...currentForm,
+        [field]: event.target.value,
+      }));
+    };
 
-  const updateName = (field) => (event) => {
-    const lettersOnly = event.target.value.replace(/[^A-Za-z\s'-]/g, "");
-    setForm((currentForm) => ({
-      ...currentForm,
-      [field]: lettersOnly,
-    }));
-  };
+  const updateName =
+    (field) => (event) => {
+      const lettersOnly =
+        event.target.value.replace(
+          /[^A-Za-z\s'-]/g,
+          ""
+        );
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+      setForm((currentForm) => ({
+        ...currentForm,
+        [field]: lettersOnly,
+      }));
+    };
+
+  const validateForm = () => {
+    const email =
+      form.email.trim();
 
     if (
       isRegister &&
-      (!form.firstName.trim() ||
-        !form.lastName.trim())
+      (
+        !form.firstName.trim() ||
+        !form.lastName.trim()
+      )
     ) {
-      setError(
-        "Please enter your first and last name."
+      return (
+        "Please enter your first " +
+        "and last name."
       );
-      return;
     }
 
-    const NAME_PATTERN = /^[A-Za-z\s'-]+$/;
+    const namePattern =
+      /^[A-Za-z\s'-]+$/;
+
     if (
       isRegister &&
-      (!NAME_PATTERN.test(form.firstName.trim()) ||
-        !NAME_PATTERN.test(form.lastName.trim()))
+      (
+        !namePattern.test(
+          form.firstName.trim()
+        ) ||
+        !namePattern.test(
+          form.lastName.trim()
+        )
+      )
     ) {
-      setError(
-        "Names can only contain letters."
+      return (
+        "Names can only contain " +
+        "letters."
       );
-      return;
     }
 
-    if (!form.email.includes("@")) {
-      setError(
-        "Please enter a valid email address."
+    if (
+      !email ||
+      !email.includes("@")
+    ) {
+      return (
+        "Please enter a valid " +
+        "email address."
       );
-      return;
     }
 
     if (!form.password) {
-      setError("Please enter your password.");
-      return;
+      return (
+        "Please enter your password."
+      );
     }
 
     if (
       isRegister &&
       form.password.length < 8
     ) {
-      setError(
-        "Password must be at least 8 characters."
+      return (
+        "Password must be at least " +
+        "8 characters."
       );
-      return;
     }
 
-    setError("");
-    setSuccess("");
-    setSubmitting(true);
+    return "";
+  };
 
-    try {
-      const user = isRegister
-        ? await registerUser(form)
-        : await loginUser(form);
-
-      const firstName =
-        user.firstName || form.firstName;
-
-      const lastName =
-        user.lastName || form.lastName;
-
-      const fullName = [
-        firstName,
-        lastName,
-      ]
-        .filter(Boolean)
-        .join(" ");
-
-      const authenticatedUser = {
-        id: String(user.id || "1"),
-        firstName,
-        lastName,
-        name:
-          user.name ||
-          fullName ||
-          user.email ||
-          form.email,
-        email: user.email || form.email,
-        role: user.role || "Member",
-      };
-
-      login(
-        authenticatedUser,
-        user.accessToken || null
-      );
-
-      setSuccess(
+  const sendAuthRequest =
+    async () => {
+      const endpoint =
         isRegister
-          ? `Account created! Welcome, ${authenticatedUser.firstName}.`
-          : `Welcome back, ${authenticatedUser.firstName}.`
-      );
+          ? "/auth/register"
+          : "/auth/login";
 
-      navigate("/dashboard", {
-        replace: true,
+      const requestBody =
+        isRegister
+          ? {
+              firstName:
+                form.firstName.trim(),
+
+              lastName:
+                form.lastName.trim(),
+
+              email:
+                form.email
+                  .trim()
+                  .toLowerCase(),
+
+              password:
+                form.password,
+            }
+          : {
+              email:
+                form.email
+                  .trim()
+                  .toLowerCase(),
+
+              password:
+                form.password,
+            };
+
+      let response;
+
+      try {
+        response = await fetch(
+          `${API_BASE_URL}${endpoint}`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify(
+              requestBody
+            ),
+          }
+        );
+      } catch {
+        throw new Error(
+          "Unable to connect to the server. Make sure Flask is running."
+        );
+      }
+
+      const contentType =
+        response.headers.get(
+          "content-type"
+        );
+
+      let responseBody = null;
+
+      if (
+        contentType?.includes(
+          "application/json"
+        )
+      ) {
+        responseBody =
+          await response.json();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          responseBody?.error ||
+            responseBody?.message ||
+            "Authentication failed."
+        );
+      }
+
+      return responseBody;
+    };
+
+  const handleSubmit =
+    async (event) => {
+      event.preventDefault();
+
+      const validationError =
+        validateForm();
+
+      if (validationError) {
+        setError(
+          validationError
+        );
+        return;
+      }
+
+      setError("");
+      setSuccess("");
+      setSubmitting(true);
+
+      try {
+        const responseBody =
+          await sendAuthRequest();
+
+        const serverUser =
+          responseBody?.user;
+
+        const token =
+          responseBody?.access_token ||
+          responseBody?.accessToken;
+
+        if (!serverUser) {
+          throw new Error(
+            "The server did not return user information."
+          );
+        }
+
+        if (!token) {
+          throw new Error(
+            "The server did not return an access token."
+          );
+        }
+
+        const profile =
+          serverUser.profile || {};
+
+        const firstName =
+          profile.first_name ||
+          profile.firstName ||
+          serverUser.first_name ||
+          serverUser.firstName ||
+          form.firstName.trim();
+
+        const lastName =
+          profile.last_name ||
+          profile.lastName ||
+          serverUser.last_name ||
+          serverUser.lastName ||
+          form.lastName.trim();
+
+        const fullName = [
+          firstName,
+          lastName,
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        const authenticatedUser = {
+          ...serverUser,
+
+          id: String(
+            serverUser.id
+          ),
+
+          firstName,
+          lastName,
+
+          name:
+            serverUser.name ||
+            fullName ||
+            serverUser.email,
+
+          email:
+            serverUser.email ||
+            form.email
+              .trim()
+              .toLowerCase(),
+
+          role:
+            serverUser.role ||
+            "Member",
+
+          profile:
+            serverUser.profile ||
+            null,
+        };
+
+        login(
+          authenticatedUser,
+          token
+        );
+
+        setSuccess(
+          isRegister
+            ? `Account created! Welcome, ${
+                firstName ||
+                authenticatedUser.name
+              }.`
+            : `Welcome back, ${
+                firstName ||
+                authenticatedUser.name
+              }.`
+        );
+
+        navigate(
+          "/dashboard",
+          {
+            replace: true,
+          }
+        );
+      } catch (requestError) {
+        setError(
+          requestError.message ||
+            "Authentication failed. Please try again."
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+  const handleModeChange =
+    () => {
+      const nextMode =
+        isRegister
+          ? "login"
+          : "register";
+
+      setError("");
+      setSuccess("");
+      setShowPassword(false);
+
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
       });
-    } catch (err) {
-      setError(
-        err.message ||
-          "Authentication failed. Please try again."
+
+      navigate(
+        `/auth?mode=${nextMode}`,
+        {
+          replace: true,
+        }
       );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleModeChange = () => {
-    setIsRegister(
-      (currentMode) => !currentMode
-    );
-
-    setError("");
-    setSuccess("");
-
-    setForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-    });
-  };
+    };
 
   return (
     <div className="auth-page">
@@ -199,30 +401,38 @@ function AuthPage() {
             {isRegister && (
               <div className="field-row">
                 <label className="field">
-                  <span>First name</span>
+                  <span>
+                    First name
+                  </span>
 
                   <input
                     type="text"
-                    pattern="[A-Za-z\s'-]+"
-                    value={form.firstName}
+                    value={
+                      form.firstName
+                    }
                     onChange={updateName(
                       "firstName"
                     )}
                     autoComplete="given-name"
+                    required
                   />
                 </label>
 
                 <label className="field">
-                  <span>Last name</span>
+                  <span>
+                    Last name
+                  </span>
 
                   <input
                     type="text"
-                    pattern="[A-Za-z\s'-]+"
-                    value={form.lastName}
+                    value={
+                      form.lastName
+                    }
                     onChange={updateName(
                       "lastName"
                     )}
                     autoComplete="family-name"
+                    required
                   />
                 </label>
               </div>
@@ -234,9 +444,12 @@ function AuthPage() {
               <input
                 type="email"
                 value={form.email}
-                onChange={update("email")}
+                onChange={update(
+                  "email"
+                )}
                 placeholder="you@example.com"
                 autoComplete="email"
+                required
               />
             </label>
 
@@ -250,14 +463,19 @@ function AuthPage() {
                       ? "text"
                       : "password"
                   }
-                  value={form.password}
-                  onChange={update("password")}
+                  value={
+                    form.password
+                  }
+                  onChange={update(
+                    "password"
+                  )}
                   placeholder="••••••••"
                   autoComplete={
                     isRegister
                       ? "new-password"
                       : "current-password"
                   }
+                  required
                 />
 
                 <button
@@ -275,7 +493,9 @@ function AuthPage() {
                       : "Show password"
                   }
                 >
-                  {showPassword ? "🙈" : "👁️"}
+                  {showPassword
+                    ? "🙈"
+                    : "👁️"}
                 </button>
               </div>
             </label>
@@ -301,7 +521,9 @@ function AuthPage() {
             <button
               type="submit"
               className="submit-button"
-              disabled={submitting}
+              disabled={
+                submitting
+              }
             >
               {submitting
                 ? "Please wait…"
@@ -318,7 +540,9 @@ function AuthPage() {
 
             <button
               type="button"
-              onClick={handleModeChange}
+              onClick={
+                handleModeChange
+              }
             >
               {isRegister
                 ? "Sign in"
@@ -336,3 +560,4 @@ function AuthPage() {
 }
 
 export default AuthPage;
+

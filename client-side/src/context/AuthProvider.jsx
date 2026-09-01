@@ -25,8 +25,6 @@ const clearStoredAuthentication = () => {
     TOKEN_STORAGE_KEY
   );
 
-  // Remove older storage keys that may
-  // still exist in the browser.
   localStorage.removeItem(
     "neighborlyRefreshToken"
   );
@@ -41,7 +39,8 @@ const normalizeUser = (user) => {
     return null;
   }
 
-  const profile = user.profile || {};
+  const profile =
+    user.profile || {};
 
   const firstName =
     user.firstName ||
@@ -66,18 +65,23 @@ const normalizeUser = (user) => {
 
   return {
     ...user,
+
     id:
       user.id !== undefined &&
       user.id !== null
         ? String(user.id)
         : "",
+
     firstName,
+
     lastName,
+
     name:
       user.name ||
       fullName ||
       user.email ||
       "Neighbour",
+
     role:
       user.role ||
       profile.role ||
@@ -99,7 +103,9 @@ const getSavedUser = () => {
     const parsedUser =
       JSON.parse(savedUser);
 
-    return normalizeUser(parsedUser);
+    return normalizeUser(
+      parsedUser
+    );
   } catch {
     localStorage.removeItem(
       USER_STORAGE_KEY
@@ -109,7 +115,20 @@ const getSavedUser = () => {
   }
 };
 
-function AuthProvider({ children }) {
+const getStoredToken = () => {
+  return (
+    localStorage.getItem(
+      TOKEN_STORAGE_KEY
+    ) ||
+    localStorage.getItem(
+      "access_token"
+    )
+  );
+};
+
+function AuthProvider({
+  children,
+}) {
   const [
     currentUser,
     setCurrentUser,
@@ -120,16 +139,14 @@ function AuthProvider({ children }) {
     setAuthLoading,
   ] = useState(true);
 
-  const login = useCallback(
-    (user, token = null) => {
+  const saveUser =
+    useCallback((user) => {
       const normalizedUser =
         normalizeUser(user);
 
       setCurrentUser(
         normalizedUser
       );
-
-      setAuthLoading(false);
 
       if (normalizedUser) {
         localStorage.setItem(
@@ -138,135 +155,162 @@ function AuthProvider({ children }) {
             normalizedUser
           )
         );
-      }
-
-      if (token) {
-        localStorage.setItem(
-          TOKEN_STORAGE_KEY,
-          token
-        );
-
-        // Remove the old token key so the
-        // application uses one consistent key.
+      } else {
         localStorage.removeItem(
-          "access_token"
+          USER_STORAGE_KEY
         );
       }
-    },
-    []
-  );
 
-  const logout = useCallback(() => {
-    setCurrentUser(null);
-    setAuthLoading(false);
+      return normalizedUser;
+    }, []);
 
-    clearStoredAuthentication();
-  }, []);
-
-  useEffect(() => {
-    const restoreSession = async () => {
-      const token =
-        localStorage.getItem(
-          TOKEN_STORAGE_KEY
-        ) ||
-        localStorage.getItem(
-          "access_token"
+  const login = useCallback(
+    (user, token) => {
+      if (!user) {
+        throw new Error(
+          "User information is required."
         );
+      }
 
       if (!token) {
-        logout();
-        return;
+        throw new Error(
+          "An access token was not returned by the server."
+        );
       }
 
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/auth/current-user`,
-          {
-            method: "GET",
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-              Accept:
-                "application/json",
-            },
-          }
-        );
+      saveUser(user);
 
-        const data =
-          await response.json();
+      localStorage.setItem(
+        TOKEN_STORAGE_KEY,
+        token
+      );
 
-        if (
-          response.status === 401 ||
-          response.status === 403
-        ) {
-          logout();
+      localStorage.removeItem(
+        "access_token"
+      );
+
+      setAuthLoading(false);
+    },
+    [saveUser]
+  );
+
+  const logout =
+    useCallback(() => {
+      setCurrentUser(null);
+
+      clearStoredAuthentication();
+
+      setAuthLoading(false);
+    }, []);
+
+  useEffect(() => {
+    const restoreSession =
+      async () => {
+        const token =
+          getStoredToken();
+
+        if (!token) {
+          setCurrentUser(null);
+          setAuthLoading(false);
           return;
         }
 
-        if (!response.ok) {
-          throw new Error(
-            data.error ||
-              data.message ||
-              "Unable to restore session."
-          );
-        }
+        try {
+          const response =
+            await fetch(
+              `${API_BASE_URL}/auth/current-user`,
+              {
+                method: "GET",
 
-        if (!data.user) {
-          throw new Error(
-            "The current-user response does not contain a user."
-          );
-        }
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`,
 
-        const restoredUser =
-          normalizeUser(data.user);
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
 
-        setCurrentUser(
-          restoredUser
-        );
+          const contentType =
+            response.headers.get(
+              "content-type"
+            );
 
-        localStorage.setItem(
-          USER_STORAGE_KEY,
-          JSON.stringify(
+          const responseBody =
+            contentType?.includes(
+              "application/json"
+            )
+              ? await response.json()
+              : null;
+
+          if (
+            response.status ===
+              401 ||
+            response.status ===
+              403
+          ) {
+            logout();
+            return;
+          }
+
+          if (!response.ok) {
+            throw new Error(
+              responseBody?.error ||
+                responseBody?.message ||
+                "Unable to restore the session."
+            );
+          }
+
+          const restoredUser =
+            responseBody?.user;
+
+          if (!restoredUser) {
+            throw new Error(
+              "The current-user response does not contain a user."
+            );
+          }
+
+          saveUser(
             restoredUser
-          )
-        );
+          );
 
-        // If an old token was found, move it
-        // to the current storage key.
-        localStorage.setItem(
-          TOKEN_STORAGE_KEY,
-          token
-        );
+          localStorage.setItem(
+            TOKEN_STORAGE_KEY,
+            token
+          );
 
-        localStorage.removeItem(
-          "access_token"
-        );
-      } catch (error) {
-        console.error(
-          "Unable to restore session:",
-          error
-        );
+          localStorage.removeItem(
+            "access_token"
+          );
+        } catch (error) {
+          console.error(
+            "Unable to restore session:",
+            error
+          );
 
-        /*
-         * Clear invalid or unusable session
-         * data so the navbar and dashboard do
-         * not display conflicting auth states.
-         */
-        logout();
-      } finally {
-        setAuthLoading(false);
-      }
-    };
+          logout();
+        } finally {
+          setAuthLoading(false);
+        }
+      };
 
     restoreSession();
-  }, [logout]);
+  }, [
+    logout,
+    saveUser,
+  ]);
 
   const value = {
     currentUser,
+
     isAuthenticated:
       Boolean(currentUser),
+
     authLoading,
+
     login,
+
     logout,
   };
 

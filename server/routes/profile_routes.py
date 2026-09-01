@@ -48,13 +48,13 @@ def get_profile(profile_id):
 
     return jsonify(
         {
-            "profile": (
+            "profile":
                 profile_schema.dump(
                     profile
                 )
-            ),
         }
     ), 200
+
 
 class OwnProfile(Resource):
     @jwt_required()
@@ -65,7 +65,11 @@ class OwnProfile(Resource):
             current_user_id = int(
                 identity
             )
-        except (TypeError, ValueError):
+
+        except (
+            TypeError,
+            ValueError,
+        ):
             return {
                 "error": (
                     "Invalid authentication "
@@ -112,8 +116,8 @@ class OwnProfile(Resource):
         if attempted_protected_fields:
             return {
                 "error": (
-                    "The id and user_id fields "
-                    "cannot be updated."
+                    "The id and user_id "
+                    "fields cannot be updated."
                 )
             }, 400
 
@@ -127,8 +131,8 @@ class OwnProfile(Resource):
         }
 
         unknown_fields = (
-            set(json_data.keys()) -
-            allowed_fields
+            set(json_data.keys())
+            - allowed_fields
         )
 
         if unknown_fields:
@@ -164,7 +168,8 @@ class OwnProfile(Resource):
                 "error": (
                     "Validation failed."
                 ),
-                "details": error.messages,
+                "details":
+                    error.messages,
             }, 400
 
         except IntegrityError:
@@ -172,19 +177,25 @@ class OwnProfile(Resource):
 
             return {
                 "error": (
-                    "The phone number is already "
-                    "in use."
+                    "Unable to update the "
+                    "profile due to a data "
+                    "conflict."
                 )
             }, 409
 
         return {
             "message": (
-                "Profile updated successfully."
+                "Profile updated "
+                "successfully."
             ),
-            "profile": profile_schema.dump(
-                updated_profile
-            ),
+            "profile":
+                profile_schema.dump(
+                    updated_profile
+                ),
         }, 200
 
 
-profile_api.add_resource( OwnProfile, "/profile",)
+profile_api.add_resource(
+    OwnProfile,
+    "/profile",
+)

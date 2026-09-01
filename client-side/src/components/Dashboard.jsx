@@ -6,6 +6,7 @@ import useItems from "../hooks/useItems";
 import useLoans from "../hooks/useLoans";
 import useRequests from "../hooks/useRequests";
 import getLoanStatus from "../utils/getLoanStatus";
+
 import "./Dashboard.css";
 
 const summaryCards = [
@@ -71,6 +72,7 @@ const getItemName = (record) => {
     record?.itemName ||
     record?.item_name ||
     record?.item ||
+    record?.name ||
     "Equipment"
   );
 };
@@ -156,7 +158,8 @@ const formatDate = (date) => {
     return "Date unavailable";
   }
 
-  const parsedDate = new Date(date);
+  const parsedDate =
+    new Date(date);
 
   if (
     Number.isNaN(
@@ -187,11 +190,16 @@ const getReturnReminderText = (
   }
 
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
 
-  const dueDate = new Date(
-    dueDateValue
+  today.setHours(
+    0,
+    0,
+    0,
+    0
   );
+
+  const dueDate =
+    new Date(dueDateValue);
 
   if (
     Number.isNaN(
@@ -201,16 +209,24 @@ const getReturnReminderText = (
     return "";
   }
 
-  dueDate.setHours(0, 0, 0, 0);
+  dueDate.setHours(
+    0,
+    0,
+    0,
+    0
+  );
 
   const millisecondsPerDay =
     1000 * 60 * 60 * 24;
 
-  const daysRemaining = Math.round(
-    (dueDate.getTime() -
-      today.getTime()) /
-      millisecondsPerDay
-  );
+  const daysRemaining =
+    Math.round(
+      (
+        dueDate.getTime() -
+        today.getTime()
+      ) /
+        millisecondsPerDay
+    );
 
   if (daysRemaining < 0) {
     const overdueDays =
@@ -235,14 +251,18 @@ const getReturnReminderText = (
 };
 
 const getStatusClass = (status) =>
-  String(status || "On Track")
+  String(
+    status || "On Track"
+  )
     .toLowerCase()
     .replaceAll(" ", "-");
 
 function Dashboard() {
-  const { currentUser } = useAuth();
+  const { currentUser } =
+    useAuth();
 
-  const { items } = useItems();
+  const { items } =
+    useItems();
 
   const {
     borrowingRequests,
@@ -257,8 +277,10 @@ function Dashboard() {
     loansError,
   } = useLoans();
 
-  const [notice, setNotice] =
-    useState("");
+  const [
+    notice,
+    setNotice,
+  ] = useState("");
 
   const [
     actionError,
@@ -290,9 +312,10 @@ function Dashboard() {
       "loans"
     );
 
-  const currentUserId = String(
-    currentUser?.id || ""
-  );
+  const currentUserId =
+    String(
+      currentUser?.id || ""
+    );
 
   const firstName =
     currentUser?.firstName ||
@@ -345,97 +368,132 @@ function Dashboard() {
       .toUpperCase() ||
     "N";
 
-  const myItems = safeItems.filter(
-    (item) =>
-      String(
-        getRecordOwnerId(item)
-      ) === currentUserId
-  );
+  const myItems =
+    safeItems.filter(
+      (item) =>
+        String(
+          getRecordOwnerId(item)
+        ) === currentUserId
+    );
 
   const recentListings =
     myItems.slice(0, 3);
 
   const pendingRequests =
-    safeRequests.filter((request) => {
-      const status = String(
-        request.status || ""
-      ).toLowerCase();
+    safeRequests.filter(
+      (request) => {
+        const status =
+          String(
+            request.status || ""
+          ).toLowerCase();
 
-      const requestType = String(
-        request.requestType ??
-        request.direction ??
-        request.type ??
-        ""
-      ).toLowerCase();
+        const requestType =
+          String(
+            request.requestType ??
+              request.request_type ??
+              request.direction ??
+              request.type ??
+              ""
+          ).toLowerCase();
 
-      return (
-        status === "pending" &&
-        (
+        const ownerId =
           String(
             getRecordOwnerId(
               request
-            )
-          ) === currentUserId ||
-          requestType === "incoming"
-        )
-      );
-    });
+            ) ?? ""
+          );
+
+        return (
+          status === "pending" &&
+          (
+            ownerId ===
+              currentUserId ||
+            requestType ===
+              "incoming"
+          )
+        );
+      }
+    );
 
   const recentPendingRequests =
     pendingRequests.slice(0, 3);
 
   const activeLoans =
-    safeLoans.filter((loan) => {
-      const status = String(
-        getLoanStatus(loan) || ""
-      ).toLowerCase();
+    safeLoans.filter(
+      (loan) => {
+        const status =
+          String(
+            getLoanStatus(loan) ||
+              ""
+          ).toLowerCase();
 
-      return status !== "returned";
-    });
+        return (
+          status !== "returned" &&
+          status !== "completed" &&
+          status !== "cancelled" &&
+          status !== "canceled"
+        );
+      }
+    );
 
   const borrowedLoans =
-    activeLoans.filter((loan) => {
-      const loanType = String(
-        loan.loanType ??
-        loan.loan_type ??
-        ""
-      ).toLowerCase();
+    activeLoans.filter(
+      (loan) => {
+        const loanType =
+          String(
+            loan.loanType ??
+              loan.loan_type ??
+              ""
+          ).toLowerCase();
 
-      return (
-        String(
-          getRecordBorrowerId(
-            loan
-          )
-        ) === currentUserId ||
-        loanType === "borrowed"
-      );
-    });
+        return (
+          String(
+            getRecordBorrowerId(
+              loan
+            ) ?? ""
+          ) === currentUserId ||
+          loanType === "borrowed"
+        );
+      }
+    );
 
   const lentLoans =
-    activeLoans.filter((loan) => {
-      const loanType = String(
-        loan.loanType ??
-        loan.loan_type ??
-        ""
-      ).toLowerCase();
+    activeLoans.filter(
+      (loan) => {
+        const loanType =
+          String(
+            loan.loanType ??
+              loan.loan_type ??
+              ""
+          ).toLowerCase();
 
-      return (
-        String(
-          getRecordOwnerId(loan)
-        ) === currentUserId ||
-        loanType === "lent"
-      );
-    });
+        return (
+          String(
+            getRecordOwnerId(
+              loan
+            ) ?? ""
+          ) === currentUserId ||
+          loanType === "lent"
+        );
+      }
+    );
 
   const currentUserActiveLoans =
     activeLoans.filter(
       (loan) =>
-        borrowedLoans.includes(loan) ||
-        lentLoans.includes(loan)
+        borrowedLoans.includes(
+          loan
+        ) ||
+        lentLoans.includes(
+          loan
+        )
     );
 
   const recentActiveLoans =
-    currentUserActiveLoans.slice(0, 3);
+    currentUserActiveLoans.slice(
+      0,
+      3
+    );
 
   const returnReminderLoan =
     [...borrowedLoans]
@@ -447,9 +505,10 @@ function Dashboard() {
           return false;
         }
 
-        const dueDate = new Date(
-          dueDateValue
-        );
+        const dueDate =
+          new Date(
+            dueDateValue
+          );
 
         return !Number.isNaN(
           dueDate.getTime()
@@ -464,46 +523,52 @@ function Dashboard() {
             getDueDate(firstLoan)
           ) -
           new Date(
-            getDueDate(secondLoan)
+            getDueDate(
+              secondLoan
+            )
           )
       )[0];
 
   const dashboardSummary =
-    summaryCards.map((card) => {
-      switch (card.title) {
-        case "My Listings":
-          return {
-            ...card,
-            value: myItems.length,
-          };
+    summaryCards.map(
+      (card) => {
+        switch (card.title) {
+          case "My Listings":
+            return {
+              ...card,
+              value:
+                myItems.length,
+            };
 
-        case "Pending Requests":
-          return {
-            ...card,
-            value:
-              pendingRequests.length,
-          };
+          case "Pending Requests":
+            return {
+              ...card,
+              value:
+                pendingRequests.length,
+            };
 
-        case "Items Borrowed":
-          return {
-            ...card,
-            value:
-              borrowedLoans.length,
-          };
+          case "Items Borrowed":
+            return {
+              ...card,
+              value:
+                borrowedLoans.length,
+            };
 
-        case "Items Lent Out":
-          return {
-            ...card,
-            value: lentLoans.length,
-          };
+          case "Items Lent Out":
+            return {
+              ...card,
+              value:
+                lentLoans.length,
+            };
 
-        default:
-          return {
-            ...card,
-            value: 0,
-          };
+          default:
+            return {
+              ...card,
+              value: 0,
+            };
+        }
       }
-    });
+    );
 
   const currentDate =
     new Intl.DateTimeFormat(
@@ -516,46 +581,49 @@ function Dashboard() {
       }
     ).format(new Date());
 
-  const handleRequest = async (
-    requestId,
-    newStatus
-  ) => {
-    setNotice("");
-    setActionError("");
-    setUpdatingRequestId(
-      requestId
-    );
+  const handleRequest =
+    async (
+      requestId,
+      newStatus
+    ) => {
+      setNotice("");
+      setActionError("");
+      setUpdatingRequestId(
+        requestId
+      );
 
-    try {
-      const result =
-        await updateRequestStatus(
-          requestId,
-          newStatus
+      try {
+        const result =
+          await updateRequestStatus(
+            requestId,
+            newStatus
+          );
+
+        if (
+          result &&
+          result.success === false
+        ) {
+          throw new Error(
+            result.message ||
+              "The request could not be updated."
+          );
+        }
+
+        setNotice(
+          result?.message ||
+            `Request ${newStatus.toLowerCase()} successfully.`
         );
-
-      if (
-        result &&
-        result.success === false
-      ) {
-        throw new Error(
-          result.message ||
+      } catch (error) {
+        setActionError(
+          error.message ||
             "The request could not be updated."
         );
+      } finally {
+        setUpdatingRequestId(
+          null
+        );
       }
-
-      setNotice(
-        result?.message ||
-          `Request ${newStatus.toLowerCase()} successfully.`
-      );
-    } catch (error) {
-      setActionError(
-        error.message ||
-          "The request could not be updated."
-      );
-    } finally {
-      setUpdatingRequestId(null);
-    }
-  };
+    };
 
   return (
     <main className="dashboard-main">
@@ -612,7 +680,9 @@ function Dashboard() {
             className="request-notice"
             role="status"
           >
-            <span>{notice}</span>
+            <span>
+              {notice}
+            </span>
 
             <button
               type="button"
@@ -631,7 +701,9 @@ function Dashboard() {
             className="request-notice error"
             role="alert"
           >
-            <span>{actionError}</span>
+            <span>
+              {actionError}
+            </span>
 
             <button
               type="button"
@@ -657,8 +729,9 @@ function Dashboard() {
             </h1>
 
             <p className="welcome-description">
-              Here is what is happening
-              in your community today.
+              Here is what is
+              happening in your
+              community today.
             </p>
           </div>
 
@@ -717,9 +790,11 @@ function Dashboard() {
                 </h2>
 
                 <p>
-                  Review requests from
-                  neighbours who want to
-                  borrow your items.
+                  Review requests
+                  from neighbours
+                  who want to
+                  borrow your
+                  items.
                 </p>
               </div>
 
@@ -741,10 +816,12 @@ function Dashboard() {
                 </div>
               ) : requestsError ? (
                 <div className="requests-empty-state error">
-                  <p>{requestsError}</p>
+                  <p>
+                    {requestsError}
+                  </p>
                 </div>
-              ) : recentPendingRequests
-                  .length > 0 ? (
+              ) : recentPendingRequests.length >
+                0 ? (
                 recentPendingRequests.map(
                   (request) => {
                     const borrowerName =
@@ -779,12 +856,16 @@ function Dashboard() {
                       String(
                         updatingRequestId
                       ) ===
-                      String(request.id);
+                      String(
+                        request.id
+                      );
 
                     return (
                       <article
                         className="request-card"
-                        key={request.id}
+                        key={
+                          request.id
+                        }
                       >
                         <span
                           className={`borrower-avatar ${
@@ -792,16 +873,21 @@ function Dashboard() {
                             "blue"
                           }`}
                         >
-                          {requestInitials}
+                          {
+                            requestInitials
+                          }
                         </span>
 
                         <div className="request-information">
                           <strong>
-                            {borrowerName}
+                            {
+                              borrowerName
+                            }
                           </strong>
 
                           <span className="request-description">
-                            Wants to borrow{" "}
+                            Wants to
+                            borrow{" "}
                             <b>
                               {getItemName(
                                 request
@@ -869,12 +955,15 @@ function Dashboard() {
 
                   <div>
                     <strong>
-                      All requests reviewed
+                      All requests
+                      reviewed
                     </strong>
 
                     <p>
-                      You have no pending
-                      borrowing requests.
+                      You have no
+                      pending
+                      borrowing
+                      requests.
                     </p>
                   </div>
                 </div>
@@ -886,11 +975,15 @@ function Dashboard() {
         <section className="loans-panel">
           <div className="panel-heading">
             <div>
-              <h2>Active Loans</h2>
+              <h2>
+                Active Loans
+              </h2>
 
               <p>
-                Items you are currently
-                borrowing or lending.
+                Items you are
+                currently
+                borrowing or
+                lending.
               </p>
             </div>
 
@@ -906,33 +999,42 @@ function Dashboard() {
             {loansLoading ? (
               <div className="loans-empty-state">
                 <p>
-                  Loading active loans...
+                  Loading active
+                  loans...
                 </p>
               </div>
             ) : loansError ? (
               <div className="loans-empty-state error">
-                <p>{loansError}</p>
+                <p>
+                  {loansError}
+                </p>
               </div>
             ) : recentActiveLoans.length >
               0 ? (
               recentActiveLoans.map(
                 (loan) => {
                   const currentStatus =
-                    getLoanStatus(loan);
+                    getLoanStatus(
+                      loan
+                    );
 
                   const borrowerId =
                     getRecordBorrowerId(
                       loan
                     );
 
-                  const loanType = String(
-                    loan.loanType ??
-                    loan.loan_type ??
-                    ""
-                  ).toLowerCase();
+                  const loanType =
+                    String(
+                      loan.loanType ??
+                        loan.loan_type ??
+                        ""
+                    ).toLowerCase();
 
                   const isBorrowed =
-                    String(borrowerId) ===
+                    String(
+                      borrowerId ??
+                        ""
+                    ) ===
                       currentUserId ||
                     loanType ===
                       "borrowed";
@@ -969,22 +1071,29 @@ function Dashboard() {
                         : fallbackPerson;
 
                   const loanItemName =
-                    getItemName(loan);
+                    getItemName(
+                      loan
+                    );
 
                   return (
                     <article
                       className="loan-card"
-                      key={loan.id}
+                      key={
+                        loan.id
+                      }
                     >
                       <span className="loan-item-icon">
                         {loan.icon ||
-                          loan.item?.icon ||
+                          loan.item
+                            ?.icon ||
                           "🧰"}
                       </span>
 
                       <div className="loan-information">
                         <strong>
-                          {loanItemName}
+                          {
+                            loanItemName
+                          }
                         </strong>
 
                         <span className="loan-person">
@@ -1008,7 +1117,9 @@ function Dashboard() {
                           currentStatus
                         )}`}
                       >
-                        {currentStatus}
+                        {
+                          currentStatus
+                        }
                       </span>
 
                       <Link
@@ -1034,8 +1145,9 @@ function Dashboard() {
                   </strong>
 
                   <p>
-                    You have no borrowed
-                    or lent items at the
+                    You have no
+                    borrowed or lent
+                    items at the
                     moment.
                   </p>
                 </div>
@@ -1048,11 +1160,14 @@ function Dashboard() {
           <section className="listings-panel">
             <div className="panel-heading">
               <div>
-                <h2>My Listings</h2>
+                <h2>
+                  My Listings
+                </h2>
 
                 <p>
-                  Your recently added
-                  tools and equipment.
+                  Your recently
+                  added tools and
+                  equipment.
                 </p>
               </div>
 
@@ -1084,7 +1199,9 @@ function Dashboard() {
                     return (
                       <article
                         className="listing-card"
-                        key={item.id}
+                        key={
+                          item.id
+                        }
                       >
                         <div className="listing-image">
                           <span>
@@ -1131,15 +1248,17 @@ function Dashboard() {
               ) : (
                 <div className="listings-empty-state">
                   <p>
-                    You have not added any
-                    items yet.
+                    You have not
+                    added any items
+                    yet.
                   </p>
 
                   <Link
                     className="primary-button"
                     to="/items/new"
                   >
-                    Add Your First Item
+                    Add Your First
+                    Item
                   </Link>
                 </div>
               )}
@@ -1221,8 +1340,9 @@ function Dashboard() {
                 </strong>
 
                 <p>
-                  You have no borrowed
-                  items to return.
+                  You have no
+                  borrowed items to
+                  return.
                 </p>
               </div>
 
