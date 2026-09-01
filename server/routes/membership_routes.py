@@ -26,3 +26,18 @@ class MembershipListResource(Resource):
 
         current_user_id = int(get_jwt_identity())
         json_data["user_id"] = current_user_id
+
+        try:
+            membership = membership_schema.load(json_data, session=db.session)
+        except ValidationError as error:
+            return {"error": "Validation failed.", "details": error.messages}, 400
+        except ValueError as error:
+            return {"error": str(error)}, 400
+
+        db.session.add(membership)
+        db.session.commit()
+ 
+        return {"membership": membership_schema.dump(membership)}, 201
+
+
+
