@@ -249,8 +249,7 @@ class Login(Resource):
 class CurrentUser(Resource):
     @jwt_required()
     def get(self):
-        """Return the currently logged-in user."""
-
+        
         try:
             user_id = int(
                 get_jwt_identity()
@@ -299,26 +298,13 @@ class Logout(Resource):
         }, 200
 
 
-api.add_resource(
-    Register,
-    "/register",
-)
+api.add_resource(Register, "/register")
 
-api.add_resource(
-    Login,
-    "/login",
-)
+api.add_resource(Login, "/login" )
 
-api.add_resource(
-    CurrentUser,
-    "/current-user",
-    "/me",
-)
+api.add_resource(CurrentUser, "/current-user", "/me")
 
-api.add_resource(
-    Logout,
-    "/logout",
-)
+api.add_resource(Logout, "/logout" )
 
 
 

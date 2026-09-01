@@ -47,56 +47,31 @@ def create_app(config_class=Config):
         },
     )
 
-    # Import models so SQLAlchemy and
-    # Flask-Migrate can discover them.
-    import models  # noqa: F401
+    # Import models 
+    
+    import models 
 
     # Import blueprints after extensions
-    # have been initialized.
-    from routes.auth import auth_bp
-
-    from routes.borrow_request_routes import (
-        borrow_requests_bp,
-    )
-
-    from routes.membership_routes import (
-        membership_bp,
-    )
-
-    from routes.payments_routes import (
-        payment_bp,
-    )
-
-    from routes.profile_routes import (
-        profile_bp,
-    )
-
-    from routes.user_routes import (
-        user_bp,
-    )
+   
+    from routes import (
+    auth_bp,
+    borrow_requests_bp,
+    loans_bp,
+    membership_bp,
+    payment_bp,
+    profile_bp,
+    user_bp,
+)
 
     # Register each blueprint once.
+    
     app.register_blueprint(auth_bp)
-
-    app.register_blueprint(
-        user_bp
-    )
-
-    app.register_blueprint(
-        profile_bp
-    )
-
-    app.register_blueprint(
-        borrow_requests_bp
-    )
-
-    app.register_blueprint(
-        membership_bp
-    )
-
-    app.register_blueprint(
-        payment_bp
-    )
+    app.register_blueprint(user_bp)
+    app.register_blueprint(profile_bp)
+    app.register_blueprint(borrow_requests_bp)
+    app.register_blueprint(loans_bp)
+    app.register_blueprint(membership_bp)
+    app.register_blueprint(payment_bp)
 
     # Health check route.
     @app.get("/api/health")

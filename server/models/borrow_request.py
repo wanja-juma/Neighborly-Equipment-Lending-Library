@@ -11,33 +11,38 @@ class BorrowingRequest(db.Model):
         primary_key=True
     )
 
+    loan_id = db.Column(
+        db.Integer,
+        db.ForeignKey("loans.id"),
+        nullable=False
+    )
+
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id"),
         nullable=False
     )
 
-    id = db.Column(db.Integer, primary_key=True)
-    loan_id = db.Column(db.Integer, db.ForeignKey('loans.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    status = db.Column(db.String(50), default='pending')
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     equipment_id = db.Column(
         db.Integer,
         db.ForeignKey("items.id"),
-        nullable=False
-    )
-    
-
-    request_date = db.Column(
-        db.DateTime,
-        default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 
     status = db.Column(
         db.String(20),
         default="pending",
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc)
+    )
+
+    request_date = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 

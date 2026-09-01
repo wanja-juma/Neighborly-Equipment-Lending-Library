@@ -80,7 +80,7 @@ class ItemList(Resource):
         return {"item": _serialize(item)}, 201
 
 
-api.add_resource(ItemList, "")
+api.add_resource(ItemList, "") #/items
 
 
 class ItemDetail(Resource):
@@ -147,7 +147,7 @@ class ItemDetail(Resource):
         return {"message": "Item deleted", "id": item_id}
 
 
-api.add_resource(ItemDetail, "/<int:item_id>")
+api.add_resource(ItemDetail, "/<int:item_id>") #/items/<int:item_id>
 
 
 users_bp = Blueprint("users_items", __name__, url_prefix="/api/users")
@@ -165,4 +165,4 @@ class UserItems(Resource):
         return {"items": [_serialize(item) for item in items]}
 
 
-users_api.add_resource(UserItems, "/<int:user_id>/items")
+users_api.add_resource(UserItems, "/<int:user_id>/items") #/users/<int:user_id>/items

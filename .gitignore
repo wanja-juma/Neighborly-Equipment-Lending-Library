@@ -31,4 +31,46 @@ server/.env
 
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
+yarn-error.log*__pycache__/
+*.pyc
+
+# Python virtual environment
+server/venv/
+
+# Python cache
+__pycache__/
+*.pycserver/venv/
+__pycache__/
+*.pyc
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+instance/
+*.db
+*.sqlite
+
+# Flask
+instance/
+.webassets-cache
+
+# Migrations
+migrations/__pycache__/
+migrations/versions/__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
