@@ -23,3 +23,6 @@ class MembershipListResource(Resource):
         json_data = request.get_json(silent=True)
         if not json_data:
             return {"error": "Request body is required."}, 400
+
+        current_user_id = int(get_jwt_identity())
+        json_data["user_id"] = current_user_id
