@@ -70,3 +70,24 @@ function PaymentBar() {
       </div>
     );
   }
+    return (
+    <form className="payment-bar" onSubmit={handleSubmit}>
+      <h3>Pay Deposit — {item?.name}</h3>
+      {error && <p className="payment-error">{error}</p>}
+      <label>
+        Deposit Amount (Ksh)
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          required
+        />
+      </label>
+      <button type="submit" disabled={submitting}>
+        {submitting ? 'Processing…' : 'Pay Now'}
+      </button>
+    </form>
+  );
+}
