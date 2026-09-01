@@ -63,3 +63,10 @@ function PaymentBar() {
       </div>
     );
   }
+    if (payment) {
+    return (
+      <div className="payment-bar payment-success">
+        <p>Deposit of Ksh{payment.amount} confirmed for {item?.name}. Enjoy your borrow!</p>
+      </div>
+    );
+  }
