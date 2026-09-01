@@ -343,6 +343,31 @@ export const refundPayment = async (
 };
 
 /* =========================
+   Memberships
+========================= */
+
+export const getMembership = async (membershipId) => {
+  const response = await request(`/memberships/${membershipId}`);
+  return response?.membership || response;
+};
+
+export const createMembership = async (membershipData) => {
+  const response = await request("/memberships", {
+    method: "POST",
+    body: JSON.stringify(membershipData),
+  });
+  return response?.membership || response;
+};
+
+export const updateMembership = async (membershipId, updates) => {
+  const response = await request(`/memberships/${membershipId}`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
+  return response?.membership || response;
+};
+
+/* =========================
    Damage reports
 ========================= */
 
