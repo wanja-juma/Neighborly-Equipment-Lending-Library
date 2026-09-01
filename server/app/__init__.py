@@ -56,6 +56,7 @@ def create_app(config_class=Config):
     from routes import (
     auth_bp,
     borrow_requests_bp,
+    categories_bp,
     loans_bp,
     membership_bp,
     payment_bp,
@@ -69,6 +70,7 @@ def create_app(config_class=Config):
     app.register_blueprint(user_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(borrow_requests_bp)
+    app.register_blueprint(categories_bp)
     app.register_blueprint(loans_bp)
     app.register_blueprint(membership_bp)
     app.register_blueprint(payment_bp)
