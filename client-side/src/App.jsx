@@ -20,14 +20,14 @@ import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
 import PaymentBar from "./components/PaymentBar";
 
-import BrowseItems from "./pages/BrowseItems";
-import DamageReports from "./pages/DamageReports";
-import Loans from "./pages/Loans";
-import MyListings from "./pages/MyListings";
-import Requests from "./pages/Requests";
-import AddItem from "./pages/AddItem";
-import EditItem from "./pages/EditItem";
-import ChangeAvailability from "./pages/ChangeAvailability";
+import BrowseItems from "./Pages/BrowseItems";
+import DamageReports from "./Pages/DamageReports";
+import Loans from "./Pages/Loans";
+import MyListings from "./Pages/MyListings";
+import Requests from "./Pages/Requests";
+import AddItem from "./Pages/AddItem";
+import EditItem from "./Pages/EditItem";
+import ChangeAvailability from "./Pages/ChangeAvailability";
 
 import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
