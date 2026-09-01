@@ -95,12 +95,17 @@ function App() {
 
                   <Route
                     path="/"
-                    element={<Home />}
+                    element={
+                      <>
+                        <Home />
+                        <About />
+                      </>
+                    }
                   />
 
                   <Route
                     path="/about"
-                    element={<About />}
+                    element={<Navigate to="/#about" replace />}
                   />
 
                   <Route
