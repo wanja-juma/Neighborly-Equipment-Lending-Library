@@ -32,3 +32,6 @@ function PaymentBar() {
         setLoading(false);
       });
   }, [loanId]);
+    const [amount, setAmount] = useState('500.00');
+  const [submitting, setSubmitting] = useState(false);
+  const [payment, setPayment] = useState(null);
