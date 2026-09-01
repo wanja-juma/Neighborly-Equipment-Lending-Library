@@ -8,3 +8,10 @@ function PaymentBar() {
 }
 
 export default PaymentBar;
+function PaymentBar() {
+  const { loanId } = useParams();
+  const [loan, setLoan] = useState(null);
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+}
