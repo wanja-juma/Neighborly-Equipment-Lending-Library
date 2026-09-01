@@ -35,3 +35,20 @@ function PaymentBar() {
     const [amount, setAmount] = useState('500.00');
   const [submitting, setSubmitting] = useState(false);
   const [payment, setPayment] = useState(null);
+    async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await createPayment({
+        loan_id: loanId,
+        amount,
+        status: 'held',
+      });
+      setPayment(result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
