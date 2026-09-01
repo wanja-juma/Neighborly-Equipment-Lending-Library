@@ -1,21 +1,22 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_restful import Api, Resource
 from marshmallow import ValidationError
-
+ 
 from app.extensions import db
 from models import Loan, Payment
-from schemas.payments_schemas import PaymentSchema
 from schemas import PaymentSchema
-
+ 
 payment_bp = Blueprint(
     "payments",
     __name__,
     url_prefix="/api/payments",
 )
-
+api = Api(payment_bp)
+ 
 payment_schema = PaymentSchema()
-
-
+ 
+ 
 def _is_authorized_for_loan(loan, user_id):
     """Either the borrower or the item's owner may access a payment on this loan."""
     if loan is None:
