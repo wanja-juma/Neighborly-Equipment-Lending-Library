@@ -40,4 +40,17 @@ class MembershipListResource(Resource):
         return {"membership": membership_schema.dump(membership)}, 201
 
 
-
+class MembershipResource(Resource):
+    method_decorators = [jwt_required()]
+ 
+    def get(self, membership_id):
+        membership = db.session.get(Membership, membership_id)
+ 
+        if membership is None:
+            return {"error": "Membership not found."}, 404
+ 
+        current_user_id = int(get_jwt_identity())
+        if membership.user_id != current_user_id:
+            return {"error": "You are not authorized to view this membership."}, 403
+ 
+        return {"membership": membership_schema.dump(membership)}, 200
