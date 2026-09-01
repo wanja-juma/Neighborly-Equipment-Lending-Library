@@ -1,6 +1,6 @@
 const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5555/api";
+  import.meta.env.VITE_TOOLS_API_URL ||
+  "http://localhost:3000";
 
 export async function getTools() {
   const response = await fetch(

@@ -1,4 +1,5 @@
 from routes.auth import auth_bp
+from .item import items_bp
 
 from routes.borrow_request_routes import (
     borrow_requests_bp,
