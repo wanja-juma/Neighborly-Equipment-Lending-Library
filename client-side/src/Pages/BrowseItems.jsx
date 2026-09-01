@@ -1,7 +1,24 @@
-import { useMemo, useState } from "react";
+import {
+  useMemo,
+  useState,
+} from "react";
+
 import useItems from "../hooks/useItems";
 import useRequests from "../hooks/useRequests";
 import "./Items.css";
+
+const CURRENT_USER_ID = "1";
+
+const DEFAULT_CATEGORIES = [
+  "Power Tools",
+  "Hand Tools",
+  "Gardening",
+  "Cleaning Equipment",
+  "Construction Equipment",
+  "Outdoor Equipment",
+  "Automotive",
+  "Other",
+];
 
 const getLocalDate = () => {
   const today = new Date();
@@ -19,83 +36,393 @@ const getLocalDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+const getItemCategory = (item) => {
+  if (
+    item?.category &&
+    typeof item.category === "object"
+  ) {
+    return (
+      item.category.name ||
+      item.category.title ||
+      ""
+    );
+  }
+
+  return (
+    item?.category ||
+    item?.category_name ||
+    item?.categoryName ||
+    ""
+  );
+};
+
+const getItemOwnerId = (item) =>
+  item?.ownerId ??
+  item?.owner_id ??
+  item?.owner?.id ??
+  "";
+
+const getItemOwnerName = (item) => {
+  if (
+    item?.owner &&
+    typeof item.owner === "object"
+  ) {
+    const firstName =
+      item.owner.first_name ||
+      item.owner.firstName ||
+      "";
+
+    const lastName =
+      item.owner.last_name ||
+      item.owner.lastName ||
+      "";
+
+    return (
+      item.owner.name ||
+      [firstName, lastName]
+        .filter(Boolean)
+        .join(" ") ||
+      "Neighbour"
+    );
+  }
+
+  return (
+    item?.ownerName ||
+    item?.owner_name ||
+    item?.owner ||
+    "Neighbour"
+  );
+};
+
+const getItemAvailability = (item) =>
+  item?.availability ||
+  item?.status ||
+  "Available";
+
 function BrowseItems() {
-   const {
+  const {
     items,
     itemsLoading,
     itemsError,
   } = useItems();
 
-  const { addBorrowingRequest } = useRequests();
+  const { addBorrowingRequest } =
+    useRequests();
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] =
-    useState("All Categories");
-  const [selectedAvailability, setSelectedAvailability] =
-    useState("Available");
-  const [notice, setNotice] = useState("");
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [searchTerm, setSearchTerm] =
+    useState("");
 
-const [borrowDates, setBorrowDates] = useState({
-  startDate: "",
-  endDate: "",
-});
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState("All Categories");
 
-const [formError, setFormError] = useState("");
+  const [
+    selectedAvailability,
+    setSelectedAvailability,
+  ] = useState("Available");
 
-const minimumDate = getLocalDate();
+  const [notice, setNotice] =
+    useState("");
 
+  const [selectedItem, setSelectedItem] =
+    useState(null);
 
-  // Do not show the current user's items on the community page
-  const communityItems = items.filter(
-    (item) => item.ownerId !== "1"
+  const [borrowDates, setBorrowDates] =
+    useState({
+      startDate: "",
+      endDate: "",
+    });
+
+  const [formError, setFormError] =
+    useState("");
+
+  const minimumDate = getLocalDate();
+
+  const safeItems = Array.isArray(items)
+    ? items
+    : [];
+
+  // Do not show the current user's items
+  // on the community browsing page.
+  const communityItems = useMemo(
+    () =>
+      safeItems.filter(
+        (item) =>
+          String(getItemOwnerId(item)) !==
+          CURRENT_USER_ID
+      ),
+    [safeItems]
   );
 
-  const categories = [
-    "All Categories",
-    ...new Set(
-      communityItems.map((item) => item.category)
-    ),
-  ];
+  /*
+   * Start with the default category list and
+   * include any additional categories received
+   * from the backend.
+   */
+  const categories = useMemo(() => {
+    const itemCategories =
+      communityItems
+        .map((item) =>
+          getItemCategory(item).trim()
+        )
+        .filter(Boolean);
+
+    return [
+      "All Categories",
+      ...new Set([
+        ...DEFAULT_CATEGORIES,
+        ...itemCategories,
+      ]),
+    ];
+  }, [communityItems]);
 
   const filteredItems = useMemo(() => {
-    const normalizedSearch = searchTerm
-      .trim()
-      .toLowerCase();
+    const normalizedSearch =
+      searchTerm.trim().toLowerCase();
 
-    return communityItems.filter((item) => {
-      const matchesSearch =
-        item.name.toLowerCase().includes(normalizedSearch) ||
-        item.description
-          .toLowerCase()
-          .includes(normalizedSearch) ||
-        item.owner.toLowerCase().includes(normalizedSearch);
+    const normalizedCategory =
+      selectedCategory.toLowerCase();
 
-      const matchesCategory =
-        selectedCategory === "All Categories" ||
-        item.category === selectedCategory;
+    const normalizedAvailability =
+      selectedAvailability.toLowerCase();
 
-      const matchesAvailability =
-        selectedAvailability === "All Statuses" ||
-        item.availability === selectedAvailability;
+    return communityItems.filter(
+      (item) => {
+        const itemName = String(
+          item?.name || ""
+        ).toLowerCase();
 
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesAvailability
-      );
-    });
+        const itemDescription = String(
+          item?.description || ""
+        ).toLowerCase();
+
+        const itemOwner =
+          getItemOwnerName(
+            item
+          ).toLowerCase();
+
+        const itemCategory =
+          getItemCategory(
+            item
+          ).toLowerCase();
+
+        const itemAvailability =
+          getItemAvailability(
+            item
+          ).toLowerCase();
+
+        const matchesSearch =
+          !normalizedSearch ||
+          itemName.includes(
+            normalizedSearch
+          ) ||
+          itemDescription.includes(
+            normalizedSearch
+          ) ||
+          itemOwner.includes(
+            normalizedSearch
+          );
+
+        const matchesCategory =
+          selectedCategory ===
+            "All Categories" ||
+          itemCategory ===
+            normalizedCategory;
+
+        const matchesAvailability =
+          selectedAvailability ===
+            "All Statuses" ||
+          itemAvailability ===
+            normalizedAvailability;
+
+        return (
+          matchesSearch &&
+          matchesCategory &&
+          matchesAvailability
+        );
+      }
+    );
   }, [
     communityItems,
     searchTerm,
     selectedCategory,
     selectedAvailability,
   ]);
+
+  const openBorrowForm = (item) => {
+    const availability =
+      getItemAvailability(
+        item
+      ).toLowerCase();
+
+    if (availability !== "available") {
+      setNotice(
+        "This item is currently unavailable."
+      );
+
+      return;
+    }
+
+    setSelectedItem(item);
+
+    setBorrowDates({
+      startDate: "",
+      endDate: "",
+    });
+
+    setFormError("");
+    setNotice("");
+  };
+
+  const closeBorrowForm = () => {
+    setSelectedItem(null);
+
+    setBorrowDates({
+      startDate: "",
+      endDate: "",
+    });
+
+    setFormError("");
+  };
+
+  const handleDateChange = (event) => {
+    const { name, value } =
+      event.target;
+
+    setBorrowDates((currentDates) => ({
+      ...currentDates,
+      [name]: value,
+    }));
+
+    setFormError("");
+  };
+
+  const handleBorrowRequest = async (
+    event
+  ) => {
+    event.preventDefault();
+
+    if (!selectedItem) {
+      return;
+    }
+
+    const availability =
+      getItemAvailability(
+        selectedItem
+      ).toLowerCase();
+
+    if (availability !== "available") {
+      setFormError(
+        "This item is no longer available to borrow."
+      );
+
+      return;
+    }
+
+    if (
+      !borrowDates.startDate ||
+      !borrowDates.endDate
+    ) {
+      setFormError(
+        "Please select both the borrowing and return dates."
+      );
+
+      return;
+    }
+
+    if (
+      borrowDates.startDate <
+      minimumDate
+    ) {
+      setFormError(
+        "The borrowing date cannot be in the past."
+      );
+
+      return;
+    }
+
+    if (
+      borrowDates.endDate <
+      borrowDates.startDate
+    ) {
+      setFormError(
+        "The return date must be after the borrowing date."
+      );
+
+      return;
+    }
+
+    try {
+      const result =
+        await addBorrowingRequest({
+          itemId: selectedItem.id,
+          itemName: selectedItem.name,
+          itemIcon:
+            selectedItem.icon ||
+            "🧰",
+          ownerId:
+            getItemOwnerId(
+              selectedItem
+            ),
+          ownerName:
+            getItemOwnerName(
+              selectedItem
+            ),
+          borrowerId:
+            CURRENT_USER_ID,
+          borrowerName: "Wanja Juma",
+          startDate:
+            borrowDates.startDate,
+          endDate:
+            borrowDates.endDate,
+        });
+
+      if (
+        result &&
+        result.success === false
+      ) {
+        setFormError(
+          result.message ||
+            "Unable to submit the request."
+        );
+
+        return;
+      }
+
+      setNotice(
+        result?.message ||
+          "Borrowing request submitted successfully."
+      );
+
+      closeBorrowForm();
+    } catch (error) {
+      setFormError(
+        error.message ||
+          "Unable to submit the borrowing request."
+      );
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+
+    setSelectedCategory(
+      "All Categories"
+    );
+
+    setSelectedAvailability(
+      "Available"
+    );
+  };
+
   if (itemsLoading) {
     return (
       <main className="dashboard-main">
         <section className="items-page">
-          <p>Loading available items...</p>
+          <p>
+            Loading available items...
+          </p>
         </section>
       </main>
     );
@@ -111,136 +438,21 @@ const minimumDate = getLocalDate();
     );
   }
 
-
- const openBorrowForm = (item) => {
-  const isAvailable =
-    item.availability?.toLowerCase() ===
-    "available";
-
-  if (!isAvailable) {
-    setNotice(
-      "This item is currently unavailable."
-    );
-    return;
-  }
-
-  setSelectedItem(item);
-
-  setBorrowDates({
-    startDate: "",
-    endDate: "",
-  });
-
-  setFormError("");
-  setNotice("");
-};
-
-const closeBorrowForm = () => {
-  setSelectedItem(null);
-
-  setBorrowDates({
-    startDate: "",
-    endDate: "",
-  });
-
-  setFormError("");
-};
-
-const handleDateChange = (event) => {
-  const { name, value } = event.target;
-
-  setBorrowDates((currentDates) => ({
-    ...currentDates,
-    [name]: value,
-  }));
-
-  setFormError("");
-};
-
-const handleBorrowRequest = async (event) => {
-  event.preventDefault();
-
-  if (
-  selectedItem?.availability?.toLowerCase() !==
-  "available"
-) {
-  setFormError(
-    "This item is no longer available to borrow."
-  );
-
-  return;
-}
-
-  if (!selectedItem) {
-    return;
-  }
-
-  if (
-    !borrowDates.startDate ||
-    !borrowDates.endDate
-  ) {
-    setFormError(
-      "Please select both the borrowing and return dates."
-    );
-
-    return;
-  }
-
-  if (borrowDates.startDate < minimumDate) {
-    setFormError(
-      "The borrowing date cannot be in the past."
-    );
-
-    return;
-  }
-
-  if (
-    borrowDates.endDate < borrowDates.startDate
-  ) {
-    setFormError(
-      "The return date must be after the borrowing date."
-    );
-
-    return;
-  }
-
-  const result = await addBorrowingRequest({
-    itemId: selectedItem.id,
-    itemName: selectedItem.name,
-    itemIcon: selectedItem.icon,
-    ownerId: selectedItem.ownerId,
-    ownerName: selectedItem.owner,
-    borrowerId: "1",
-    borrowerName: "Wanja Juma",
-    startDate: borrowDates.startDate,
-    endDate: borrowDates.endDate,
-  });
-
-  if (!result.success) {
-    setFormError(result.message);
-    return;
-  }
-
-  setNotice(result.message);
-  closeBorrowForm();
-};
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setSelectedCategory("All Categories");
-    setSelectedAvailability("Available");
-  };
-
   return (
     <main className="dashboard-main">
       <section className="items-page">
         {notice && (
-          <div className="browse-notice" role="status">
+          <div
+            className="browse-notice"
+            role="status"
+          >
             <span>{notice}</span>
 
             <button
               type="button"
-              onClick={() => setNotice("")}
+              onClick={() =>
+                setNotice("")
+              }
               aria-label="Dismiss notification"
             >
               ×
@@ -257,13 +469,13 @@ const handleBorrowRequest = async (event) => {
             <h1>Browse Items</h1>
 
             <p>
-              Find tools and equipment available from
-              neighbours in your community.
+              Find tools and equipment
+              available from neighbours in
+              your community.
             </p>
           </div>
         </header>
 
-        {/* Search and filters */}
         <section
           className="browse-filters"
           aria-label="Item filters"
@@ -275,7 +487,9 @@ const handleBorrowRequest = async (event) => {
               type="search"
               value={searchTerm}
               onChange={(event) =>
-                setSearchTerm(event.target.value)
+                setSearchTerm(
+                  event.target.value
+                )
               }
               placeholder="Search items, descriptions or owners..."
               aria-label="Search community items"
@@ -288,14 +502,21 @@ const handleBorrowRequest = async (event) => {
             <select
               value={selectedCategory}
               onChange={(event) =>
-                setSelectedCategory(event.target.value)
+                setSelectedCategory(
+                  event.target.value
+                )
               }
             >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
+              {categories.map(
+                (category) => (
+                  <option
+                    key={category}
+                    value={category}
+                  >
+                    {category}
+                  </option>
+                )
+              )}
             </select>
           </label>
 
@@ -303,17 +524,30 @@ const handleBorrowRequest = async (event) => {
             <span>Availability</span>
 
             <select
-              value={selectedAvailability}
+              value={
+                selectedAvailability
+              }
               onChange={(event) =>
-                setSelectedAvailability(event.target.value)
+                setSelectedAvailability(
+                  event.target.value
+                )
               }
             >
-              <option value="Available">Available</option>
+              <option value="Available">
+                Available
+              </option>
+
               <option value="All Statuses">
                 All Statuses
               </option>
-              <option value="Requested">Requested</option>
-              <option value="On Loan">On Loan</option>
+
+              <option value="Requested">
+                Requested
+              </option>
+
+              <option value="On Loan">
+                On Loan
+              </option>
             </select>
           </label>
 
@@ -326,88 +560,118 @@ const handleBorrowRequest = async (event) => {
           </button>
         </section>
 
-        {/* Result count */}
         <div className="browse-results-heading">
           <p>
-            <strong>{filteredItems.length}</strong>
+            <strong>
+              {filteredItems.length}
+            </strong>{" "}
             {filteredItems.length === 1
-              ? " item found"
-              : " items found"}
+              ? "item found"
+              : "items found"}
           </p>
         </div>
 
-        {/* Equipment results */}
         {filteredItems.length > 0 ? (
           <div className="items-page-grid">
-            {filteredItems.map((item) => (
-              <article
-                className="equipment-card"
-                key={item.id}
-              >
-                <div className="equipment-image">
-                  <span>{item.icon}</span>
+            {filteredItems.map((item) => {
+              const category =
+                getItemCategory(item) ||
+                "Other";
 
-                  <span
-                    className={`image-status ${item.statusColor}`}
-                  >
-                    {item.availability}
-                  </span>
-                </div>
+              const owner =
+                getItemOwnerName(item);
 
-                <div className="equipment-content">
-                  <div className="equipment-heading">
-                    <span className="equipment-category">
-                      {item.category}
-                    </span>
-                  </div>
+              const availability =
+                getItemAvailability(item);
 
-                  <h2>{item.name}</h2>
+              const isAvailable =
+                availability.toLowerCase() ===
+                "available";
 
-                  <p className="equipment-description">
-                    {item.description}
-                  </p>
+              const statusClass =
+                item.statusColor ||
+                availability
+                  .toLowerCase()
+                  .replaceAll(" ", "-");
 
-                  <div className="equipment-details">
-                    <span>
-                      <b>Condition:</b> {item.condition}
-                    </span>
-
-                    <span>
-                      <b>Owner:</b> {item.owner}
-                    </span>
-
-                    <span>
-                      <b>Location:</b> {item.location}
-                    </span>
-                  </div>
-
-                  <button
-                    className="borrow-item-button"
-                    type="button"
-                    disabled={
-                    item.availability?.toLowerCase() !==
-                    "available"
-                  }
-                  onClick={() => openBorrowForm(item)}
+              return (
+                <article
+                  className="equipment-card"
+                  key={item.id}
                 >
-                  {item.availability?.toLowerCase() ===
-                  "available"
-                    ? "Request to Borrow"
-                    : "Currently Unavailable"}
-                </button>
-                </div>
-              </article>
-            ))}
+                  <div className="equipment-image">
+                    <span>
+                      {item.icon || "🧰"}
+                    </span>
+
+                    <span
+                      className={`image-status ${statusClass}`}
+                    >
+                      {availability}
+                    </span>
+                  </div>
+
+                  <div className="equipment-content">
+                    <div className="equipment-heading">
+                      <span className="equipment-category">
+                        {category}
+                      </span>
+                    </div>
+
+                    <h2>{item.name}</h2>
+
+                    <p className="equipment-description">
+                      {item.description}
+                    </p>
+
+                    <div className="equipment-details">
+                      <span>
+                        <b>Condition:</b>{" "}
+                        {item.condition ||
+                          "Not specified"}
+                      </span>
+
+                      <span>
+                        <b>Owner:</b>{" "}
+                        {owner}
+                      </span>
+
+                      <span>
+                        <b>Location:</b>{" "}
+                        {item.location ||
+                          "Not specified"}
+                      </span>
+                    </div>
+
+                    <button
+                      className="borrow-item-button"
+                      type="button"
+                      disabled={!isAvailable}
+                      onClick={() =>
+                        openBorrowForm(item)
+                      }
+                    >
+                      {isAvailable
+                        ? "Request to Borrow"
+                        : "Currently Unavailable"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         ) : (
           <div className="items-empty-state">
             <span>🔍</span>
 
-            <h2>No matching items found</h2>
+            <h2>
+              No matching items found
+            </h2>
 
             <p>
-              Try changing your search term, category or
-              availability filter.
+              Try changing your search term,
+              category or availability
+              filter.
             </p>
 
             <button
@@ -422,139 +686,171 @@ const handleBorrowRequest = async (event) => {
       </section>
 
       {selectedItem && (
-  <div className="borrow-modal-overlay">
-    <section
-      className="borrow-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="borrow-modal-title"
-    >
-      <header className="borrow-modal-header">
-        <div>
-          <p className="page-label">
-            BORROWING REQUEST
-          </p>
+        <div className="borrow-modal-overlay">
+          <section
+            className="borrow-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="borrow-modal-title"
+          >
+            <header className="borrow-modal-header">
+              <div>
+                <p className="page-label">
+                  BORROWING REQUEST
+                </p>
 
-          <h2 id="borrow-modal-title">
-            Request {selectedItem.name}
-          </h2>
+                <h2 id="borrow-modal-title">
+                  Request{" "}
+                  {selectedItem.name}
+                </h2>
 
-          <p>
-            Select the dates you would like to borrow this
-            item.
-          </p>
-        </div>
+                <p>
+                  Select the dates you
+                  would like to borrow
+                  this item.
+                </p>
+              </div>
 
-        <button
-          className="close-modal-button"
-          type="button"
-          onClick={closeBorrowForm}
-          aria-label="Close borrowing form"
-        >
-          ×
-        </button>
-      </header>
+              <button
+                className="close-modal-button"
+                type="button"
+                onClick={closeBorrowForm}
+                aria-label="Close borrowing form"
+              >
+                ×
+              </button>
+            </header>
 
-      <div className="borrow-item-summary">
-        <span className="borrow-summary-icon">
-          {selectedItem.icon}
-        </span>
+            <div className="borrow-item-summary">
+              <span className="borrow-summary-icon">
+                {selectedItem.icon ||
+                  "🧰"}
+              </span>
 
-        <div>
-          <strong>{selectedItem.name}</strong>
+              <div>
+                <strong>
+                  {selectedItem.name}
+                </strong>
 
-          <span>
-            Owned by {selectedItem.owner}
-          </span>
+                <span>
+                  Owned by{" "}
+                  {getItemOwnerName(
+                    selectedItem
+                  )}
+                </span>
 
-          <small>
-            {selectedItem.condition}
-          </small>
-        </div>
-      </div>
+                <small>
+                  {selectedItem.condition ||
+                    "Condition not specified"}
+                </small>
+              </div>
+            </div>
 
-      <form
-        className="borrow-date-form"
-        onSubmit={handleBorrowRequest}
-      >
-        <div className="borrow-date-fields">
-          <label className="item-form-field">
-            <span>
-              Borrowing Date <b>*</b>
-            </span>
-
-            <input
-              type="date"
-              name="startDate"
-              value={borrowDates.startDate}
-              min={minimumDate}
-              onChange={handleDateChange}
-            />
-          </label>
-
-          <label className="item-form-field">
-            <span>
-              Return Date <b>*</b>
-            </span>
-
-            <input
-              type="date"
-              name="endDate"
-              value={borrowDates.endDate}
-              min={
-                borrowDates.startDate || minimumDate
+            <form
+              className="borrow-date-form"
+              onSubmit={
+                handleBorrowRequest
               }
-              onChange={handleDateChange}
-            />
-          </label>
+            >
+              <div className="borrow-date-fields">
+                <label className="item-form-field">
+                  <span>
+                    Borrowing Date{" "}
+                    <b>*</b>
+                  </span>
+
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={
+                      borrowDates.startDate
+                    }
+                    min={minimumDate}
+                    onChange={
+                      handleDateChange
+                    }
+                    required
+                  />
+                </label>
+
+                <label className="item-form-field">
+                  <span>
+                    Return Date <b>*</b>
+                  </span>
+
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={
+                      borrowDates.endDate
+                    }
+                    min={
+                      borrowDates.startDate ||
+                      minimumDate
+                    }
+                    onChange={
+                      handleDateChange
+                    }
+                    required
+                  />
+                </label>
+              </div>
+
+              {formError && (
+                <div
+                  className="borrow-form-error"
+                  role="alert"
+                >
+                  {formError}
+                </div>
+              )}
+
+              <div className="borrow-request-information">
+                <strong>
+                  Before submitting
+                </strong>
+
+                <ul>
+                  <li>
+                    Wait for the item owner
+                    to approve your request.
+                  </li>
+
+                  <li>
+                    Collect the item only
+                    after the request is
+                    approved.
+                  </li>
+
+                  <li>
+                    Return the item by the
+                    selected return date.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="borrow-modal-actions">
+                <button
+                  className="cancel-request-button"
+                  type="button"
+                  onClick={
+                    closeBorrowForm
+                  }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="submit-request-button"
+                  type="submit"
+                >
+                  Submit Request
+                </button>
+              </div>
+            </form>
+          </section>
         </div>
-
-        {formError && (
-          <div className="borrow-form-error" role="alert">
-            {formError}
-          </div>
-        )}
-
-        <div className="borrow-request-information">
-          <strong>Before submitting</strong>
-
-          <ul>
-            <li>
-              Wait for the item owner to approve your
-              request.
-            </li>
-
-            <li>
-              Collect the item only after the request is
-              approved.
-            </li>
-
-            <li>
-              Return the item by the selected return date.
-            </li>
-          </ul>
-        </div>
-
-        <div className="borrow-modal-actions">
-          <button
-            className="cancel-request-button"
-            type="button"
-            onClick={closeBorrowForm}
-          >
-            Cancel
-          </button>
-
-          <button
-            className="submit-request-button"
-            type="submit"
-          >
-            Submit Request
-          </button>
-        </div>
-      </form>
-    </section>
-  </div>
-)}
+      )}
     </main>
   );
 }

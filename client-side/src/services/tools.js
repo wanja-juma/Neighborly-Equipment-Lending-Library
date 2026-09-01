@@ -1,17 +1,19 @@
-const API_BASE_URL = 'http://localhost:3000';
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5555/api";
 
-export async function getTools({ page = 1, limit = 10 } = {}) {
+export async function getTools() {
   const response = await fetch(
-    `${API_BASE_URL}/items?_page=${page}&_limit=${limit}`
+    `${API_URL}/items`
   );
 
   if (!response.ok) {
-    throw new Error('Failed to fetch tools');
+    throw new Error(
+      "Failed to fetch tools"
+    );
   }
 
-  const data = await response.json();
-  const totalCount = Number(response.headers.get('X-Total-Count')) || data.length;
-  const totalPages = Math.ceil(totalCount / limit);
-
-  return { tools: data, totalCount, totalPages };
+  return response.json();
 }
+
+ 
