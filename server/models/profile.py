@@ -54,7 +54,7 @@ class Profile(db.Model):
         back_populates="profile",
     )
 
-    validates("first_name", "last_name")
+    @validates("first_name", "last_name")
     def validate_name(self, key, value):
             field_name = key.replace("_", " ").title()
 

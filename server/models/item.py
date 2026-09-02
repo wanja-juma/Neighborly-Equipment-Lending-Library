@@ -15,9 +15,9 @@ class Item(db.Model):
     image = db.Column(db.String(500))
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
 
-    category_id = db.Column(db.String(100), db.ForeignKey("categories.id"))
+    
     image = db.Column(db.String(500))
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"))
+    
 
     condition = db.Column(db.String(50))
     status = db.Column(db.String(50), default="Available")

@@ -15,6 +15,7 @@ import AuthPage from "./components/AuthPage.jsx";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PaymentRouteGuard from "./components/PaymentRouteGuard.jsx";
 
 import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
@@ -33,9 +34,11 @@ import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
+import Settings from "./Pages/Settings";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 
 import "./App.css";
+
 
 function App() {
   const location = useLocation();
@@ -60,14 +63,18 @@ function App() {
     }
   }, [location]);
 
+
   const dashboardRoutePrefixes = [
     "/dashboard",
     "/items",
     "/listings",
     "/requests",
     "/loans",
+    "/payments",
     "/damage-reports",
+    "/settings",
   ];
+
 
   const isDashboardRoute =
     dashboardRoutePrefixes.some(
@@ -79,28 +86,39 @@ function App() {
         )
     );
 
+
   return (
     <AuthProvider>
       <ItemsProvider>
         <RequestsProvider>
           <LoansProvider>
             <DamageReportsProvider>
+
               <Navbar />
 
               <div className="app-content">
                 <Routes>
-                  {/* =========================
-                      PUBLIC ROUTES
-                  ========================== */}
+
+                  {/* PUBLIC ROUTES*/}
 
                   <Route
                     path="/"
-                    element={<Home />}
+                    element={
+                      <>
+                        <Home />
+                        <About />
+                      </>
+                    }
                   />
 
                   <Route
                     path="/about"
-                    element={<About />}
+                    element={
+                      <Navigate
+                        to="/#about"
+                        replace
+                      />
+                    }
                   />
 
                   <Route
@@ -114,18 +132,12 @@ function App() {
                   />
 
                   <Route
-                    path="/payment/:id"
-                    element={<PaymentBar />}
-                  />
-
-                  <Route
                     path="/auth"
                     element={<AuthPage />}
                   />
 
-                  {/* =========================
-                      PROTECTED ROUTES
-                  ========================== */}
+
+                  {/* PROTECTED DASHBOARD*/}
 
                   <Route
                     element={
@@ -134,6 +146,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   >
+
                     <Route
                       path="/dashboard"
                       element={<Dashboard />}
@@ -176,17 +189,44 @@ function App() {
                       element={<Loans />}
                     />
 
+
+                    {/* PAYMENT ROUTE */}
+
+                    <Route
+                      path="/payments/:loanId"
+                      element={
+                        <PaymentRouteGuard>
+                          <PaymentBar />
+                        </PaymentRouteGuard>
+                      }
+                    />
+
+
+                    <Route
+                      path="/payments"
+                      element={
+                        <Navigate
+                          to="/requests"
+                          replace
+                        />
+                      }
+                    />
+
+
                     <Route
                       path="/damage-reports"
                       element={
                         <DamageReports />
                       }
                     />
+
+                    <Route
+                      path="/settings"
+                        element={<Settings />}
+                    />
+
                   </Route>
 
-                  {/* =========================
-                      UNKNOWN ROUTES
-                  ========================== */}
 
                   <Route
                     path="*"
@@ -197,12 +237,15 @@ function App() {
                       />
                     }
                   />
+
                 </Routes>
               </div>
+
 
               {!isDashboardRoute && (
                 <Footer />
               )}
+
             </DamageReportsProvider>
           </LoansProvider>
         </RequestsProvider>
@@ -210,5 +253,6 @@ function App() {
     </AuthProvider>
   );
 }
+
 
 export default App;
