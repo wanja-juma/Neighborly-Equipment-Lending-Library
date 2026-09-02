@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
   createBorrowingRequest,
@@ -43,9 +46,7 @@ function RequestsProvider({ children }) {
               data?.requests ||
               [];
 
-        setBorrowingRequests(
-          requests
-        );
+        setBorrowingRequests(requests);
       } catch (error) {
         console.error(
           "Failed to load borrowing requests:",
@@ -68,30 +69,64 @@ function RequestsProvider({ children }) {
   const addBorrowingRequest = async (
     requestData
   ) => {
+    /*
+     * Backend field names:
+     *
+     * user_id
+     * equipment_id
+     * start_date
+     * end_date
+     * status
+     * message
+     */
+
+    const equipmentId =
+      requestData.equipment_id ??
+      requestData.item_id ??
+      requestData.itemId;
+
+    const userId =
+      requestData.user_id ??
+      requestData.borrower_id ??
+      requestData.borrowerId;
+
+    const startDate =
+      requestData.start_date ??
+      requestData.startDate;
+
+    const endDate =
+      requestData.end_date ??
+      requestData.endDate;
+
+
     const duplicateRequest =
       borrowingRequests.find(
-        (request) =>
-          String(
-            request.itemId ??
-              request.item_id
-          ) ===
+        (request) => {
+          const existingEquipmentId =
+            request.equipment_id ??
+            request.item_id ??
+            request.itemId;
+
+          const existingUserId =
+            request.user_id ??
+            request.borrower_id ??
+            request.borrowerId;
+
+          const existingStatus =
             String(
-              requestData.itemId ??
-                requestData.item_id
-            ) &&
-          String(
-            request.borrowerId ??
-              request.borrower_id
-          ) ===
-            String(
-              requestData.borrowerId ??
-                requestData.borrower_id
-            ) &&
-          String(
-            request.status
-          ).toLowerCase() ===
-            "pending"
+              request.status || ""
+            ).toLowerCase();
+
+          return (
+            String(existingEquipmentId) ===
+              String(equipmentId) &&
+            String(existingUserId) ===
+              String(userId) &&
+            existingStatus === "pending"
+          );
+        }
       );
+
 
     if (duplicateRequest) {
       return {
@@ -101,16 +136,60 @@ function RequestsProvider({ children }) {
       };
     }
 
-    try {
-      const newRequestData = {
-        ...requestData,
-        status: "Pending",
+
+    if (!equipmentId) {
+      return {
+        success: false,
+        message:
+          "The equipment ID is required.",
       };
+    }
+
+
+    if (!userId) {
+      return {
+        success: false,
+        message:
+          "The borrower ID is required.",
+      };
+    }
+
+
+    if (!startDate || !endDate) {
+      return {
+        success: false,
+        message:
+          "Please select both borrowing dates.",
+      };
+    }
+
+
+    try {
+      /*
+       * Convert the frontend camelCase
+       * fields to the snake_case names
+       * required by Flask.
+       */
+      const payload = {
+        user_id: Number(userId),
+        equipment_id:
+          Number(equipmentId),
+
+        start_date: startDate,
+        end_date: endDate,
+
+        status: "pending",
+
+        message:
+          requestData.message || null,
+      };
+
 
       const data =
         await createBorrowingRequest(
-          newRequestData
+          payload
         );
+
 
       const savedRequest =
         data?.borrowing_request ||
@@ -118,12 +197,14 @@ function RequestsProvider({ children }) {
         data?.request ||
         data;
 
+
       setBorrowingRequests(
         (currentRequests) => [
           savedRequest,
           ...currentRequests,
         ]
       );
+
 
       return {
         success: true,
@@ -136,6 +217,7 @@ function RequestsProvider({ children }) {
         "Failed to create borrowing request:",
         error
       );
+
 
       return {
         success: false,
@@ -151,18 +233,43 @@ function RequestsProvider({ children }) {
     requestId,
     newStatus
   ) => {
-    const allowedStatuses = [
-      "Pending",
-      "Approved",
-      "Declined",
-      "Cancelled",
-    ];
+    /*
+     * The UI currently uses statuses such as:
+     *
+     * Approved
+     * Declined
+     * Cancelled
+     *
+     * Flask expects:
+     *
+     * approved
+     * rejected
+     * cancelled
+     */
 
-    if (
-      !allowedStatuses.includes(
-        newStatus
-      )
-    ) {
+    const statusMap = {
+      Pending: "pending",
+      pending: "pending",
+
+      Approved: "approved",
+      approved: "approved",
+
+      Declined: "rejected",
+      declined: "rejected",
+
+      Rejected: "rejected",
+      rejected: "rejected",
+
+      Cancelled: "cancelled",
+      cancelled: "cancelled",
+    };
+
+
+    const backendStatus =
+      statusMap[newStatus];
+
+
+    if (!backendStatus) {
       return {
         success: false,
         message:
@@ -170,20 +277,23 @@ function RequestsProvider({ children }) {
       };
     }
 
+
     try {
       const data =
         await updateBorrowingRequest(
           requestId,
           {
-            status: newStatus,
+            status: backendStatus,
           }
         );
+
 
       const updatedRequest =
         data?.borrowing_request ||
         data?.borrowingRequest ||
         data?.request ||
         data;
+
 
       setBorrowingRequests(
         (currentRequests) =>
@@ -196,17 +306,25 @@ function RequestsProvider({ children }) {
           )
       );
 
+
+      const displayStatus =
+        backendStatus === "rejected"
+          ? "declined"
+          : backendStatus;
+
+
       return {
         success: true,
         request: updatedRequest,
         message:
-          `Request ${newStatus.toLowerCase()}.`,
+          `Request ${displayStatus}.`,
       };
     } catch (error) {
       console.error(
         "Failed to update request:",
         error
       );
+
 
       return {
         success: false,
