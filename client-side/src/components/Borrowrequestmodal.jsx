@@ -139,4 +139,44 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
             ×
           </button>
         </header>
-    
+
+        <div className="borrow-item-summary">
+          <span className="borrow-summary-icon">{item.icon || "🧰"}</span>
+          <div>
+            <strong>{item.name}</strong>
+            <span>Owned by {getItemOwnerName(item)}</span>
+            <small>{item.condition || "Condition not specified"}</small>
+          </div>
+        </div>
+ 
+        <form className="borrow-date-form" onSubmit={handleSubmit}>
+          <div className="borrow-date-fields">
+            <label className="item-form-field">
+              <span>
+                Borrowing Date <b>*</b>
+              </span>
+              <input
+                type="date"
+                name="startDate"
+                value={borrowDates.startDate}
+                min={minimumDate}
+                onChange={handleDateChange}
+                required
+              />
+            </label>
+ 
+            <label className="item-form-field">
+              <span>
+                Return Date <b>*</b>
+              </span>
+              <input
+                type="date"
+                name="endDate"
+                value={borrowDates.endDate}
+                min={borrowDates.startDate || minimumDate}
+                onChange={handleDateChange}
+                required
+              />
+            </label>
+          </div>
+    )
