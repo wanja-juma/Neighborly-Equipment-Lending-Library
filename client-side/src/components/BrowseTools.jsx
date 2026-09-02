@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   MapPin,
   ShoppingCart,
@@ -9,7 +9,7 @@ import {
   User,
 } from "lucide-react";
 import { getTools } from "../services/tools";
-import useAuth from "../hooks/useAuth.js";
+import useCart from "../hooks/useCart";
 import "./BrowseTools.css";
 
 const ITEMS_PER_PAGE = 6;
@@ -18,12 +18,10 @@ function BrowseTools() {
   const [tools, setTools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cart, setCart] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { addToCart, isInCart, count } = useCart();
 
   useEffect(() => {
     setLoading(true);
@@ -43,33 +41,6 @@ function BrowseTools() {
         setLoading(false);
       });
   }, [page]);
-
-  function isInCart(toolId) {
-    return cart.some((item) => item.id === toolId);
-  }
-
-  function handleAddToCart(tool) {
-    setCart((current) => {
-      if (current.some((item) => item.id === tool.id)) {
-        return current;
-      }
-
-      return [...current, tool];
-    });
-  }
-
-  function handleRequest(tool) {
-    if (!currentUser) {
-      navigate("/auth?mode=login", {
-        state: {
-          redirectTo: `/tools/${tool.id}`,
-        },
-      });
-      return;
-    }
-
-    navigate(`/tools/${tool.id}`);
-  }
 
   if (loading) {
     return (
@@ -94,11 +65,11 @@ function BrowseTools() {
           Browse tools
         </h2>
 
-        {cart.length > 0 && (
-          <div className="browse-tools__cart-badge">
+        {count > 0 && (
+          <Link to="/cart" className="browse-tools__cart-badge">
             <ShoppingCart size={16} />
-            {cart.length} selected
-          </div>
+            {count} selected
+          </Link>
         )}
       </div>
 
@@ -157,21 +128,8 @@ function BrowseTools() {
                 <div className="tool-card__actions">
                   <button
                     type="button"
-                    className="tool-card__btn tool-card__btn--request"
-                    onClick={() =>
-                      handleRequest(tool)
-                    }
-                    disabled={!available}
-                  >
-                    Request
-                  </button>
-
-                  <button
-                    type="button"
                     className="tool-card__btn tool-card__btn--cart"
-                    onClick={() =>
-                      handleAddToCart(tool)
-                    }
+                    onClick={() => addToCart(tool)}
                     disabled={inCart}
                   >
                     {inCart ? (
