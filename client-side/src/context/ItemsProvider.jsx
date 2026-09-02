@@ -9,7 +9,7 @@ import ItemsContext from "./ItemsContext";
 import useAuth from "../hooks/useAuth";
 
 function ItemsProvider({ children }) {
-  
+  const { currentUser } = useAuth();
 
   const [items, setItems] = useState([]);
   const [itemsLoading, setItemsLoading] =
