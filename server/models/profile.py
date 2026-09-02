@@ -1,110 +1,173 @@
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from app.extensions import db
-from sqlalchemy.orm import validates
+from app.models.profile import Profile
 
 
-class Profile(db.Model):
-    __tablename__ = "profiles"
+profiles_bp = Blueprint(
+    "profiles",
+    __name__,
+    url_prefix="/api/profiles",
+)
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
+
+def serialize_profile(profile):
+    return {
+        "id": profile.id,
+        "user_id": profile.user_id,
+        "first_name": profile.first_name,
+        "last_name": profile.last_name,
+        "phone_number": profile.phone_number,
+        "address": profile.address,
+        "avatar_url": profile.avatar_url,
+        "bio": profile.bio,
+        "email": (
+            profile.user.email
+            if profile.user
+            else None
+        ),
+    }
+
+
+# -------------------------------------------------
+# GET /api/profiles/<profile_id>
+# Fetch a particular profile by its profile ID
+# -------------------------------------------------
+@profiles_bp.route(
+    "/<int:profile_id>",
+    methods=["GET"],
+)
+@jwt_required()
+def get_profile(profile_id):
+    profile = db.session.get(
+        Profile,
+        profile_id,
     )
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("users.id"),
-        unique=True,
-        nullable=False,
-        index=True,
+    if not profile:
+        return (
+            jsonify({
+                "error": "Profile not found."
+            }),
+            404,
+        )
+
+    return (
+        jsonify({
+            "profile":
+                serialize_profile(
+                    profile
+                )
+        }),
+        200,
     )
 
-    first_name = db.Column(
-        db.String(100),
-        nullable=False,
+
+# -------------------------------------------------
+# PUT /api/profiles/me
+# Update the currently logged-in user's profile
+# -------------------------------------------------
+@profiles_bp.route(
+    "/me",
+    methods=["PUT"],
+)
+@jwt_required()
+def update_my_profile():
+    current_user_id = int(
+        get_jwt_identity()
     )
 
-    last_name = db.Column(
-        db.String(100),
-        nullable=False,
-    )
+    profile = Profile.query.filter_by(
+        user_id=current_user_id
+    ).first()
 
-    phone_number = db.Column(
-        db.String(20),
-        unique=True,
-        nullable=True,
-    )
+    if not profile:
+        return (
+            jsonify({
+                "error":
+                    "Profile not found."
+            }),
+            404,
+        )
 
-    address = db.Column(
-        db.String(255),
-        nullable=True,
-    )
+    data = request.get_json(
+        silent=True
+    ) or {}
 
-    avatar_url = db.Column(
-        db.String(500),
-        nullable=True,
-    )
+    allowed_fields = {
+        "first_name",
+        "last_name",
+        "phone_number",
+        "address",
+        "avatar_url",
+        "bio",
+    }
 
-    bio = db.Column(
-        db.Text,
-        nullable=True,
-    )
+    for field in allowed_fields:
+        if field in data:
+            value = data[field]
 
-    user = db.relationship(
-        "User",
-        back_populates="profile",
-    )
+            if (
+                isinstance(
+                    value,
+                    str,
+                )
+            ):
+                value = value.strip()
 
-    @validates("first_name", "last_name")
-    def validate_name(self, key, value):
-            field_name = key.replace("_", " ").title()
-
-            if not value or not value.strip():
-                raise ValueError(
-                f"{field_name} is required."
+            setattr(
+                profile,
+                field,
+                value,
             )
 
-            return value.strip()
-
-    @validates("phone_number")
-    def validate_phone_number(self, key, value):
-            if value is None or not value.strip():
-                return None
-
-            normalized_phone = (
-            value.strip()
-            .replace(" ", "")
-            .replace("-", "")
-        )
-
-            if normalized_phone.startswith("+"):
-                digits = normalized_phone[1:]
-            else:
-                digits = normalized_phone
-
-            if not digits.isdigit():
-                raise ValueError(
-            "Phone number must contain only digits "
-            "and an optional leading plus sign."
-        )
-
-            if not 9 <= len(digits) <= 15:
-                raise ValueError(
-            "Phone number must contain between "
-            "9 and 15 digits."
-        )
-
-            return normalized_phone
-
-
-    @validates("address", "bio")
-    def clean_optional_text(self, key, value):
-        if value is None or not value.strip():
-            return None
-
-        return value.strip()
-
-    def __repr__(self):
+    if (
+        not profile.first_name
+        or not profile.first_name.strip()
+    ):
         return (
-            f"<Profile {self.id}: "
-            f"{self.first_name} {self.last_name}>"
+            jsonify({
+                "error":
+                    "First name is required."
+            }),
+            400,
         )
+
+    if (
+        not profile.last_name
+        or not profile.last_name.strip()
+    ):
+        return (
+            jsonify({
+                "error":
+                    "Last name is required."
+            }),
+            400,
+        )
+
+    try:
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+
+        return (
+            jsonify({
+                "error":
+                    "Unable to update profile."
+            }),
+            500,
+        )
+
+    return (
+        jsonify({
+            "message":
+                "Profile updated successfully.",
+            "profile":
+                serialize_profile(
+                    profile
+                ),
+        }),
+        200,
+    )
