@@ -29,6 +29,7 @@ import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
 import EditItem from "./Pages/EditItem";
 import ChangeAvailability from "./Pages/ChangeAvailability";
+import Cart from "./Pages/Cart";
 
 import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
@@ -36,6 +37,7 @@ import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
 import Settings from "./Pages/Settings";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
+import CartProvider from "./context/CartProvider";
 
 import "./App.css";
 
@@ -93,159 +95,166 @@ function App() {
         <RequestsProvider>
           <LoansProvider>
             <DamageReportsProvider>
+              <CartProvider>
 
-              <Navbar />
+                <Navbar />
 
-              <div className="app-content">
-                <Routes>
+                <div className="app-content">
+                  <Routes>
 
-                  {/* PUBLIC ROUTES*/}
-
-                  <Route
-                    path="/"
-                    element={
-                      <>
-                        <Home />
-                        <About />
-                      </>
-                    }
-                  />
-
-                  <Route
-                    path="/about"
-                    element={
-                      <Navigate
-                        to="/#about"
-                        replace
-                      />
-                    }
-                  />
-
-                  <Route
-                    path="/browse-tools"
-                    element={<BrowseTools />}
-                  />
-
-                  <Route
-                    path="/tools/:id"
-                    element={<ItemDetail />}
-                  />
-
-                  <Route
-                    path="/auth"
-                    element={<AuthPage />}
-                  />
-
-
-                  {/* PROTECTED DASHBOARD*/}
-
-                  <Route
-                    element={
-                      <ProtectedRoute>
-                        <DashboardLayout />
-                      </ProtectedRoute>
-                    }
-                  >
+                    {/* PUBLIC ROUTES*/}
 
                     <Route
-                      path="/dashboard"
-                      element={<Dashboard />}
-                    />
-
-                    <Route
-                      path="/items"
-                      element={<BrowseItems />}
-                    />
-
-                    <Route
-                      path="/items/new"
-                      element={<AddItem />}
-                    />
-
-                    <Route
-                      path="/listings"
-                      element={<MyListings />}
-                    />
-
-                    <Route
-                      path="/listings/:itemId/edit"
-                      element={<EditItem />}
-                    />
-
-                    <Route
-                      path="/listings/:itemId/availability"
+                      path="/"
                       element={
-                        <ChangeAvailability />
+                        <>
+                          <Home />
+                          <About />
+                        </>
                       }
                     />
 
                     <Route
-                      path="/requests"
-                      element={<Requests />}
-                    />
-
-                    <Route
-                      path="/loans"
-                      element={<Loans />}
-                    />
-
-
-                    {/* PAYMENT ROUTE */}
-
-                    <Route
-                      path="/payments/:loanId"
-                      element={
-                        <PaymentRouteGuard>
-                          <PaymentBar />
-                        </PaymentRouteGuard>
-                      }
-                    />
-
-
-                    <Route
-                      path="/payments"
+                      path="/about"
                       element={
                         <Navigate
-                          to="/requests"
+                          to="/#about"
                           replace
                         />
                       }
                     />
 
+                    <Route
+                      path="/browse-tools"
+                      element={<BrowseTools />}
+                    />
 
                     <Route
-                      path="/damage-reports"
+                      path="/cart"
+                      element={<Cart />}
+                    />
+
+                    <Route
+                      path="/tools/:id"
+                      element={<ItemDetail />}
+                    />
+
+                    <Route
+                      path="/auth"
+                      element={<AuthPage />}
+                    />
+
+
+                    {/* PROTECTED DASHBOARD*/}
+
+                    <Route
                       element={
-                        <DamageReports />
+                        <ProtectedRoute>
+                          <DashboardLayout />
+                        </ProtectedRoute>
+                      }
+                    >
+
+                      <Route
+                        path="/dashboard"
+                        element={<Dashboard />}
+                      />
+
+                      <Route
+                        path="/items"
+                        element={<BrowseItems />}
+                      />
+
+                      <Route
+                        path="/items/new"
+                        element={<AddItem />}
+                      />
+
+                      <Route
+                        path="/listings"
+                        element={<MyListings />}
+                      />
+
+                      <Route
+                        path="/listings/:itemId/edit"
+                        element={<EditItem />}
+                      />
+
+                      <Route
+                        path="/listings/:itemId/availability"
+                        element={
+                          <ChangeAvailability />
+                        }
+                      />
+
+                      <Route
+                        path="/requests"
+                        element={<Requests />}
+                      />
+
+                      <Route
+                        path="/loans"
+                        element={<Loans />}
+                      />
+
+
+                      {/* PAYMENT ROUTE */}
+
+                      <Route
+                        path="/payments/:loanId"
+                        element={
+                          <PaymentRouteGuard>
+                            <PaymentBar />
+                          </PaymentRouteGuard>
+                        }
+                      />
+
+
+                      <Route
+                        path="/payments"
+                        element={
+                          <Navigate
+                            to="/requests"
+                            replace
+                          />
+                        }
+                      />
+
+
+                      <Route
+                        path="/damage-reports"
+                        element={
+                          <DamageReports />
+                        }
+                      />
+
+                      <Route
+                        path="/settings"
+                          element={<Settings />}
+                      />
+
+                    </Route>
+
+
+                    <Route
+                      path="*"
+                      element={
+                        <Navigate
+                          to="/"
+                          replace
+                        />
                       }
                     />
 
-                    <Route
-                      path="/settings"
-                        element={<Settings />}
-                    />
-
-                  </Route>
+                  </Routes>
+                </div>
 
 
-                  <Route
-                    path="*"
-                    element={
-                      <Navigate
-                        to="/"
-                        replace
-                      />
-                    }
-                  />
+                {!isDashboardRoute && (
+                  <Footer />
+                )}
 
-                </Routes>
-              </div>
-
-
-              {!isDashboardRoute && (
-                <Footer />
-              )}
-
+              </CartProvider>
             </DamageReportsProvider>
           </LoansProvider>
         </RequestsProvider>
