@@ -1,5 +1,5 @@
 from flask import Flask
-
+from flask_cors import CORS
 from app.config import Config
 from app.extensions import (
     cors,
@@ -12,7 +12,7 @@ from app.extensions import (
 
 def create_app(config_class=Config):
     app = Flask(__name__)
-
+    
     # Load application configuration.
     app.config.from_object(config_class)
 
@@ -30,6 +30,7 @@ def create_app(config_class=Config):
             r"/api/*": {
                 "origins": [
                     "http://localhost:5173",
+                    "http://127.0.0.1:5173",
                 ],
                 "methods": [
                     "GET",
@@ -43,6 +44,7 @@ def create_app(config_class=Config):
                     "Content-Type",
                     "Authorization",
                 ],
+                "supports_credentials": True
             },
         },
     )
@@ -82,5 +84,30 @@ def create_app(config_class=Config):
                 "Neighborly API is running."
             ),
         }, 200
+
+    # Temporary test seeder route for mock assumptions
+    @app.get("/api/seed-test-data")
+    def seed_test_data():
+        from models.user import User
+        from models.borrow_request import BorrowingRequest
+        from models.loans import Loan
+
+        # Check if test users exist by email
+        owner = User.query.filter_by(email='owner@neighborly.com').first()
+        if not owner:
+            owner = User(email='owner@neighborly.com')
+            owner.password = 'password123'
+            db.session.add(owner)
+
+        borrower = User.query.filter_by(email='borrower@neighborly.com').first()
+        if not borrower:
+            borrower = User(email='borrower@neighborly.com')
+            borrower.password = 'password123'
+            db.session.add(borrower)
+        
+        db.session.commit()
+        return {"message": "Test environment ready!"}, 200
+
+    
 
     return app

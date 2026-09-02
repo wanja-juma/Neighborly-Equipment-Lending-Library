@@ -14,7 +14,7 @@ class BorrowingRequest(db.Model):
     loan_id = db.Column(
         db.Integer,
         db.ForeignKey("loans.id"),
-        nullable=False
+        nullable=True
     )
 
     user_id = db.Column(

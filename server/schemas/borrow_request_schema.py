@@ -9,6 +9,7 @@ class BorrowingRequestSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = BorrowingRequest
         load_instance = True
+        include_fk = True 
 
     id = fields.Int(
         dump_only=True
@@ -35,7 +36,8 @@ class BorrowingRequestSchema(SQLAlchemyAutoSchema):
         ]),
         load_default="pending"
     )
-
+    start_date = fields.DateTime(required=True)
+    end_date = fields.DateTime(required=True)
     message = fields.Str(
         allow_none=True
     )
