@@ -30,3 +30,11 @@ function Cart() {
     navigate("/cart", { replace: true });
    
   }, [currentUser, cartItems]);
+
+  function handleModalSuccess(message) {
+    if (selectedItem) {
+      removeFromCart(selectedItem.id);
+    }
+    setSelectedItem(null);
+    setNotice(message);
+  }
