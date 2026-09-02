@@ -1235,6 +1235,12 @@ button {
   background: #dcfce7;
 }
 
+.navigation-link-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Basic responsiveness */
 
 @media (max-width: 800px) {

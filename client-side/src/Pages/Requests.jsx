@@ -173,10 +173,20 @@ function Requests() {
     setUpdatingRequestId(requestId);
 
     try {
-      await updateRequestStatus(
-        requestId,
-        newStatus
-      );
+      const result =
+        await updateRequestStatus(
+          requestId,
+          newStatus
+        );
+
+      if (!result?.success) {
+        setActionError(
+          result?.message ||
+            `Unable to ${newStatus} the request.`
+        );
+
+        return;
+      }
 
       setNotice(
         newStatus === "approved"
@@ -286,6 +296,16 @@ function Requests() {
   };
 
 
+  const getLoanId = (request) => {
+    return (
+      request.loan_id ??
+      request.loanId ??
+      request.loan?.id ??
+      null
+    );
+  };
+
+
   const formatDate = (value) => {
     if (
       !value ||
@@ -322,7 +342,9 @@ function Requests() {
       <main className="dashboard-main">
         <section className="requests-page">
           <div className="requests-state">
-            <p>Loading requests...</p>
+            <p>
+              Loading requests...
+            </p>
           </div>
         </section>
       </main>
@@ -509,10 +531,15 @@ function Requests() {
                     ) ===
                     String(requestId);
 
+                  const loanId =
+                    getLoanId(request);
+
                   const canPay =
                     activeTab ===
                       "outgoing" &&
-                    status === "approved";
+                    status ===
+                      "approved" &&
+                    Boolean(loanId);
 
                   const personName =
                     getDisplayedPersonName(
@@ -630,7 +657,7 @@ function Requests() {
 
                           <Link
                             className="pay-request-button"
-                            to={`/payments/${requestId}`}
+                            to={`/payments/${loanId}`}
                           >
                             Pay Now
                           </Link>

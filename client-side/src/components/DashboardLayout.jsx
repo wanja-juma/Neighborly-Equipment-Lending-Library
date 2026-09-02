@@ -5,7 +5,10 @@ import {
 } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
+import useRequests from "../hooks/useRequests";
+
 import "./Dashboard.css";
+
 
 const navigationItems = [
   {
@@ -29,18 +32,86 @@ const navigationItems = [
     path: "/loans",
   },
   {
-    name: "Payments",
-    path: "/payments",
-  },
-  {
     name: "Damage Reports",
     path: "/damage-reports",
   },
 ];
 
+
 function DashboardLayout() {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
+  const {
+    logout,
+    currentUser,
+  } = useAuth();
+
+  const {
+    borrowingRequests,
+  } = useRequests();
+
+  const navigate =
+    useNavigate();
+
+
+  const currentUserId =
+    String(
+      currentUser?.id || ""
+    );
+
+
+  const safeRequests =
+    Array.isArray(
+      borrowingRequests
+    )
+      ? borrowingRequests
+      : [];
+
+
+  const approvedPaymentRequests =
+    safeRequests.filter(
+      (request) => {
+        const status =
+          String(
+            request.status || ""
+          ).toLowerCase();
+
+        const borrowerId =
+          request.user_id ??
+          request.userId ??
+          request.borrower_id ??
+          request.borrowerId ??
+          request.user?.id ??
+          request.borrower?.id;
+
+        const loanId =
+          request.loan_id ??
+          request.loanId ??
+          request.loan?.id;
+
+
+        return (
+          status === "approved" &&
+          String(borrowerId) ===
+            currentUserId &&
+          Boolean(loanId)
+        );
+      }
+    );
+
+
+  const paymentRequest =
+    approvedPaymentRequests[0];
+
+
+  const paymentLoanId =
+    paymentRequest?.loan_id ??
+    paymentRequest?.loanId ??
+    paymentRequest?.loan?.id ??
+    null;
+
+
+  const canAccessPayments =
+    Boolean(paymentLoanId);
+
 
   const handleLogout = () => {
     logout();
@@ -53,9 +124,12 @@ function DashboardLayout() {
     );
   };
 
+
   return (
     <div className="neighborly-app">
+
       <aside className="sidebar">
+
         <div className="logo">
           <span className="logo-icon">
             N
@@ -66,7 +140,9 @@ function DashboardLayout() {
           </span>
         </div>
 
+
         <nav className="sidebar-navigation">
+
           {navigationItems.map(
             (item) => (
               <NavLink
@@ -90,7 +166,47 @@ function DashboardLayout() {
               </NavLink>
             )
           )}
+
+
+          {canAccessPayments ? (
+            <NavLink
+              to={`/payments/${paymentLoanId}`}
+              className={({
+                isActive,
+              }) =>
+                isActive
+                  ? "navigation-link active"
+                  : "navigation-link"
+              }
+            >
+              <span className="navigation-icon">
+                ○
+              </span>
+
+              <span>
+                Payments
+              </span>
+            </NavLink>
+          ) : (
+            <span
+              className="
+                navigation-link
+                navigation-link-disabled
+              "
+              title="Payments become available after a borrowing request is approved."
+            >
+              <span className="navigation-icon">
+                ○
+              </span>
+
+              <span>
+                Payments
+              </span>
+            </span>
+          )}
+
         </nav>
+
 
         <div className="community-card">
           <span className="community-icon">
@@ -108,6 +224,7 @@ function DashboardLayout() {
           </div>
         </div>
 
+
         <button
           className="logout-button"
           type="button"
@@ -115,11 +232,14 @@ function DashboardLayout() {
         >
           Log out
         </button>
+
       </aside>
 
       <Outlet />
+
     </div>
   );
 }
+
 
 export default DashboardLayout;

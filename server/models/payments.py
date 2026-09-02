@@ -29,9 +29,9 @@ class Payment(db.Model):
 
     @validates('amount')
     def validate_amount(self, key, value):
-        if value is not None and value < 0:
+        if value is not None and value <= 0:
             raise ValueError(
-                "Amount cannot be negative."
+                "Amount must be greater than zero."
             )
         return value
 

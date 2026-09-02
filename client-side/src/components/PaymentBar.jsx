@@ -1,69 +1,229 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import tools from '../data/tools';
-import './PaymentBar.css';
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Link,
+  useParams,
+} from "react-router-dom";
+
+import {
+  createPayment,
+  getItem,
+  getLoan,
+} from "../services/api";
+
+import "./PaymentBar.css";
+
 
 function PaymentBar() {
-  const { id } = useParams();
-  const tool = tools.find((t) => t.id === id);
-  const [duration, setDuration] = useState(1);
-  const [method, setMethod] = useState('mpesa');
-  const [submitted, setSubmitted] = useState(false);
+  const { loanId } = useParams();
 
-  if (!tool) {
-    return (
-      <div className="payment-bar">
-        <p>Tool not found.</p>
-        <Link to="/tools">Back to Browse Tools</Link>
-      </div>
-    );
-  }
+  const [loan, setLoan] =
+    useState(null);
 
-  const total = duration * tool.dailyRate;
+  const [item, setItem] =
+    useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+  const [amount, setAmount] =
+    useState("500.00");
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const [payment, setPayment] =
+    useState(null);
+
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLoanDetails = async () => {
+      try {
+        const loanData =
+          await getLoan(loanId);
+
+        if (cancelled) {
+          return;
+        }
+
+        setLoan(loanData);
+
+        const itemData =
+          await getItem(
+            loanData.item_id
+          );
+
+        if (cancelled) {
+          return;
+        }
+
+        setItem(itemData);
+      } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
+        setError(
+          err.message ||
+            "Unable to load loan details."
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    if (loanId) {
+      loadLoanDetails();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [loanId]);
+
+
+  const handleSubmit = async (
+    event
+  ) => {
+    event.preventDefault();
+
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const result =
+        await createPayment({
+          loan_id: Number(loanId),
+          amount: Number(amount),
+          status: "held",
+        });
+
+      setPayment(result);
+    } catch (err) {
+      setError(
+        err.message ||
+          "Unable to process payment."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (submitted) {
+
+  if (!loanId) {
     return (
-      <div className="payment-bar payment-success">
-        <p>Payment of Ksh{total} confirmed for {tool.name}. Enjoy your borrow!</p>
+      <div className="payment-bar">
+        <p className="payment-error">
+          No loan was selected.
+        </p>
+
+        <Link to="/loans">
+          Back to My Loans
+        </Link>
       </div>
     );
   }
 
+
+  if (loading) {
+    return (
+      <div className="payment-bar">
+        <p>
+          Loading loan details...
+        </p>
+      </div>
+    );
+  }
+
+
+  if (error && !loan) {
+    return (
+      <div className="payment-bar">
+        <p className="payment-error">
+          {error}
+        </p>
+
+        <Link to="/loans">
+          Back to My Loans
+        </Link>
+      </div>
+    );
+  }
+
+
+  if (payment) {
+    return (
+      <div className="payment-bar payment-success">
+        <p>
+          Deposit of Ksh{" "}
+          {payment.amount} confirmed
+          for {item?.name}.
+        </p>
+
+        <Link to="/loans">
+          Back to My Loans
+        </Link>
+      </div>
+    );
+  }
+
+
   return (
-    <form className="payment-bar" onSubmit={handleSubmit}>
-      <h3>Borrow {tool.name}</h3>
+    <form
+      className="payment-bar"
+      onSubmit={handleSubmit}
+    >
+      <h3>
+        Pay Deposit
+        {item?.name
+          ? ` — ${item.name}`
+          : ""}
+      </h3>
+
+      {error && (
+        <p className="payment-error">
+          {error}
+        </p>
+      )}
 
       <label>
-        Duration (days)
+        Deposit Amount (Ksh)
+
         <input
           type="number"
-          min="1"
-          value={duration}
-          onChange={(e) => setDuration(Number(e.target.value))}
+          min="0"
+          step="0.01"
+          value={amount}
+          onChange={(event) =>
+            setAmount(
+              event.target.value
+            )
+          }
+          required
         />
       </label>
 
-      <label>
-        Payment Method
-        <select value={method} onChange={(e) => setMethod(e.target.value)}>
-          <option value="mpesa">M-Pesa</option>
-          <option value="card">Card</option>
-          <option value="cash">Cash on Pickup</option>
-        </select>
-      </label>
-
-      <div className="payment-total">
-        Total: <strong>Ksh{total}</strong>
-      </div>
-
-      <button type="submit">Pay Now</button>
+      <button
+        type="submit"
+        disabled={submitting}
+      >
+        {submitting
+          ? "Processing..."
+          : "Pay Now"}
+      </button>
     </form>
   );
 }
+
 
 export default PaymentBar;
