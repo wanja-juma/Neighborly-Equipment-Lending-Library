@@ -15,6 +15,7 @@ import AuthPage from "./components/AuthPage.jsx";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PaymentRouteGuard from "./components/PaymentRouteGuard.jsx";
 
 import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
@@ -33,6 +34,7 @@ import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
+import Settings from "./Pages/Settings";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 
 
@@ -40,6 +42,7 @@ import Requests from './components/Requests';
 import Loans from './components/Loans';
 
 import "./App.css";
+
 
 function App() {
   const location = useLocation();
@@ -64,14 +67,18 @@ function App() {
     }
   }, [location]);
 
+
   const dashboardRoutePrefixes = [
     "/dashboard",
     "/items",
     "/listings",
     "/requests",
     "/loans",
+    "/payments",
     "/damage-reports",
+    "/settings",
   ];
+
 
   const isDashboardRoute =
     dashboardRoutePrefixes.some(
@@ -83,28 +90,39 @@ function App() {
         )
     );
 
+
   return (
     <AuthProvider>
       <ItemsProvider>
         <RequestsProvider>
           <LoansProvider>
             <DamageReportsProvider>
+
               <Navbar />
 
               <div className="app-content">
                 <Routes>
-                  {/* =========================
-                      PUBLIC ROUTES
-                  ========================== */}
+
+                  {/* PUBLIC ROUTES*/}
 
                   <Route
                     path="/"
-                    element={<Home />}
+                    element={
+                      <>
+                        <Home />
+                        <About />
+                      </>
+                    }
                   />
 
                   <Route
                     path="/about"
-                    element={<About />}
+                    element={
+                      <Navigate
+                        to="/#about"
+                        replace
+                      />
+                    }
                   />
 
                   <Route
@@ -118,19 +136,14 @@ function App() {
                   />
 
                   <Route
-                    path="/payment/:id"
-                    element={<PaymentBar />}
-                  />
-
-                  <Route
                     path="/auth"
                     element={<AuthPage />}
                   />
 
-                  {/* =========================
-                      PROTECTED ROUTES
-                  ========================== */}
 
+                  {/* PROTECTED DASHBOARD*/}
+
+<<<<<<< HEAD
                  <Route element={
                   <ProtectedRoute>
     <DashboardLayout />
@@ -146,10 +159,96 @@ function App() {
   <Route path="/loans" element={<Loans />} />
   <Route path="/damage-reports" element={<DamageReports />} />
 </Route>
+=======
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout />
+                      </ProtectedRoute>
+                    }
+                  >
 
-                  {/* =========================
-                      UNKNOWN ROUTES
-                  ========================== */}
+                    <Route
+                      path="/dashboard"
+                      element={<Dashboard />}
+                    />
+
+                    <Route
+                      path="/items"
+                      element={<BrowseItems />}
+                    />
+
+                    <Route
+                      path="/items/new"
+                      element={<AddItem />}
+                    />
+
+                    <Route
+                      path="/listings"
+                      element={<MyListings />}
+                    />
+
+                    <Route
+                      path="/listings/:itemId/edit"
+                      element={<EditItem />}
+                    />
+
+                    <Route
+                      path="/listings/:itemId/availability"
+                      element={
+                        <ChangeAvailability />
+                      }
+                    />
+
+                    <Route
+                      path="/requests"
+                      element={<Requests />}
+                    />
+
+                    <Route
+                      path="/loans"
+                      element={<Loans />}
+                    />
+
+
+                    {/* PAYMENT ROUTE */}
+
+                    <Route
+                      path="/payments/:loanId"
+                      element={
+                        <PaymentRouteGuard>
+                          <PaymentBar />
+                        </PaymentRouteGuard>
+                      }
+                    />
+
+
+                    <Route
+                      path="/payments"
+                      element={
+                        <Navigate
+                          to="/requests"
+                          replace
+                        />
+                      }
+                    />
+
+
+                    <Route
+                      path="/damage-reports"
+                      element={
+                        <DamageReports />
+                      }
+                    />
+
+                    <Route
+                      path="/settings"
+                        element={<Settings />}
+                    />
+
+                  </Route>
+>>>>>>> dev
+
 
                   <Route
                     path="*"
@@ -160,12 +259,15 @@ function App() {
                       />
                     }
                   />
+
                 </Routes>
               </div>
+
 
               {!isDashboardRoute && (
                 <Footer />
               )}
+
             </DamageReportsProvider>
           </LoansProvider>
         </RequestsProvider>
@@ -173,5 +275,6 @@ function App() {
     </AuthProvider>
   );
 }
+
 
 export default App;

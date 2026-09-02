@@ -11,6 +11,8 @@ class BorrowingRequest(db.Model):
         primary_key=True
     )
 
+    # A loan does not exist until the request
+    # has been approved.
     loan_id = db.Column(
         db.Integer,
         db.ForeignKey("loans.id"),
@@ -26,6 +28,17 @@ class BorrowingRequest(db.Model):
     equipment_id = db.Column(
         db.Integer,
         db.ForeignKey("items.id"),
+        nullable=False
+    )
+
+    # Dates selected by the borrower.
+    start_date = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
+    end_date = db.Column(
+        db.DateTime,
         nullable=False
     )
 
@@ -58,6 +71,11 @@ class BorrowingRequest(db.Model):
 
     item = db.relationship(
         "Item",
+        backref="borrowing_requests"
+    )
+
+    loan = db.relationship(
+        "Loan",
         backref="borrowing_requests"
     )
 
