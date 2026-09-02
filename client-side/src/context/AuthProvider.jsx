@@ -117,8 +117,7 @@ const getSavedUser = () => {
 
 const getStoredToken = () => {
   return (
-    localStorage.getItem(
-      TOKEN_STORAGE_KEY
+    localStorage.getItem("neighborlyToken"
     ) ||
     localStorage.getItem(
       "access_token"
@@ -180,8 +179,8 @@ function AuthProvider({
 
       saveUser(user);
 
-      localStorage.setItem(
-        TOKEN_STORAGE_KEY,
+      localStorage.setItem("neighborlyToken"
+        ,
         token
       );
 

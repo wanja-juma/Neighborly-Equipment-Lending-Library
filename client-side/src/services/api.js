@@ -2,6 +2,13 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5555/api";
 
+
+const TOKEN_KEY = 'neighborlyToken';
+
+export const getAuthToken = () => localStorage.getItem(TOKEN_KEY);
+
+
+
 const getAccessToken = () => {
   return (
     localStorage.getItem(
@@ -163,22 +170,11 @@ export const deleteItem = (
    Borrowing requests
 ========================= */
 
-export const getBorrowingRequests =
-  async () => {
-    const response = await request(
-      "/borrowing-requests"
-    );
-
-    if (Array.isArray(response)) {
-      return response;
-    }
-
-    return (
-      response?.borrowing_requests ||
-      response?.borrowingRequests ||
-      []
-    );
-  };
+export const getBorrowingRequests = async (type = 'incoming') => {
+  const response = await request(`/borrowing-requests?type=${type}`);
+  if (Array.isArray(response)) return response;
+  return response?.borrowing_requests || response?.borrowingRequests || [];
+};
 
 export const createBorrowingRequest =
   async (requestData) => {
