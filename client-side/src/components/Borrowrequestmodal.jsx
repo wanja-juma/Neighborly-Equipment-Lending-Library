@@ -79,5 +79,30 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
       setFormError("The return date must be after the borrowing date.");
       return;
     }
+    setSubmitting(true);
+    try {
+      const result = await addBorrowingRequest({
+        itemId: item.id,
+        itemName: item.name,
+        itemIcon: item.icon || "🧰",
+        ownerId: getItemOwnerId(item),
+        ownerName: getItemOwnerName(item),
+        borrowerId: currentUser?.id,
+        borrowerName: currentUser?.name,
+        startDate: borrowDates.startDate,
+        endDate: borrowDates.endDate,
+      });
  
-   } }
+      if (result && result.success === false) {
+        setFormError(result.message || "Unable to submit the request.");
+        return;
+      }
+ 
+      onSuccess?.(result?.message || "Borrowing request submitted successfully.");
+    } catch (error) {
+      setFormError(error.message || "Unable to submit the borrowing request.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+   } 
