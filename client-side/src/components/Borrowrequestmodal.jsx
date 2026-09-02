@@ -121,5 +121,22 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
             <h2 id="borrow-modal-title">Request {item.name}</h2>
             <p>Select the dates you would like to borrow this item.</p>
           </div>
-          
+
+          <button
+            className="close-modal-button"
+            type="button"
+            onClick={onClose}
+            aria-label="Close borrowing form"
+          >
+            ×
+          </button>
+        </header><button
+            className="close-modal-button"
+            type="button"
+            onClick={onClose}
+            aria-label="Close borrowing form"
+          >
+            ×
+          </button>
+        </header>
     
