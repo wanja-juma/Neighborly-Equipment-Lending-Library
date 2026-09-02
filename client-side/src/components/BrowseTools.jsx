@@ -1,7 +1,3 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getTools } from '../services/tools';
-import './BrowseTools.css';
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -86,7 +82,7 @@ function BrowseTools() {
   if (error) {
     return (
       <p className="browse-tools__status browse-tools__status--error">
-        Couldn't load tools. Make sure the Flask server is running.
+        Couldn't load tools. Is json-server running on port 3000?
       </p>
     );
   }
@@ -107,21 +103,6 @@ function BrowseTools() {
       </div>
 
       <div className="browse-tools__grid">
-        {tools.map((tool) => (
-          <Link to={`/tools/${tool.id}`} key={tool.id} className="tool-card">
-            <div className="tool-card__image-wrap">
-              <img
-                src={tool.image}
-                alt={tool.name}
-                className="tool-card__image"
-              />
-              {tool.status !== 'Available' && (
-                <span className="tool-card__badge">{tool.status}</span>
-              )}
-            </div>
-            <div className="tool-card__body">
-              <p className="tool-card__name">{tool.name}</p>
-              <p className="tool-card__condition">{tool.condition}</p>
         {tools.map((tool) => {
           const available =
             tool.availability === "Available";
@@ -134,12 +115,20 @@ function BrowseTools() {
               key={tool.id}
             >
               <div className="tool-card__icon-wrap">
-                <span
-                  className="tool-card__icon"
-                  aria-hidden="true"
-                >
-                  {tool.icon || "🔧"}
-                </span>
+                {tool.image ? (
+                  <img
+                    className="tool-card__icon"
+                    src={tool.image}
+                    alt={tool.name || "Tool"}
+                  />
+                ) : (
+                  <span
+                    className="tool-card__icon"
+                    aria-hidden="true"
+                  >
+                    {tool.icon || "🔧"}
+                  </span>
+                )}
 
                 {!available && (
                   <span className="tool-card__badge">

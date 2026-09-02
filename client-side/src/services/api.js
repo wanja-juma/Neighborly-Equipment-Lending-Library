@@ -202,6 +202,29 @@ export const getItem =
   };
 
 
+const toItemRequestBody = (
+  itemData
+) => {
+  if (
+    !(itemData.image instanceof File)
+  ) {
+    return JSON.stringify(itemData);
+  }
+
+  const formData = new FormData();
+
+  Object.entries(itemData).forEach(
+    ([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value);
+      }
+    }
+  );
+
+  return formData;
+};
+
+
 export const createItem =
   async (
     itemData
@@ -213,9 +236,7 @@ export const createItem =
           method: "POST",
 
           body:
-            JSON.stringify(
-              itemData
-            ),
+            toItemRequestBody(itemData),
         }
       );
 
@@ -238,9 +259,7 @@ export const updateItem =
           method: "PATCH",
 
           body:
-            JSON.stringify(
-              updates
-            ),
+            toItemRequestBody(updates),
         }
       );
 

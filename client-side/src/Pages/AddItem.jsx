@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useItems from "../hooks/useItems";
 import "./Items.css";
@@ -9,6 +9,7 @@ const initialFormData = {
   description: "",
   condition: "",
   icon: "🧰",
+  image: null,
 };
 
 const categories = [
@@ -49,6 +50,19 @@ function AddItem() {
     useState(initialFormData);
 
   const [errors, setErrors] = useState({});
+  const [imagePreview, setImagePreview] = useState(null);
+
+  useEffect(() => {
+    if (!formData.image) {
+      setImagePreview(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(formData.image);
+    setImagePreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [formData.image]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -61,6 +75,21 @@ function AddItem() {
     setErrors((currentErrors) => ({
       ...currentErrors,
       [name]: "",
+      submit: "",
+    }));
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    setFormData((currentData) => ({
+      ...currentData,
+      image: file,
+    }));
+
+    setErrors((currentErrors) => ({
+      ...currentErrors,
+      image: "",
       submit: "",
     }));
   };
@@ -112,6 +141,7 @@ function AddItem() {
           formData.description.trim(),
         condition: formData.condition,
         icon: formData.icon,
+        image: formData.image,
       });
 
       navigate("/listings");
@@ -303,6 +333,35 @@ function AddItem() {
               </div>
             </label>
 
+            {/* Item image */}
+            <label className="item-form-field">
+              <span>Item Image</span>
+
+              <input
+                type="file"
+                name="image"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                onChange={handleImageChange}
+                className={
+                  errors.image ? "input-error" : ""
+                }
+              />
+
+              {errors.image && (
+                <small className="field-error">
+                  {errors.image}
+                </small>
+              )}
+
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Item preview"
+                  className="item-image-preview"
+                />
+              )}
+            </label>
+
             {/* Item icon */}
             <fieldset className="icon-fieldset">
               <legend>Choose an item icon</legend>
@@ -368,7 +427,14 @@ function AddItem() {
 
             <article className="equipment-card preview-card">
               <div className="equipment-image">
-                <span>{formData.icon}</span>
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt={formData.name || "Item preview"}
+                  />
+                ) : (
+                  <span>{formData.icon}</span>
+                )}
 
                 <span className="image-status available">
                   Available

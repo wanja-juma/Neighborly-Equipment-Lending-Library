@@ -25,6 +25,7 @@ const initialFormData = {
   description: "",
   icon: "🧰",
   availability: "Available",
+  image: null,
 };
 
 function EditItem() {
@@ -39,6 +40,7 @@ function EditItem() {
   const [formData, setFormData] = useState(initialFormData);
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const selectedItem = items.find(
     (item) => String(item.id) === String(itemId)
@@ -56,8 +58,22 @@ function EditItem() {
       description: selectedItem.description || "",
       icon: selectedItem.icon || "🧰",
       availability: selectedItem.availability || "Available",
+      image: null,
     });
+
+    setImagePreview(selectedItem.image || null);
   }, [selectedItem]);
+
+  useEffect(() => {
+    if (!(formData.image instanceof File)) {
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(formData.image);
+    setImagePreview(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [formData.image]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -70,6 +86,21 @@ function EditItem() {
     setFormErrors((currentErrors) => ({
       ...currentErrors,
       [name]: "",
+      submit: "",
+    }));
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    setFormData((currentData) => ({
+      ...currentData,
+      image: file,
+    }));
+
+    setFormErrors((currentErrors) => ({
+      ...currentErrors,
+      image: "",
       submit: "",
     }));
   };
@@ -115,7 +146,7 @@ function EditItem() {
     setIsSubmitting(true);
 
     try {
-      await updateItem(itemId, {
+      const updates = {
         name: formData.name.trim(),
         category: formData.category,
         condition: formData.condition,
@@ -125,7 +156,13 @@ function EditItem() {
         statusColor:
           formData.availability === "Available" ? "available" : "unavailable",
         updatedAt: new Date().toISOString(),
-      });
+      };
+
+      if (formData.image instanceof File) {
+        updates.image = formData.image;
+      }
+
+      await updateItem(itemId, updates);
 
       navigate("/listings");
     } catch (error) {
@@ -328,6 +365,30 @@ function EditItem() {
               )}
             </label>
 
+            <label className="edit-form-field">
+              <span>Item Image</span>
+
+              <input
+                type="file"
+                name="image"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                onChange={handleImageChange}
+                className={formErrors.image ? "input-error" : ""}
+              />
+
+              {formErrors.image && (
+                <small className="field-error">{formErrors.image}</small>
+              )}
+
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Item preview"
+                  className="item-image-preview"
+                />
+              )}
+            </label>
+
             <fieldset className="edit-icon-fieldset">
               <legend>Item Icon</legend>
 
@@ -379,7 +440,15 @@ function EditItem() {
           <aside className="edit-item-preview">
             <p className="page-label">LISTING PREVIEW</p>
 
-            <div className="edit-preview-icon">{formData.icon}</div>
+            {imagePreview ? (
+              <img
+                className="edit-preview-icon"
+                src={imagePreview}
+                alt={formData.name || "Item preview"}
+              />
+            ) : (
+              <div className="edit-preview-icon">{formData.icon}</div>
+            )}
 
             <span className="equipment-category">
               {formData.category || "Category"}

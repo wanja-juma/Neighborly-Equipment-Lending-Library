@@ -1,25 +1,3 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { getItem } from '../services/api';
-import './PaymentBar.css';
-
-function PaymentBar() {
-  const { id } = useParams();
-  const [tool, setTool] = useState(undefined);
-  const [duration, setDuration] = useState(1);
-  const [method, setMethod] = useState('mpesa');
-  const [submitted, setSubmitted] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    getItem(id)
-      .then((data) => {
-        if (!cancelled) setTool(data);
-      })
-      .catch(() => {
-        if (!cancelled) setTool(null);
-      });
 import {
   useEffect,
   useState,
@@ -111,17 +89,6 @@ function PaymentBar() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
-
-  if (tool === undefined) {
-    return (
-      <div className="payment-bar">
-        <p>Loading…</p>
-      </div>
-    );
-  }
-
-  if (!tool) {
   }, [loanId]);
 
 
@@ -179,10 +146,6 @@ function PaymentBar() {
     );
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
 
   if (loading) {
     return (
@@ -213,7 +176,6 @@ function PaymentBar() {
   if (payment) {
     return (
       <div className="payment-bar payment-success">
-        <p>Borrow request sent for {tool.name}. The owner will confirm shortly.</p>
         <p>
           Deposit of Ksh{" "}
           {payment.amount} confirmed
@@ -265,16 +227,6 @@ function PaymentBar() {
         />
       </label>
 
-      <label>
-        Payment Method
-        <select value={method} onChange={(e) => setMethod(e.target.value)}>
-          <option value="mpesa">M-Pesa</option>
-          <option value="card">Card</option>
-          <option value="cash">Cash on Pickup</option>
-        </select>
-      </label>
-
-      <button type="submit">Send Borrow Request</button>
       <button
         type="submit"
         disabled={submitting}

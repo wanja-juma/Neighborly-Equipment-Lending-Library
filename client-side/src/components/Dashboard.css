@@ -785,6 +785,7 @@ button {
 
 .listing-image {
   position: relative;
+  overflow: hidden;
 
   display: grid;
   height: 100px;
@@ -795,6 +796,14 @@ button {
 
 .listing-image > span {
   font-size: 36px;
+}
+
+.listing-image > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .listing-options-button {

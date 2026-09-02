@@ -237,10 +237,17 @@ function MyListings() {
                   key={item.id}
                 >
                   <div className="equipment-image">
-                    <span>
-                      {item.icon ||
-                        "🧰"}
-                    </span>
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name || "Item"}
+                      />
+                    ) : (
+                      <span>
+                        {item.icon ||
+                          "🧰"}
+                      </span>
+                    )}
 
                     <button
                       className="equipment-options"

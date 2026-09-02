@@ -609,9 +609,16 @@ function BrowseItems() {
                   key={item.id}
                 >
                   <div className="equipment-image">
-                    <span>
-                      {item.icon || "🧰"}
-                    </span>
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name || "Item"}
+                      />
+                    ) : (
+                      <span>
+                        {item.icon || "🧰"}
+                      </span>
+                    )}
 
                     <span
                       className={`image-status ${statusClass}`}
@@ -731,10 +738,18 @@ function BrowseItems() {
             </header>
 
             <div className="borrow-item-summary">
-              <span className="borrow-summary-icon">
-                {selectedItem.icon ||
-                  "🧰"}
-              </span>
+              {selectedItem.image ? (
+                <img
+                  className="borrow-summary-icon"
+                  src={selectedItem.image}
+                  alt={selectedItem.name || "Item"}
+                />
+              ) : (
+                <span className="borrow-summary-icon">
+                  {selectedItem.icon ||
+                    "🧰"}
+                </span>
+              )}
 
               <div>
                 <strong>

@@ -249,6 +249,7 @@
 
 .equipment-image {
   position: relative;
+  overflow: hidden;
 
   display: grid;
   height: 155px;
@@ -259,6 +260,22 @@
 
 .equipment-image > span {
   font-size: 52px;
+}
+
+.equipment-image > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-image-preview {
+  width: 96px;
+  height: 96px;
+  margin-top: 8px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .equipment-options {
@@ -823,6 +840,10 @@
   font-size: 25px;
 }
 
+img.borrow-summary-icon {
+  object-fit: cover;
+}
+
 .borrow-item-summary div {
   display: flex;
   flex-direction: column;
@@ -1184,6 +1205,12 @@
   font-size: 4rem;
   background: #f1f5f9;
   border-radius: 12px;
+}
+
+img.edit-preview-icon {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
 }
 
 .edit-item-preview h2 {
