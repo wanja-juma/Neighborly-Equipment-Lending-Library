@@ -48,5 +48,34 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
     return null;
   }
 
-  
-}
+  function handleDateChange(event) {
+    const { name, value } = event.target;
+    setBorrowDates((current) => ({ ...current, [name]: value }));
+    setFormError("");
+  }
+ 
+  async function handleSubmit(event) {
+    event.preventDefault();
+ 
+    const availability = getItemAvailability(item).toLowerCase();
+    if (availability !== "available") {
+      setFormError("This item is no longer available to borrow.");
+      return;
+    }
+ 
+    if (!borrowDates.startDate || !borrowDates.endDate) {
+      setFormError("Please select both the borrowing and return dates.");
+      return;
+    }
+ 
+    if (borrowDates.startDate < minimumDate) {
+      setFormError("The borrowing date cannot be in the past.");
+      return;
+    }
+ 
+    if (borrowDates.endDate < borrowDates.startDate) {
+      setFormError("The return date must be after the borrowing date.");
+      return;
+    }
+ 
+   } }
