@@ -1,69 +1,95 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import tools from '../data/tools';
+import { getLoan, getItem, createPayment } from '../services/api';
 import './PaymentBar.css';
 
 function PaymentBar() {
-  const { id } = useParams();
-  const tool = tools.find((t) => t.id === id);
-  const [duration, setDuration] = useState(1);
-  const [method, setMethod] = useState('mpesa');
-  const [submitted, setSubmitted] = useState(false);
+  const { loanId } = useParams();
+  const [loan, setLoan] = useState(null);
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [amount, setAmount] = useState('500.00');
+  const [submitting, setSubmitting] = useState(false);
+  const [payment, setPayment] = useState(null);
 
-  if (!tool) {
+  useEffect(() => {
+    setLoading(true);
+    getLoan(loanId)
+      .then((loanData) => {
+        setLoan(loanData);
+        // LoanSchema only returns item_id, not a nested item — fetch it separately
+        return getItem(loanData.item_id);
+      })
+      .then((itemData) => {
+        setItem(itemData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [loanId]);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await createPayment({
+        loan_id: loanId,
+        amount,
+        status: 'held',
+      });
+      setPayment(result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (loading) {
+    return <p className="payment-bar">Loading loan details…</p>;
+  }
+  if (error && !loan) {
     return (
       <div className="payment-bar">
-        <p>Tool not found.</p>
-        <Link to="/tools">Back to Browse Tools</Link>
+        <p>Couldn't load this loan: {error}</p>
+        <Link to="/loans">Back to My Loans</Link>
       </div>
     );
   }
 
-  const total = duration * tool.dailyRate;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
-
-  if (submitted) {
+  if (payment) {
     return (
       <div className="payment-bar payment-success">
-        <p>Payment of Ksh{total} confirmed for {tool.name}. Enjoy your borrow!</p>
+        <p>Deposit of Ksh{payment.amount} confirmed for {item?.name}. Enjoy your borrow!</p>
       </div>
     );
   }
 
   return (
     <form className="payment-bar" onSubmit={handleSubmit}>
-      <h3>Borrow {tool.name}</h3>
-
+      <h3>Pay Deposit — {item?.name}</h3>
+      {error && <p className="payment-error">{error}</p>}
       <label>
-        Duration (days)
+        Deposit Amount (Ksh)
         <input
           type="number"
-          min="1"
-          value={duration}
-          onChange={(e) => setDuration(Number(e.target.value))}
+          min="0"
+          step="0.01"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          required
         />
       </label>
-
-      <label>
-        Payment Method
-        <select value={method} onChange={(e) => setMethod(e.target.value)}>
-          <option value="mpesa">M-Pesa</option>
-          <option value="card">Card</option>
-          <option value="cash">Cash on Pickup</option>
-        </select>
-      </label>
-
-      <div className="payment-total">
-        Total: <strong>Ksh{total}</strong>
-      </div>
-
-      <button type="submit">Pay Now</button>
+      <button type="submit" disabled={submitting}>
+        {submitting ? 'Processing…' : 'Pay Now'}
+      </button>
     </form>
   );
 }
+
 
 export default PaymentBar;
