@@ -106,3 +106,20 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
     }
   }
    } 
+
+   return (
+    <div className="borrow-modal-overlay">
+      <section
+        className="borrow-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="borrow-modal-title"
+      >
+        <header className="borrow-modal-header">
+          <div>
+            <p className="page-label">BORROWING REQUEST</p>
+            <h2 id="borrow-modal-title">Request {item.name}</h2>
+            <p>Select the dates you would like to borrow this item.</p>
+          </div>
+          
+    
