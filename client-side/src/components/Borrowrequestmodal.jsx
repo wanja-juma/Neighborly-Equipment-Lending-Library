@@ -24,3 +24,20 @@ const getItemOwnerName = (item) => {
   }
   return item?.ownerName || item?.owner_name || item?.owner || "Neighbour";
 };
+
+const getItemAvailability = (item) =>
+  item?.availability || item?.status || "Available";
+ 
+// A borrow-request form for a single item. Renders nothing if `item` is null —
+// the parent controls when it's open by passing/clearing the item.
+function BorrowRequestModal({ item, onClose, onSuccess }) {
+  const { currentUser } = useAuth();
+  const { addBorrowingRequest } = useRequests();
+ 
+  const [borrowDates, setBorrowDates] = useState({
+    startDate: "",
+    endDate: "",
+  });
+
+  
+}
