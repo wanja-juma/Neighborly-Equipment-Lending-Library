@@ -16,6 +16,14 @@ function CartProvider({ children }) {
   function removeFromCart(itemId) {
     setCartItems((current) => current.filter((i) => i.id !== itemId));
   }
+
+  function isInCart(itemId) {
+    return cartItems.some((i) => i.id === itemId);
+  }
+
+  function clearCart() {
+    setCartItems([]);
+  }
 }
 
 export default CartProvider;
