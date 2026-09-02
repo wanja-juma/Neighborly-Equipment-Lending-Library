@@ -348,26 +348,6 @@ function Dashboard() {
     fullName.split(" ")[0] ||
     "Neighbour";
 
-  const initials =
-    [firstName, lastName]
-      .filter(Boolean)
-      .map((name) =>
-        name.charAt(0)
-      )
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() ||
-    fullName
-      .split(" ")
-      .filter(Boolean)
-      .map((name) =>
-        name.charAt(0)
-      )
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() ||
-    "N";
-
   const myItems =
     safeItems.filter(
       (item) =>
@@ -651,26 +631,6 @@ function Dashboard() {
             <span className="notification-indicator" />
           </button>
 
-          <div className="profile">
-            <span className="profile-avatar">
-              {initials}
-            </span>
-
-            <div className="profile-details">
-              <strong>
-                {fullName}
-              </strong>
-
-              <small>
-                {currentUser?.role ||
-                  "Member"}
-              </small>
-            </div>
-
-            <span className="profile-arrow">
-              ⌄
-            </span>
-          </div>
         </div>
       </header>
 

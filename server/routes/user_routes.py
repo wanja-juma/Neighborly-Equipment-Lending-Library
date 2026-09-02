@@ -2,14 +2,17 @@ from flask import (
     Blueprint,
     request,
 )
+
 from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
 )
+
 from flask_restful import (
     Api,
     Resource,
 )
+
 from sqlalchemy.exc import (
     IntegrityError,
     SQLAlchemyError,
@@ -17,11 +20,6 @@ from sqlalchemy.exc import (
 
 from app.extensions import db
 from models import User
-
-from schemas import UserSchema
-
-from schemas import UserSchema
-
 
 
 user_bp = Blueprint(
@@ -48,13 +46,15 @@ def get_authenticated_user():
 
 
 class ChangePassword(Resource):
+
     @jwt_required()
     def put(self):
         user = get_authenticated_user()
 
         if user is None:
             return {
-                "error": "User not found."
+                "error":
+                    "User not found."
             }, 404
 
         json_data = request.get_json(
@@ -63,24 +63,29 @@ class ChangePassword(Resource):
 
         if not json_data:
             return {
-                "error": (
+                "error":
                     "Request body is required."
-                )
             }, 400
 
-        current_password = json_data.get(
-            "current_password",
-            "",
+        current_password = (
+            json_data.get(
+                "current_password",
+                "",
+            )
         )
 
-        new_password = json_data.get(
-            "new_password",
-            "",
+        new_password = (
+            json_data.get(
+                "new_password",
+                "",
+            )
         )
 
-        confirm_password = json_data.get(
-            "confirm_password",
-            "",
+        confirm_password = (
+            json_data.get(
+                "confirm_password",
+                "",
+            )
         )
 
         if (
@@ -89,43 +94,39 @@ class ChangePassword(Resource):
             or not confirm_password
         ):
             return {
-                "error": (
+                "error":
                     "Current password, new "
                     "password and confirmation "
                     "are required."
-                )
             }, 400
 
         if not user.check_password(
             current_password
         ):
             return {
-                "error": (
+                "error":
                     "The current password is "
                     "incorrect."
-                )
             }, 401
 
         if (
-            new_password !=
-            confirm_password
+            new_password
+            != confirm_password
         ):
             return {
-                "error": (
+                "error":
                     "The new passwords do not "
                     "match."
-                )
             }, 400
 
         if user.check_password(
             new_password
         ):
             return {
-                "error": (
+                "error":
                     "The new password must be "
                     "different from the current "
                     "password."
-                )
             }, 400
 
         try:
@@ -133,48 +134,59 @@ class ChangePassword(Resource):
                 new_password
             )
 
-            db.session.add(user)
+            db.session.add(
+                user
+            )
+
             db.session.commit()
 
         except ValueError as error:
             db.session.rollback()
 
             return {
-                "error": str(error)
+                "error":
+                    str(error)
             }, 400
 
         except SQLAlchemyError:
             db.session.rollback()
 
             return {
-                "error": (
+                "error":
                     "The password could not be "
                     "updated."
-                )
             }, 500
 
         return {
-            "message": (
+            "message":
                 "Password changed successfully."
-            )
         }, 200
 
-user_api.add_resource( ChangePassword, "/me/password",)
+
+user_api.add_resource(
+    ChangePassword,
+    "/me/password",
+)
 
 
 class DeleteAccount(Resource):
+
     @jwt_required()
     def delete(self):
         user = get_authenticated_user()
 
         if user is None:
             return {
-                "error": "User not found."
+                "error":
+                    "User not found."
             }, 404
 
-        json_data = request.get_json(
-            silent=True
-        ) or {}
+        json_data = (
+            request.get_json(
+                silent=True
+            )
+            or {}
+        )
 
         password = json_data.get(
             "password",
@@ -183,52 +195,51 @@ class DeleteAccount(Resource):
 
         if not password:
             return {
-                "error": (
+                "error":
                     "Your password is required "
                     "to delete the account."
-                )
             }, 400
 
         if not user.check_password(
             password
         ):
             return {
-                "error": (
+                "error":
                     "The password is incorrect."
-                )
             }, 401
 
         try:
-            db.session.delete(user)
+            db.session.delete(
+                user
+            )
+
             db.session.commit()
 
         except IntegrityError:
             db.session.rollback()
 
             return {
-                "error": (
+                "error":
                     "The account cannot be "
                     "deleted while it has active "
                     "items, requests, loans or "
                     "payments."
-                )
             }, 409
 
         except SQLAlchemyError:
             db.session.rollback()
 
             return {
-                "error": (
+                "error":
                     "The account could not be "
                     "deleted."
-                )
             }, 500
 
         return {
-            "message": (
+            "message":
                 "Account deleted successfully."
-            )
         }, 200
+
 
 user_api.add_resource(
     DeleteAccount,

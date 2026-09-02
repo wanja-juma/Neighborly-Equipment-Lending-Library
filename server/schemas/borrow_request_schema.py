@@ -14,11 +14,24 @@ class BorrowingRequestSchema(SQLAlchemyAutoSchema):
         dump_only=True
     )
 
+    loan_id = fields.Int(
+        dump_only=True,
+        allow_none=True
+    )
+
     user_id = fields.Int(
         required=True
     )
 
     equipment_id = fields.Int(
+        required=True
+    )
+
+    start_date = fields.DateTime(
+        required=True
+    )
+
+    end_date = fields.DateTime(
         required=True
     )
 
@@ -39,7 +52,6 @@ class BorrowingRequestSchema(SQLAlchemyAutoSchema):
     message = fields.Str(
         allow_none=True
     )
-
 
 
 borrowing_request_schema = BorrowingRequestSchema()
