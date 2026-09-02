@@ -91,6 +91,46 @@ function PaymentBar() {
       cancelled = true;
     };
   }, [loanId]);
+ useEffect(() => {
+  let cancelled = false;
+
+  const loadLoanDetails = async () => {
+    try {
+      const loanData = await getLoan(loanId);
+
+      if (cancelled) return;
+
+      setLoan(loanData);
+
+      const itemData = await getItem(
+        loanData.item_id
+      );
+
+      if (cancelled) return;
+
+      setItem(itemData);
+    } catch (err) {
+      if (cancelled) return;
+
+      setError(
+        err.message ||
+          "Unable to load loan details."
+      );
+    } finally {
+      if (!cancelled) {
+        setLoading(false);
+      }
+    }
+  };
+
+  if (loanId) {
+    loadLoanDetails();
+  }
+
+  return () => {
+    cancelled = true;
+  };
+}, [loanId]);
 
 
   const handleSubmit = async (
