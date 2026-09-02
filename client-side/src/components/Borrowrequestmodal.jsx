@@ -39,5 +39,14 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
     endDate: "",
   });
 
+  const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+ 
+  const minimumDate = getLocalDate();
+ 
+  if (!item) {
+    return null;
+  }
+
   
 }
