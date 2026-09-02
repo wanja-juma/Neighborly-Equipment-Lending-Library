@@ -24,6 +24,19 @@ function CartProvider({ children }) {
   function clearCart() {
     setCartItems([]);
   }
+
+  const value = {
+    cartItems,
+    addToCart,
+    removeFromCart,
+    isInCart,
+    clearCart,
+    count: cartItems.length,
+  };
+
+  return (
+    <CartContext.Provider value={value}>{children}</CartContext.Provider>
+  );
 }
 
 export default CartProvider;
