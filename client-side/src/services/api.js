@@ -126,9 +126,7 @@ const request = async (
 };
 
 
-/* =========================
-   Users
-========================= */
+/* Users*/
 
 export const changePassword =
   async (
@@ -164,9 +162,7 @@ export const deleteAccount =
   };
 
 
-/* =========================
-   Items
-========================= */
+/* Items */
 
 export const getItems =
   async () => {
@@ -267,9 +263,7 @@ export const deleteItem = (
 };
 
 
-/* =========================
-   Borrowing requests
-========================= */
+/* Borrowing requests */
 
 export const getBorrowingRequests =
   async () => {
@@ -366,9 +360,7 @@ export const deleteBorrowingRequest =
   };
 
 
-/* =========================
-   Loans
-========================= */
+/* Loans */
 
 export const getLoans =
   async () => {
@@ -472,9 +464,7 @@ export const deleteLoan = (
 };
 
 
-/* =========================
-   Payments
-========================= */
+/*  Payments*/
 
 export const getPayment =
   async (
@@ -537,9 +527,7 @@ export const refundPayment =
   };
 
 
-/* =========================
-   Damage reports
-========================= */
+/* Damage reports */
 
 export const getDamageReports =
   async () => {

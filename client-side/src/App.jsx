@@ -34,6 +34,7 @@ import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
+import Settings from "./Pages/Settings";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 
 import "./App.css";
@@ -71,6 +72,7 @@ function App() {
     "/loans",
     "/payments",
     "/damage-reports",
+    "/settings",
   ];
 
 
@@ -97,9 +99,7 @@ function App() {
               <div className="app-content">
                 <Routes>
 
-                  {/* =========================
-                      PUBLIC ROUTES
-                  ========================== */}
+                  {/* PUBLIC ROUTES*/}
 
                   <Route
                     path="/"
@@ -137,9 +137,7 @@ function App() {
                   />
 
 
-                  {/* =========================
-                      PROTECTED DASHBOARD
-                  ========================== */}
+                  {/* PROTECTED DASHBOARD*/}
 
                   <Route
                     element={
@@ -222,12 +220,13 @@ function App() {
                       }
                     />
 
+                    <Route
+                      path="/settings"
+                        element={<Settings />}
+                    />
+
                   </Route>
 
-
-                  {/* =========================
-                      UNKNOWN ROUTES
-                  ========================== */}
 
                   <Route
                     path="*"

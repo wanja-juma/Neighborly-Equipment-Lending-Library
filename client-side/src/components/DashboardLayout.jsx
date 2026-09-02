@@ -35,6 +35,11 @@ const navigationItems = [
     name: "Damage Reports",
     path: "/damage-reports",
   },
+
+  {
+  name: "Settings",
+  path: "/settings",
+},
 ];
 
 
