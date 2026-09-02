@@ -2,7 +2,7 @@ import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import useRequests from "../hooks/useRequests";
 import "./BorrowRequestModal.css";
- 
+
 const getLocalDate = () => {
   const today = new Date();
   const year = today.getFullYear();
@@ -10,7 +10,7 @@ const getLocalDate = () => {
   const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
- 
+
 const getItemOwnerId = (item) =>
   item?.ownerId ?? item?.owner_id ?? item?.owner?.id ?? "";
 
@@ -29,23 +29,22 @@ const getItemOwnerName = (item) => {
 
 const getItemAvailability = (item) =>
   item?.availability || item?.status || "Available";
- 
+
 // A borrow-request form for a single item. Renders nothing if `item` is null —
 // the parent controls when it's open by passing/clearing the item.
 function BorrowRequestModal({ item, onClose, onSuccess }) {
   const { currentUser } = useAuth();
   const { addBorrowingRequest } = useRequests();
- 
+
   const [borrowDates, setBorrowDates] = useState({
     startDate: "",
     endDate: "",
   });
-
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
- 
+
   const minimumDate = getLocalDate();
- 
+
   if (!item) {
     return null;
   }
@@ -55,30 +54,31 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
     setBorrowDates((current) => ({ ...current, [name]: value }));
     setFormError("");
   }
- 
+
   async function handleSubmit(event) {
     event.preventDefault();
- 
+
     const availability = getItemAvailability(item).toLowerCase();
     if (availability !== "available") {
       setFormError("This item is no longer available to borrow.");
       return;
     }
- 
+
     if (!borrowDates.startDate || !borrowDates.endDate) {
       setFormError("Please select both the borrowing and return dates.");
       return;
     }
- 
+
     if (borrowDates.startDate < minimumDate) {
       setFormError("The borrowing date cannot be in the past.");
       return;
     }
- 
+
     if (borrowDates.endDate < borrowDates.startDate) {
       setFormError("The return date must be after the borrowing date.");
       return;
     }
+
     setSubmitting(true);
     try {
       const result = await addBorrowingRequest({
@@ -92,12 +92,12 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
         startDate: borrowDates.startDate,
         endDate: borrowDates.endDate,
       });
- 
+
       if (result && result.success === false) {
         setFormError(result.message || "Unable to submit the request.");
         return;
       }
- 
+
       onSuccess?.(result?.message || "Borrowing request submitted successfully.");
     } catch (error) {
       setFormError(error.message || "Unable to submit the borrowing request.");
@@ -105,9 +105,8 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
       setSubmitting(false);
     }
   }
-   } 
 
-   return (
+  return (
     <div className="borrow-modal-overlay">
       <section
         className="borrow-modal"
@@ -130,14 +129,6 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
           >
             ×
           </button>
-        </header><button
-            className="close-modal-button"
-            type="button"
-            onClick={onClose}
-            aria-label="Close borrowing form"
-          >
-            ×
-          </button>
         </header>
 
         <div className="borrow-item-summary">
@@ -148,7 +139,7 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
             <small>{item.condition || "Condition not specified"}</small>
           </div>
         </div>
- 
+
         <form className="borrow-date-form" onSubmit={handleSubmit}>
           <div className="borrow-date-fields">
             <label className="item-form-field">
@@ -164,7 +155,7 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
                 required
               />
             </label>
- 
+
             <label className="item-form-field">
               <span>
                 Return Date <b>*</b>
@@ -179,4 +170,43 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
               />
             </label>
           </div>
-    )
+
+          {formError && (
+            <div className="borrow-form-error" role="alert">
+              {formError}
+            </div>
+          )}
+
+          <div className="borrow-request-information">
+            <strong>Before submitting</strong>
+            <ul>
+              <li>Wait for the item owner to approve your request.</li>
+              <li>Collect the item only after the request is approved.</li>
+              <li>Return the item by the selected return date.</li>
+            </ul>
+          </div>
+
+          <div className="borrow-modal-actions">
+            <button
+              className="cancel-request-button"
+              type="button"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+
+            <button
+              className="submit-request-button"
+              type="submit"
+              disabled={submitting}
+            >
+              {submitting ? "Submitting…" : "Submit Request"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+export default BorrowRequestModal;
