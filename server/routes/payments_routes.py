@@ -149,11 +149,6 @@ def get_payment(payment_id):
             )
     }), 200
 
-        db.session.add(payment)
-        db.session.commit()
-
-        return {"payment": payment_schema.dump(payment)}, 201
-
 
 class PaymentResource(Resource):
     method_decorators = [jwt_required()]
