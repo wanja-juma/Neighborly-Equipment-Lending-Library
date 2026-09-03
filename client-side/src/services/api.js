@@ -250,6 +250,28 @@ export const updateItem =
     );
   };
 
+  export const getProfile = async (
+  profileId
+) => {
+  const response = await request(
+    `/profiles/${profileId}`
+  );
+
+  return (
+    response?.profile ||
+    response
+  );
+};
+
+
+export const updateMyProfile = async (profileData) => {
+  const response = await request("/profile", {
+    method: "PUT",
+    body: JSON.stringify(profileData),
+  });
+
+  return response?.profile || response;
+};
 
 export const deleteItem = (
   itemId
@@ -261,6 +283,10 @@ export const deleteItem = (
     }
   );
 };
+
+
+
+
 
 
 /* Borrowing requests */
