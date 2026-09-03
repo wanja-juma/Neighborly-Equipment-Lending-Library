@@ -351,20 +351,21 @@ def update_borrowing_request(
         }), 403
 
     try:
-        updated_request = (
-            borrowing_request_schema.load(
-                json_data,
-                instance=borrowing_request,
-                partial=True,
-                session=db.session
+        if "status" in json_data:
+            borrowing_request.status = str(
+                json_data["status"]
+            ).lower()
+
+        if "message" in json_data:
+            borrowing_request.message = (
+                json_data["message"]
             )
-        )
+
+        updated_request = borrowing_request
 
         new_status = str(
-            updated_request.status
-            or ""
+            updated_request.status or ""
         ).lower()
-
         # Normalize rejected to declined
         # so the frontend sees one value.
         if new_status == "rejected":
