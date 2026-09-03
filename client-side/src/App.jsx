@@ -31,13 +31,13 @@ import AddItem from "./Pages/AddItem";
 import EditItem from "./Pages/EditItem";
 import ChangeAvailability from "./Pages/ChangeAvailability";
 import Cart from "./Pages/Cart";
+import ItemDetails from "./Pages/ItemDetails";
 
 import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
 import Settings from "./Pages/Settings";
-import ItemDetails from "./Pages/ItemDetails";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 import CartProvider from "./context/CartProvider";
 
@@ -77,7 +77,7 @@ function App() {
     "/payments",
     "/damage-reports",
     "/settings",
-     "/profile",
+    "/profile",
   ];
 
 
@@ -116,54 +116,6 @@ function App() {
                         </>
                       }
                     />
-              <Navbar />
-
-              <div className="app-content">
-                <Routes>
-
-                  {/* PUBLIC ROUTES*/}
-
-                  <Route
-                    path="/"
-                    element={
-                      <>
-                        <Home />
-                        <About />
-                      </>
-                    }
-                  />
-
-                  <Route
-                    path="/about"
-                    element={
-                      <Navigate
-                        to="/#about"
-                        replace
-                      />
-                    }
-                  />
-
-                  <Route
-                    path="/browse-tools"
-                    element={<BrowseTools />}
-                  />
-
-                  <Route
-                    path="/tools/:id"
-                    element={<ItemDetail />}
-                  />
-
-                  <Route
-                    path="/auth"
-                    element={<AuthPage />}
-                  />
-                  <Route
-                    element={
-                      <ProtectedRoute>
-                        <DashboardLayout />
-                      </ProtectedRoute>
-                    }
-                  >
 
                     <Route
                       path="/about"
@@ -217,6 +169,11 @@ function App() {
                       />
 
                       <Route
+                        path="/items/:itemId"
+                        element={<ItemDetails />}
+                      />
+
+                      <Route
                         path="/items/new"
                         element={<AddItem />}
                       />
@@ -230,24 +187,6 @@ function App() {
                         path="/listings/:itemId/edit"
                         element={<EditItem />}
                       />
-                    <Route
-                      path="/items/:itemId"
-                      element={<ItemDetails />}
-                    />
-
-                    <Route
-                      path="/loans"
-                      element={<Loans />}
-                    />
-
-                    <Route
-                      path="/payments/:loanId"
-                      element={
-                        <PaymentRouteGuard>
-                          <PaymentBar />
-                        </PaymentRouteGuard>
-                      }
-                    />
 
                       <Route
                         path="/listings/:itemId/availability"
@@ -289,12 +228,6 @@ function App() {
                         }
                       />
 
-                    <Route
-                      path="/profile"
-                      element={<Profile />}
-                    />
-
-                  </Route>
 
                       <Route
                         path="/damage-reports"
@@ -306,6 +239,11 @@ function App() {
                       <Route
                         path="/settings"
                           element={<Settings />}
+                      />
+
+                      <Route
+                        path="/profile"
+                        element={<Profile />}
                       />
 
                     </Route>
