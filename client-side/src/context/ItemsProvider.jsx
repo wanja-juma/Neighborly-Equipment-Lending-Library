@@ -30,10 +30,11 @@ const toBackendFields = (data) => {
 
 function ItemsProvider({ children }) {
   const { currentUser } = useAuth();
+
   const [items, setItems] = useState([]);
   const [itemsLoading, setItemsLoading] =
     useState(true);
-    
+
   const [itemsError, setItemsError] =
     useState("");
 
@@ -59,10 +60,14 @@ function ItemsProvider({ children }) {
   }, []);
 
   const addItem = async (itemData) => {
+    if (!currentUser?.id) {
+      throw new Error("You must be logged in to add an item.");
+    }
+
     const savedItem = await createItem(
       toBackendFields({
         ...itemData,
-        ownerId: Number(currentUser?.id),
+        ownerId: Number(currentUser.id),
       })
     );
 
