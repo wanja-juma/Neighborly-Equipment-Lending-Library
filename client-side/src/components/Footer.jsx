@@ -35,7 +35,7 @@ function Footer() {
           <ul>
             <li><a href="/contact">Contact Us</a></li>
             <li><a href="/guidelines">Community Guidelines</a></li>
-            <li><a href="/report">Report an Issue / Tool</a></li>
+            <li><Link to="/damage-reports">Report an Issue / Tool</Link></li>
           </ul>
         </div>
 
