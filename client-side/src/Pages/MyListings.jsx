@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+
 import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
 import "./Items.css";
 
+
 function MyListings() {
+  const { currentUser } = useAuth();
+
   const {
     items,
     itemsLoading,
@@ -12,92 +16,159 @@ function MyListings() {
     deleteItem,
   } = useItems();
 
-  const { currentUser } = useAuth();
-
-  const [notice, setNotice] = useState("");
-  const [deleteError, setDeleteError] =
+  const [notice, setNotice] =
     useState("");
+
+  const [
+    deleteError,
+    setDeleteError,
+  ] = useState("");
 
   const [
     deletingItemId,
     setDeletingItemId,
   ] = useState(null);
 
+
   const currentUserId = String(
-    currentUser?.id || ""
+    currentUser?.id || "1"
   );
 
-  const myItems = items.filter((item) => {
-    const ownerId =
-      item.ownerId ?? item.owner_id;
+  const safeItems = Array.isArray(items)
+    ? items
+    : [];
 
-    return String(ownerId) === currentUserId;
-  });
 
-  const handleDeleteItem = async (item) => {
-    setNotice("");
-    setDeleteError("");
+  const myItems = safeItems.filter(
+    (item) => {
+      const ownerId =
+        item.ownerId ??
+        item.owner_id ??
+        item.owner?.id;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${item.name}"? This action cannot be undone.`
+      return (
+        String(ownerId) ===
+        currentUserId
+      );
+    }
+  );
+
+
+  const getCategoryName = (
+    item
+  ) => {
+    if (
+      item.category &&
+      typeof item.category ===
+        "object"
+    ) {
+      return (
+        item.category.name ||
+        "Other"
+      );
+    }
+
+    return (
+      item.category ||
+      item.category_name ||
+      "Other"
     );
-
-    if (!confirmed) {
-      return;
-    }
-
-    setDeletingItemId(item.id);
-
-    try {
-      await deleteItem(item.id);
-
-      setNotice(
-        `${item.name} was deleted successfully.`
-      );
-    } catch (error) {
-      setDeleteError(
-        error.message ||
-          `Failed to delete ${item.name}.`
-      );
-    } finally {
-      setDeletingItemId(null);
-    }
   };
+
+
+  const handleDeleteItem =
+    async (item) => {
+      setNotice("");
+      setDeleteError("");
+
+      const confirmed =
+        window.confirm(
+          `Are you sure you want to delete "${item.name}"? This action cannot be undone.`
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setDeletingItemId(
+        item.id
+      );
+
+      try {
+        const result =
+          await deleteItem(
+            item.id
+          );
+
+        if (
+          result &&
+          result.success === false
+        ) {
+          throw new Error(
+            result.message ||
+              "The item could not be deleted."
+          );
+        }
+
+        setNotice(
+          `${item.name} was deleted successfully.`
+        );
+      } catch (error) {
+        setDeleteError(
+          error.message ||
+            `Failed to delete ${item.name}.`
+        );
+      } finally {
+        setDeletingItemId(
+          null
+        );
+      }
+    };
+
 
   if (itemsLoading) {
     return (
       <main className="dashboard-main">
         <section className="items-page">
-          <p>Loading your listings...</p>
+          <p>
+            Loading your listings...
+          </p>
         </section>
       </main>
     );
   }
+
 
   if (itemsError) {
     return (
       <main className="dashboard-main">
         <section className="items-page">
-          <p role="alert">{itemsError}</p>
+          <p>
+            {itemsError}
+          </p>
         </section>
       </main>
     );
   }
 
+
   return (
     <main className="dashboard-main">
       <section className="items-page">
+
         <header className="items-page-header">
           <div>
             <p className="page-label">
               OWNER INVENTORY
             </p>
 
-            <h1>My Listings</h1>
+            <h1>
+              My Listings
+            </h1>
 
             <p>
-              Manage the tools and equipment you
-              have listed.
+              Manage the tools and
+              equipment you have listed.
             </p>
           </div>
 
@@ -105,21 +176,29 @@ function MyListings() {
             className="add-item-link"
             to="/items/new"
           >
-            <span>+</span>
+            <span>
+              +
+            </span>
+
             Add New Item
           </Link>
         </header>
+
 
         {notice && (
           <div
             className="listing-notice success"
             role="status"
           >
-            <span>{notice}</span>
+            <span>
+              {notice}
+            </span>
 
             <button
               type="button"
-              onClick={() => setNotice("")}
+              onClick={() =>
+                setNotice("")
+              }
               aria-label="Dismiss notification"
             >
               ×
@@ -127,12 +206,15 @@ function MyListings() {
           </div>
         )}
 
+
         {deleteError && (
           <div
             className="listing-notice error"
             role="alert"
           >
-            <span>{deleteError}</span>
+            <span>
+              {deleteError}
+            </span>
 
             <button
               type="button"
@@ -146,137 +228,205 @@ function MyListings() {
           </div>
         )}
 
+
         <div className="listings-summary">
           <span>
-            <strong>{myItems.length}</strong>
+            <strong>
+              {myItems.length}
+            </strong>{" "}
 
             {myItems.length === 1
-              ? " item listed"
-              : " items listed"}
+              ? "item listed"
+              : "items listed"}
           </span>
         </div>
 
+
         {myItems.length > 0 ? (
           <div className="items-page-grid">
-            {myItems.map((item) => {
-              const isDeleting =
-                String(deletingItemId) ===
-                String(item.id);
 
-              const availabilityClass = (
-                item.statusColor ||
-                item.availability ||
-                ""
-              )
-                .toLowerCase()
-                .replaceAll(" ", "-");
+            {myItems.map(
+              (item) => {
+                const isDeleting =
+                  String(
+                    deletingItemId
+                  ) ===
+                  String(
+                    item.id
+                  );
 
-              return (
-                <article
-                  className="equipment-card"
-                  key={item.id}
-                >
-                  <div className="equipment-image">
-                    <span>
-                      {item.icon || "🧰"}
-                    </span>
+                const availability =
+                  item.availability ||
+                  item.status ||
+                  "Unknown";
 
-                    <button
-                      className="equipment-options"
-                      type="button"
-                      aria-label={`Options for ${item.name}`}
-                    >
-                      •••
-                    </button>
-                  </div>
+                const availabilityClass =
+                  item.statusColor ||
+                  String(
+                    availability
+                  )
+                    .toLowerCase()
+                    .replaceAll(
+                      " ",
+                      "-"
+                    );
 
-                  <div className="equipment-content">
-                    <div className="equipment-heading">
-                      <span className="equipment-category">
-                        {item.category ||
-                          "Equipment"}
-                      </span>
 
-                      <span
-                        className={`equipment-availability ${availabilityClass}`}
-                      >
-                        {item.availability ||
-                          "Unknown"}
-                      </span>
-                    </div>
-
-                    <h2>{item.name}</h2>
-
-                    <p className="equipment-description">
-                      {item.description}
-                    </p>
-
-                    <div className="equipment-details">
-                      <span>
-                        <b>Condition:</b>{" "}
-                        {item.condition ||
-                          "Not specified"}
-                      </span>
+                return (
+                  <article
+                    className="equipment-card"
+                    key={item.id}
+                  >
+                    <div className="equipment-image">
 
                       <span>
-                        <b>Location:</b>{" "}
-                        {item.location ||
-                          "Greenview Estate"}
+                        {item.icon ||
+                          "🧰"}
                       </span>
-                    </div>
-
-                    <div className="listing-actions">
-                      <Link
-                        className="change-availability-button"
-                        to={`/listings/${item.id}/availability`}
-                      >
-                        Change Availability
-                      </Link>
-
-                      <Link
-                        className="edit-listing-button"
-                        to={`/listings/${item.id}/edit`}
-                      >
-                        Edit Listing
-                      </Link>
 
                       <button
-                        className="delete-listing-button"
+                        className="equipment-options"
                         type="button"
-                        disabled={isDeleting}
-                        onClick={() =>
-                          handleDeleteItem(item)
-                        }
+                        aria-label={`Options for ${
+                          item.name ||
+                          "equipment"
+                        }`}
                       >
-                        {isDeleting
-                          ? "Deleting..."
-                          : "Delete"}
+                        •••
                       </button>
+
                     </div>
-                  </div>
-                </article>
-              );
-            })}
+
+
+                    <div className="equipment-content">
+
+                      <div className="equipment-heading">
+
+                        <span className="equipment-category">
+                          {
+                            getCategoryName(
+                              item
+                            )
+                          }
+                        </span>
+
+                        <span
+                          className={`equipment-availability ${availabilityClass}`}
+                        >
+                          {availability}
+                        </span>
+
+                      </div>
+
+
+                      <h2>
+                        {item.name ||
+                          "Equipment"}
+                      </h2>
+
+
+                      <p className="equipment-description">
+                        {item.description ||
+                          "No description provided."}
+                      </p>
+
+
+                      <div className="equipment-details">
+
+                        <span>
+                          <b>
+                            Condition:
+                          </b>{" "}
+                          {item.condition ||
+                            "Not specified"}
+                        </span>
+
+                        <span>
+                          <b>
+                            Location:
+                          </b>{" "}
+                          {item.location ||
+                            "Greenview Estate"}
+                        </span>
+
+                      </div>
+
+
+                      <div className="listing-actions">
+
+                        <Link
+                          to={`/items/${item.id}/edit`}
+                          className="listing-action-btn edit-listing-btn"
+                        >
+                          Edit Listing
+                        </Link>
+
+
+                        <Link
+                          to={`/items/${item.id}/availability`}
+                          className="listing-action-btn availability-btn"
+                        >
+                          Change Availability
+                        </Link>
+
+
+                        <button
+                          type="button"
+                          className="listing-action-btn delete-listing-btn"
+                          disabled={
+                            isDeleting
+                          }
+                          onClick={() =>
+                            handleDeleteItem(
+                              item
+                            )
+                          }
+                        >
+                          {isDeleting
+                            ? "Deleting..."
+                            : "Delete"}
+                        </button>
+
+                      </div>
+
+                    </div>
+                  </article>
+                );
+              }
+            )}
+
           </div>
         ) : (
           <div className="items-empty-state">
-            <span>🧰</span>
 
-            <h2>No items listed yet</h2>
+            <span>
+              🧰
+            </span>
+
+            <h2>
+              No items listed yet
+            </h2>
 
             <p>
-              Add your first tool or equipment item
-              to start sharing with your community.
+              Add your first tool or
+              equipment item to start
+              sharing with your
+              community.
             </p>
 
-            <Link to="/items/new">
+            <Link
+              to="/items/new"
+            >
               Add Your First Item
             </Link>
+
           </div>
         )}
+
       </section>
     </main>
   );
 }
+
 
 export default MyListings;

@@ -1,0 +1,147 @@
+.item-details-page {
+  padding: 32px;
+}
+
+.item-details-back-link,
+.item-details-back-button {
+  display: inline-block;
+  margin-bottom: 24px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.item-details-card {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 1.3fr;
+  gap: 40px;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.item-details-image-area {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.item-details-image {
+  width: 100%;
+  height: 100%;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.item-details-placeholder {
+  font-size: 80px;
+}
+
+.item-details-information h1 {
+  margin: 8px 0 12px;
+  font-size: 32px;
+}
+
+.item-details-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.item-details-description {
+  margin: 24px 0;
+  line-height: 1.7;
+}
+
+.item-details-status {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.item-details-status.available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.item-details-status.unavailable {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.item-details-meta {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.item-details-meta div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.item-details-meta span {
+  color: #6b7280;
+}
+
+.item-details-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.item-details-primary-button,
+.item-details-secondary-button,
+.item-details-disabled-button {
+  padding: 11px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.item-details-primary-button {
+  background: #111827;
+  color: #ffffff;
+}
+
+.item-details-secondary-button {
+  border: 1px solid #d1d5db;
+  color: #111827;
+}
+
+.item-details-disabled-button {
+  border: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.item-details-state {
+  padding: 40px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .item-details-page {
+    padding: 20px;
+  }
+
+  .item-details-card {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .item-details-image-area {
+    min-height: 220px;
+  }
+}

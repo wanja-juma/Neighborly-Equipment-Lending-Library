@@ -1,140 +1,666 @@
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:3000";
+  "http://localhost:5555/api";
 
-const request = async (endpoint, options = {}) => {
-  const response = await fetch(
-    `${API_URL}${endpoint}`,
-    options
+
+const getAccessToken = () => {
+  return (
+    localStorage.getItem(
+      "neighborlyToken"
+    ) ||
+    localStorage.getItem(
+      "access_token"
+    )
   );
+};
+
+
+const request = async (
+  endpoint,
+  options = {}
+) => {
+  const token =
+    getAccessToken();
+
+  const headers = {
+    ...options.headers,
+  };
+
+
+  if (
+    options.body &&
+    !(
+      options.body
+      instanceof FormData
+    )
+  ) {
+    headers["Content-Type"] =
+      "application/json";
+  }
+
+
+  if (token) {
+    headers.Authorization =
+      `Bearer ${token}`;
+  }
+
+
+  let response;
+
+  try {
+    response = await fetch(
+      `${API_URL}${endpoint}`,
+      {
+        ...options,
+        headers,
+      }
+    );
+  } catch {
+    throw new Error(
+      "Unable to connect to the server. Make sure the Flask server is running."
+    );
+  }
+
+
+  if (
+    response.status === 204
+  ) {
+    return null;
+  }
+
+
+  const contentType =
+    response.headers.get(
+      "content-type"
+    );
+
+
+  const responseBody =
+    contentType?.includes(
+      "application/json"
+    )
+      ? await response.json()
+      : await response.text();
+
 
   if (!response.ok) {
+
+    if (
+      response.status === 401
+    ) {
+      throw new Error(
+        responseBody?.error ||
+        responseBody?.message ||
+        "Your session has expired or you are not logged in. Please log in again."
+      );
+    }
+
+
+    if (
+      response.status === 403
+    ) {
+      throw new Error(
+        responseBody?.error ||
+        responseBody?.message ||
+        "You are not authorized to perform this action."
+      );
+    }
+
+
+    const errorMessage =
+      typeof responseBody ===
+      "object"
+        ? responseBody?.error ||
+          responseBody?.message
+        : responseBody;
+
+
     throw new Error(
+      errorMessage ||
       `Request failed with status ${response.status}.`
     );
   }
 
-  if (response.status === 204) {
-    return null;
-  }
 
-  return response.json();
+  return responseBody;
 };
+
+
+/* Users*/
+
+export const changePassword =
+  async (
+    passwordData
+  ) => {
+    return request(
+      "/users/me/password",
+      {
+        method: "PUT",
+
+        body: JSON.stringify(
+          passwordData
+        ),
+      }
+    );
+  };
+
+
+export const deleteAccount =
+  async (
+    password
+  ) => {
+    return request(
+      "/users/me",
+      {
+        method: "DELETE",
+
+        body: JSON.stringify({
+          password,
+        }),
+      }
+    );
+  };
+
 
 /* Items */
 
-export const getItems = () => {
-  return request("/items");
+export const getItems =
+  async () => {
+    const response =
+      await request(
+        "/items"
+      );
+
+    if (
+      Array.isArray(
+        response
+      )
+    ) {
+      return response;
+    }
+
+    return (
+      response?.items ||
+      []
+    );
+  };
+
+
+export const getItem =
+  async (
+    itemId
+  ) => {
+    const response =
+      await request(
+        `/items/${itemId}`
+      );
+
+    return (
+      response?.item ||
+      response
+    );
+  };
+
+
+export const createItem =
+  async (
+    itemData
+  ) => {
+    const response =
+      await request(
+        "/items",
+        {
+          method: "POST",
+
+          body:
+            JSON.stringify(
+              itemData
+            ),
+        }
+      );
+
+    return (
+      response?.item ||
+      response
+    );
+  };
+
+
+export const updateItem =
+  async (
+    itemId,
+    updates
+  ) => {
+    const response =
+      await request(
+        `/items/${itemId}`,
+        {
+          method: "PATCH",
+
+          body:
+            JSON.stringify(
+              updates
+            ),
+        }
+      );
+
+    return (
+      response?.item ||
+      response
+    );
+  };
+
+  export const getProfile = async (
+  profileId
+) => {
+  const response = await request(
+    `/profiles/${profileId}`
+  );
+
+  return (
+    response?.profile ||
+    response
+  );
 };
 
-export const createItem = (itemData) => {
-  return request("/items", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(itemData),
+
+export const updateMyProfile = async (profileData) => {
+  const response = await request("/profile", {
+    method: "PUT",
+    body: JSON.stringify(profileData),
   });
+
+  return response?.profile || response;
 };
 
-export const updateItem = (itemId, updates) => {
-  return request(`/items/${itemId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updates),
-  });
+export const deleteItem = (
+  itemId
+) => {
+  return request(
+    `/items/${itemId}`,
+    {
+      method: "DELETE",
+    }
+  );
 };
 
-export const deleteItem = (itemId) => {
-  return request(`/items/${itemId}`, {
-    method: "DELETE",
-  });
-};
+
+
+
+
 
 /* Borrowing requests */
 
-export const getBorrowingRequests = () => {
-  return request("/borrowingRequests");
-};
+export const getBorrowingRequests =
+  async () => {
+    const response =
+      await request(
+        "/borrowing-requests"
+      );
 
-export const createBorrowingRequest = (
-  requestData
-) => {
-  return request("/borrowingRequests", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(requestData),
-  });
-};
-
-export const updateBorrowingRequest = (
-  requestId,
-  updates
-) => {
-  return request(
-    `/borrowingRequests/${requestId}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updates),
+    if (
+      Array.isArray(
+        response
+      )
+    ) {
+      return response;
     }
-  );
-};
+
+    return (
+      response
+        ?.borrowing_requests ||
+      response
+        ?.borrowingRequests ||
+      []
+    );
+  };
+
+
+export const createBorrowingRequest =
+  async (
+    requestData
+  ) => {
+    const response =
+      await request(
+        "/borrowing-requests",
+        {
+          method: "POST",
+
+          body:
+            JSON.stringify(
+              requestData
+            ),
+        }
+      );
+
+    return (
+      response
+        ?.borrowing_request ||
+      response
+        ?.borrowingRequest ||
+      response
+    );
+  };
+
+
+export const updateBorrowingRequest =
+  async (
+    requestId,
+    updates
+  ) => {
+    const response =
+      await request(
+        `/borrowing-requests/${requestId}`,
+        {
+          method:
+            "PATCH",
+
+          body:
+            JSON.stringify(
+              updates
+            ),
+        }
+      );
+
+    return (
+      response
+        ?.borrowing_request ||
+      response
+        ?.borrowingRequest ||
+      response
+    );
+  };
+
+
+export const deleteBorrowingRequest =
+  (
+    requestId
+  ) => {
+    return request(
+      `/borrowing-requests/${requestId}`,
+      {
+        method:
+          "DELETE",
+      }
+    );
+  };
+
 
 /* Loans */
 
-export const getLoans = () => {
-  return request("/loans");
-};
+export const getLoans =
+  async () => {
+    const response =
+      await request(
+        "/loans"
+      );
 
-export const createLoan = (loanData) => {
-  return request("/loans", {
-    method: "POST",
-    body: JSON.stringify(loanData),
-  });
-};
+    if (
+      Array.isArray(
+        response
+      )
+    ) {
+      return response;
+    }
 
-export const updateLoan = (
-  loanId,
-  updatedData
-) => {
-  return request(`/loans/${loanId}`, {
-    method: "PATCH",
-    body: JSON.stringify(updatedData),
-  });
-};
+    return (
+      response?.loans ||
+      []
+    );
+  };
 
-/* Damage reports */
 
-export const getDamageReports = () => {
-  return request("/damageReports");
-};
+export const getLoan =
+  async (
+    loanId
+  ) => {
+    const response =
+      await request(
+        `/loans/${loanId}`
+      );
 
-export const createDamageReport = (reportData) => {
-  return request("/damageReports", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(reportData),
-  });
-};
+    return (
+      response?.loan ||
+      response
+    );
+  };
 
-export const updateDamageReport = (
-  reportId,
-  updates
+
+export const createLoan =
+  async (
+    loanData
+  ) => {
+    const response =
+      await request(
+        "/loans",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify(
+              loanData
+            ),
+        }
+      );
+
+    return (
+      response?.loan ||
+      response
+    );
+  };
+
+
+export const updateLoan =
+  async (
+    loanId,
+    updates
+  ) => {
+    const response =
+      await request(
+        `/loans/${loanId}`,
+        {
+          method:
+            "PATCH",
+
+          body:
+            JSON.stringify(
+              updates
+            ),
+        }
+      );
+
+    return (
+      response?.loan ||
+      response
+    );
+  };
+
+
+export const deleteLoan = (
+  loanId
 ) => {
   return request(
-    `/damageReports/${reportId}`,
+    `/loans/${loanId}`,
     {
-      method: "PATCH",
-      body: JSON.stringify(updates),
+      method:
+        "DELETE",
     }
   );
 };
+
+
+/*  Payments*/
+
+export const getPayment =
+  async (
+    paymentId
+  ) => {
+    const response =
+      await request(
+        `/payments/${paymentId}`
+      );
+
+    return (
+      response?.payment ||
+      response
+    );
+  };
+
+
+export const createPayment =
+  async (
+    paymentData
+  ) => {
+    const response =
+      await request(
+        "/payments",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify(
+              paymentData
+            ),
+        }
+      );
+
+    return (
+      response?.payment ||
+      response
+    );
+  };
+
+
+export const refundPayment =
+  async (
+    paymentId
+  ) => {
+    const response =
+      await request(
+        `/payments/${paymentId}/refund`,
+        {
+          method:
+            "PATCH",
+        }
+      );
+
+    return (
+      response?.payment ||
+      response
+    );
+  };
+
+
+/* =========================
+   Memberships
+
+export const getMembership = async (membershipId) => {
+  const response = await request(`/memberships/${membershipId}`);
+  return response?.membership || response;
+};
+
+export const createMembership = async (membershipData) => {
+  const response = await request("/memberships", {
+    method: "POST",
+    body: JSON.stringify(membershipData),
+  });
+  return response?.membership || response;
+};
+
+export const updateMembership = async (membershipId, updates) => {
+  const response = await request(`/memberships/${membershipId}`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
+  return response?.membership || response;
+};
+
+/* =========================
+   Damage reports
+/* Damage reports */
+
+export const getDamageReports =
+  async () => {
+    const response =
+      await request(
+        "/damage-reports"
+      );
+
+    if (
+      Array.isArray(
+        response
+      )
+    ) {
+      return response;
+    }
+
+    return (
+      response
+        ?.damage_reports ||
+      response
+        ?.damageReports ||
+      []
+    );
+  };
+
+
+export const createDamageReport =
+  async (
+    reportData
+  ) => {
+    const response =
+      await request(
+        "/damage-reports",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify(
+              reportData
+            ),
+        }
+      );
+
+    return (
+      response
+        ?.damage_report ||
+      response
+        ?.damageReport ||
+      response
+    );
+  };
+
+
+export const updateDamageReport =
+  async (
+    reportId,
+    updates
+  ) => {
+    const response =
+      await request(
+        `/damage-reports/${reportId}`,
+        {
+          method:
+            "PATCH",
+
+          body:
+            JSON.stringify(
+              updates
+            ),
+        }
+      );
+
+    return (
+      response
+        ?.damage_report ||
+      response
+        ?.damageReport ||
+      response
+    );
+  };
+
+
+export default request;

@@ -1,9 +1,8 @@
 from sqlalchemy.orm import validates
-
 from app.extensions import db
+from sqlalchemy import func
 
 VALID_STATUSES = ('held', 'refunded', 'forfeited')
-
 
 class Payment(db.Model):
     __tablename__ = 'payments'
@@ -17,7 +16,8 @@ class Payment(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
-    loan = db.relationship('Loan', back_populates='payment')
+    # FIXED LINE 20: changed 'payment' to 'payments' to match Loan.payments
+    loan = db.relationship('Loan', back_populates='payments')
 
     @validates('status')
     def validate_status(self, key, value):
@@ -25,16 +25,14 @@ class Payment(db.Model):
             raise ValueError(
                 f"Status must be one of {VALID_STATUSES}."
             )
-
         return value
 
     @validates('amount')
     def validate_amount(self, key, value):
-        if value is not None and value < 0:
+        if value is not None and value <= 0:
             raise ValueError(
-                "Amount cannot be negative."
+                "Amount must be greater than zero."
             )
-
         return value
 
     def __repr__(self):

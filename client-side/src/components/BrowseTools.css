@@ -1,31 +1,4 @@
 .browse-tools {
-  padding: 2rem 1.5rem;
-}
-
-.tool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  max-width: 900px;
-}
-
-.tool-card {
-  display: block;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  text-decoration: none;
-  color: inherit;
-  background-color: #fff;
-}
-
-.tool-card:hover {
-  border-color: #1e5631;
-}
-
-.tool-rate {
-  font-weight: 600;
-  color: #1e5631;
   padding: 3rem 6%;
   font-family: 'Inter', sans-serif;
 }
