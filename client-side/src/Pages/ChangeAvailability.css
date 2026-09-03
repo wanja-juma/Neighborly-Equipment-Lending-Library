@@ -1,5 +1,7 @@
 .availability-page {
+  width: calc(100% - var(--sidebar-width));
   min-height: 100%;
+  margin-left: var(--sidebar-width);
   padding: 2rem;
   background: #f5f7f5;
 }

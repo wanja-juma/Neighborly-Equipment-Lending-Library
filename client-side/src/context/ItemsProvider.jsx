@@ -5,8 +5,28 @@ import {
   getItems,
   updateItem as updateItemRequest,
 } from "../services/api";
-import ItemsContext from "./ItemsContext";
 import useAuth from "../hooks/useAuth";
+import ItemsContext from "./ItemsContext";
+
+// The backend expects categoryId/status; older parts of the UI still
+// collect them as category/availability. Translate here, in one place,
+// so every caller (AddItem, EditItem, ChangeAvailability...) can keep
+// using the field names they already have.
+const toBackendFields = (data) => {
+  const backendData = { ...data };
+
+  if ("category" in backendData) {
+    backendData.categoryId = backendData.category;
+    delete backendData.category;
+  }
+
+  if ("availability" in backendData) {
+    backendData.status = backendData.availability;
+    delete backendData.availability;
+  }
+
+  return backendData;
+};
 
 function ItemsProvider({ children }) {
   const { currentUser } = useAuth();
@@ -14,7 +34,7 @@ function ItemsProvider({ children }) {
   const [items, setItems] = useState([]);
   const [itemsLoading, setItemsLoading] =
     useState(true);
-    
+
   const [itemsError, setItemsError] =
     useState("");
 
@@ -40,24 +60,27 @@ function ItemsProvider({ children }) {
   }, []);
 
   const addItem = async (itemData) => {
-  if (!currentUser?.id) {
-    throw new Error("You must be logged in to add an item.");
-  }
+    if (!currentUser?.id) {
+      throw new Error("You must be logged in to add an item.");
+    }
 
-  const newItemData = {
-    ...itemData,
-    ownerId: Number(currentUser.id),
+    const savedItem = await createItem(
+      toBackendFields({
+        ...itemData,
+        ownerId: Number(currentUser.id),
+      })
+    );
+
+    setItems((currentItems) => [
+      savedItem,
+      ...currentItems.filter(
+        (item) =>
+          String(item.id) !== String(savedItem.id)
+      ),
+    ]);
+
+    return savedItem;
   };
-
-  const savedItem = await createItem(newItemData);
-
-  setItems((currentItems) => [
-    savedItem,
-    ...currentItems,
-  ]);
-
-  return savedItem;
-};
 
   const updateItem = async (
     itemId,
@@ -65,7 +88,7 @@ function ItemsProvider({ children }) {
   ) => {
     const updatedItem = await updateItemRequest(
       itemId,
-      updates
+      toBackendFields(updates)
     );
 
     setItems((currentItems) =>

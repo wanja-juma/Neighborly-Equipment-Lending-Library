@@ -1,11 +1,39 @@
-from flask import Blueprint, request
+import os
+import uuid
+
+from flask import Blueprint, current_app, request
 from flask_restful import Api, Resource
+from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from models.item import Item
 
 items_bp = Blueprint("items", __name__, url_prefix="/api/items")
 api = Api(items_bp)
+
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
+
+def _save_image(image_file):
+    extension = image_file.filename.rsplit(".", 1)[-1].lower() if "." in image_file.filename else ""
+
+    if extension not in ALLOWED_IMAGE_EXTENSIONS:
+        return None, "Image must be a png, jpg, jpeg, gif or webp file"
+
+    filename = secure_filename(f"{uuid.uuid4().hex}.{extension}")
+    upload_dir = os.path.join(current_app.root_path, "static", "uploads", "items")
+    os.makedirs(upload_dir, exist_ok=True)
+    image_file.save(os.path.join(upload_dir, filename))
+
+    image_url = f"{request.host_url.rstrip('/')}/static/uploads/items/{filename}"
+    return image_url, None
+
+
+def _request_data():
+    if request.content_type and request.content_type.startswith("multipart/form-data"):
+        return request.form.to_dict()
+
+    return request.get_json(silent=True) or {}
 
 
 def _serialize(item):
@@ -46,7 +74,7 @@ class ItemList(Resource):
 
     def post(self):
         #adds an item to the system
-        data = request.get_json(silent=True) or {}
+        data = _request_data()
 
         name = (data.get("name") or "").strip()
         owner_id = data.get("ownerId")
@@ -61,14 +89,26 @@ class ItemList(Resource):
                 "message": f"Missing required field(s): {', '.join(missing)}"
             }, 400
 
-        if not isinstance(owner_id, int) or isinstance(owner_id, bool):
+        if isinstance(owner_id, bool):
             return {"message": "ownerId must be an integer"}, 400
+
+        try:
+            owner_id = int(owner_id)
+        except (TypeError, ValueError):
+            return {"message": "ownerId must be an integer"}, 400
+
+        image_url = data.get("image")
+        image_file = request.files.get("image")
+        if image_file and image_file.filename:
+            image_url, image_error = _save_image(image_file)
+            if image_error:
+                return {"message": image_error}, 400
 
         item = Item(
             name=name,
             owner_id=owner_id,
             description=data.get("description"),
-            image=data.get("image"),
+            image=image_url,
             category_id=data.get("categoryId"),
             condition=data.get("condition"),
             status=data.get("status") or "Available",
@@ -99,7 +139,7 @@ class ItemDetail(Resource):
         if item is None:
             return {"message": "Item not found"}, 404
 
-        data = request.get_json(silent=True) or {}
+        data = _request_data()
 
         if "name" in data:
             name = (data.get("name") or "").strip()
@@ -109,14 +149,24 @@ class ItemDetail(Resource):
 
         if "ownerId" in data:
             owner_id = data.get("ownerId")
-            if not isinstance(owner_id, int) or isinstance(owner_id, bool):
+            if isinstance(owner_id, bool):
+                return {"message": "ownerId must be an integer"}, 400
+            try:
+                owner_id = int(owner_id)
+            except (TypeError, ValueError):
                 return {"message": "ownerId must be an integer"}, 400
             item.owner_id = owner_id
 
         if "description" in data:
             item.description = data.get("description")
 
-        if "image" in data:
+        image_file = request.files.get("image")
+        if image_file and image_file.filename:
+            image_url, image_error = _save_image(image_file)
+            if image_error:
+                return {"message": image_error}, 400
+            item.image = image_url
+        elif "image" in data:
             item.image = data.get("image")
 
         if "categoryId" in data:

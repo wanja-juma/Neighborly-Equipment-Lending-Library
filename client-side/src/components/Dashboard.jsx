@@ -1435,10 +1435,17 @@ function Dashboard() {
 
                         <div className="listing-image">
 
-                          <span>
-                            {item.icon ||
-                              "🧰"}
-                          </span>
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt={item.name || "Item"}
+                            />
+                          ) : (
+                            <span>
+                              {item.icon ||
+                                "🧰"}
+                            </span>
+                          )}
 
 
                           <Link

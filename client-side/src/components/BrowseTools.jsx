@@ -86,12 +86,20 @@ function BrowseTools() {
               key={tool.id}
             >
               <div className="tool-card__icon-wrap">
-                <span
-                  className="tool-card__icon"
-                  aria-hidden="true"
-                >
-                  {tool.icon || "🔧"}
-                </span>
+                {tool.image ? (
+                  <img
+                    className="tool-card__icon"
+                    src={tool.image}
+                    alt={tool.name || "Tool"}
+                  />
+                ) : (
+                  <span
+                    className="tool-card__icon"
+                    aria-hidden="true"
+                  >
+                    {tool.icon || "🔧"}
+                  </span>
+                )}
 
                 {!available && (
                   <span className="tool-card__badge">
