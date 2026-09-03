@@ -33,7 +33,6 @@ function Footer() {
         <div className="footer-column">
           <h4>Support</h4>
           <ul>
-            <li><a href="/guidelines">Community Guidelines</a></li>
             <li><Link to="/damage-reports">Report an Issue / Tool</Link></li>
           </ul>
         </div>
