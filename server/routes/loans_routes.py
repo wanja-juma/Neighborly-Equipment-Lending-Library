@@ -211,3 +211,5 @@ def delete_loan(loan_id):
             )
         }
     ), 200
+    return jsonify({"message": "Loan deleted successfully"}), 200
+

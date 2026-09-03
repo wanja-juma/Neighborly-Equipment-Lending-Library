@@ -1,8 +1,4 @@
-import {
-  useMemo,
-  useState,
-} from "react";
-
+import { useMemo, useState } from "react";
 import useItems from "../hooks/useItems";
 import useRequests from "../hooks/useRequests";
 
@@ -255,7 +251,7 @@ const getItemIcon = (
 
 
 function BrowseItems() {
-  const {
+   const {
     items,
     itemsLoading,
     itemsError,
@@ -714,9 +710,7 @@ function BrowseItems() {
 
             <button
               type="button"
-              onClick={() =>
-                setNotice("")
-              }
+              onClick={() => setNotice("")}
               aria-label="Dismiss notification"
             >
               ×
@@ -750,7 +744,6 @@ function BrowseItems() {
           </div>
 
         </header>
-
 
         <section
           className="browse-filters"
@@ -879,7 +872,6 @@ function BrowseItems() {
           </button>
 
         </section>
-
 
         <div className="browse-results-heading">
 

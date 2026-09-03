@@ -29,7 +29,7 @@ REQUIRED_REGISTER_FIELDS = (
     "password",
 )
 
-
+REQUIRED_REGISTER_FIELDS = ["firstname","lastname", "email", "password"]
 class Register(Resource):
     def post(self):
         """Register a new user."""

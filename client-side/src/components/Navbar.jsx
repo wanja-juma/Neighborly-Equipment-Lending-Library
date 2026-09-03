@@ -30,41 +30,13 @@ function Navbar() {
     });
   };
 
-  const firstName =
-  currentUser?.profile?.first_name ||
-  currentUser?.firstName ||
-  currentUser?.first_name ||
-  "";
-
-const lastName =
-  currentUser?.profile?.last_name ||
-  currentUser?.lastName ||
-  currentUser?.last_name ||
-  "";
-
-const fullName =
-  currentUser?.name ||
-  [firstName, lastName]
-    .filter(Boolean)
-    .join(" ") ||
-  currentUser?.email ||
-  "Member";
-
-const userInitials =
-  [firstName, lastName]
-    .filter(Boolean)
-    .map((name) => name.charAt(0))
-    .join("")
-    .slice(0, 2)
-    .toUpperCase() ||
-  fullName
-    .split(" ")
+  const userInitials = currentUser?.name
+    ?.split(" ")
     .filter(Boolean)
     .map((name) => name[0])
     .join("")
     .slice(0, 2)
-    .toUpperCase() ||
-  "U";
+    .toUpperCase();
 
   return (
     <nav className="navbar">
@@ -111,8 +83,8 @@ const userInitials =
 
             <div className="navbar-user-details">
               <strong>
-  {fullName}
-</strong>
+                {currentUser.name}
+              </strong>
 
               <small>
                 {currentUser.role || "Member"}

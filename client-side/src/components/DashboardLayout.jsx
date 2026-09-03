@@ -72,13 +72,8 @@ function DashboardLayout() {
       <aside className="sidebar">
 
         <div className="logo">
-          <span className="logo-icon">
-            N
-          </span>
-
-          <span className="logo-text">
-            Neighborly
-          </span>
+          <span className="logo-icon">N</span>
+          <span className="logo-text">Neighborly</span>
         </div>
 
 
@@ -129,18 +124,11 @@ function DashboardLayout() {
 
 
         <div className="community-card">
-          <span className="community-icon">
-            ⌂
-          </span>
+          <span className="community-icon">⌂</span>
 
           <div>
-            <small>
-              Your community
-            </small>
-
-            <strong>
-              Greenview Estate
-            </strong>
+            <small>Your community</small>
+            <strong>Greenview Estate</strong>
           </div>
         </div>
 
