@@ -9,6 +9,7 @@ import getLoanStatus from "../utils/getLoanStatus";
 
 import "./Dashboard.css";
 
+
 const summaryCards = [
   {
     id: 1,
@@ -36,6 +37,7 @@ const summaryCards = [
   },
 ];
 
+
 const normalizeCollection = (
   value,
   ...properties
@@ -57,6 +59,7 @@ const normalizeCollection = (
   return [];
 };
 
+
 const getItemName = (record) => {
   if (
     record?.item &&
@@ -76,6 +79,7 @@ const getItemName = (record) => {
     "Equipment"
   );
 };
+
 
 const getPersonName = (
   directName,
@@ -132,6 +136,7 @@ const getPersonName = (
   return fallback;
 };
 
+
 const getRecordOwnerId = (record) =>
   record?.ownerId ??
   record?.owner_id ??
@@ -140,6 +145,7 @@ const getRecordOwnerId = (record) =>
   record?.item?.owner_id ??
   record?.item?.owner?.id;
 
+
 const getRecordBorrowerId = (record) =>
   record?.borrowerId ??
   record?.borrower_id ??
@@ -147,11 +153,13 @@ const getRecordBorrowerId = (record) =>
   record?.userId ??
   record?.user_id;
 
+
 const getDueDate = (loan) =>
   loan?.dueDate ??
   loan?.due_date ??
   loan?.endDate ??
   loan?.end_date;
+
 
 const formatDate = (date) => {
   if (!date) {
@@ -178,6 +186,7 @@ const formatDate = (date) => {
     }
   ).format(parsedDate);
 };
+
 
 const getReturnReminderText = (
   loan
@@ -250,12 +259,14 @@ const getReturnReminderText = (
   return `Due in ${daysRemaining} days`;
 };
 
+
 const getStatusClass = (status) =>
   String(
     status || "On Track"
   )
     .toLowerCase()
     .replaceAll(" ", "-");
+
 
 function Dashboard() {
   const { currentUser } =
@@ -277,6 +288,7 @@ function Dashboard() {
     loansError,
   } = useLoans();
 
+
   const [
     notice,
     setNotice,
@@ -291,6 +303,12 @@ function Dashboard() {
     updatingRequestId,
     setUpdatingRequestId,
   ] = useState(null);
+
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState("");
+
 
   const safeItems =
     normalizeCollection(
@@ -312,10 +330,66 @@ function Dashboard() {
       "loans"
     );
 
+
+  /*
+   * Dashboard item search
+   *
+   * The search uses the same item data
+   * already loaded by useItems().
+   */
+  const normalizedSearchTerm =
+    searchTerm
+      .trim()
+      .toLowerCase();
+
+  const filteredItems =
+    normalizedSearchTerm
+      ? safeItems.filter((item) => {
+          const name =
+            String(
+              item?.name || ""
+            ).toLowerCase();
+
+          const description =
+            String(
+              item?.description || ""
+            ).toLowerCase();
+
+          const condition =
+            String(
+              item?.condition || ""
+            ).toLowerCase();
+
+          const status =
+            String(
+              item?.status ||
+                item?.availability ||
+                ""
+            ).toLowerCase();
+
+          return (
+            name.includes(
+              normalizedSearchTerm
+            ) ||
+            description.includes(
+              normalizedSearchTerm
+            ) ||
+            condition.includes(
+              normalizedSearchTerm
+            ) ||
+            status.includes(
+              normalizedSearchTerm
+            )
+          );
+        })
+      : [];
+
+
   const currentUserId =
     String(
       currentUser?.id || ""
     );
+
 
   const firstName =
     currentUser?.firstName ||
@@ -348,6 +422,7 @@ function Dashboard() {
     fullName.split(" ")[0] ||
     "Neighbour";
 
+
   const myItems =
     safeItems.filter(
       (item) =>
@@ -358,6 +433,7 @@ function Dashboard() {
 
   const recentListings =
     myItems.slice(0, 3);
+
 
   const pendingRequests =
     safeRequests.filter(
@@ -398,6 +474,7 @@ function Dashboard() {
   const recentPendingRequests =
     pendingRequests.slice(0, 3);
 
+
   const activeLoans =
     safeLoans.filter(
       (loan) => {
@@ -415,6 +492,7 @@ function Dashboard() {
         );
       }
     );
+
 
   const borrowedLoans =
     activeLoans.filter(
@@ -437,6 +515,7 @@ function Dashboard() {
       }
     );
 
+
   const lentLoans =
     activeLoans.filter(
       (loan) => {
@@ -458,6 +537,7 @@ function Dashboard() {
       }
     );
 
+
   const currentUserActiveLoans =
     activeLoans.filter(
       (loan) =>
@@ -474,6 +554,7 @@ function Dashboard() {
       0,
       3
     );
+
 
   const returnReminderLoan =
     [...borrowedLoans]
@@ -508,6 +589,7 @@ function Dashboard() {
             )
           )
       )[0];
+
 
   const dashboardSummary =
     summaryCards.map(
@@ -550,6 +632,7 @@ function Dashboard() {
       }
     );
 
+
   const currentDate =
     new Intl.DateTimeFormat(
       "en-GB",
@@ -560,6 +643,7 @@ function Dashboard() {
         year: "numeric",
       }
     ).format(new Date());
+
 
   const handleRequest =
     async (
@@ -605,9 +689,13 @@ function Dashboard() {
       }
     };
 
+
   return (
     <main className="dashboard-main">
+
+      {/* Top Navigation */}
       <header className="top-navigation">
+
         <label className="search-bar">
           <span className="search-icon">
             ⌕
@@ -615,12 +703,19 @@ function Dashboard() {
 
           <input
             type="search"
-            placeholder="Search items or neighbours..."
-            aria-label="Search items or neighbours"
+            placeholder="Search items..."
+            aria-label="Search items"
+            value={searchTerm}
+            onChange={(event) =>
+              setSearchTerm(
+                event.target.value
+              )
+            }
           />
         </label>
 
         <div className="top-navigation-actions">
+
           <button
             className="notification-button"
             type="button"
@@ -634,7 +729,9 @@ function Dashboard() {
         </div>
       </header>
 
+
       <section className="dashboard-content">
+
         {notice && (
           <div
             className="request-notice"
@@ -655,6 +752,7 @@ function Dashboard() {
             </button>
           </div>
         )}
+
 
         {actionError && (
           <div
@@ -677,8 +775,107 @@ function Dashboard() {
           </div>
         )}
 
+
+        {/* Search Results */}
+        {normalizedSearchTerm && (
+          <section className="dashboard-search-results">
+
+            <div className="search-results-heading">
+              <div>
+                <h2>
+                  Search Results
+                </h2>
+
+                <p>
+                  Results for "
+                  {searchTerm.trim()}"
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="clear-search-button"
+                onClick={() =>
+                  setSearchTerm("")
+                }
+              >
+                Clear
+              </button>
+            </div>
+
+
+            {filteredItems.length > 0 ? (
+              <div className="search-results-list">
+
+                {filteredItems.map(
+                  (item) => (
+                    <Link
+                      key={item.id}
+                      to={`/items/${item.id}`}
+                      className="search-result-item"
+                    >
+                      <div className="search-result-icon">
+                        {item.icon || "🧰"}
+                      </div>
+
+                      <div className="search-result-information">
+
+                        <strong>
+                          {item.name ||
+                            "Equipment"}
+                        </strong>
+
+                        <span>
+                          {item.description ||
+                            "No description available."}
+                        </span>
+
+                        <small>
+                          {item.condition ||
+                            "Condition unavailable"}
+                        </small>
+
+                      </div>
+
+                      <span className="search-result-status">
+                        {item.status ||
+                          item.availability ||
+                          "Available"}
+                      </span>
+
+                    </Link>
+                  )
+                )}
+
+              </div>
+            ) : (
+              <div className="search-empty-state">
+
+                <span>
+                  ⌕
+                </span>
+
+                <strong>
+                  No items found
+                </strong>
+
+                <p>
+                  No equipment matches "
+                  {searchTerm.trim()}".
+                </p>
+
+              </div>
+            )}
+
+          </section>
+        )}
+
+
+        {/* Welcome Section */}
         <div className="welcome-row">
+
           <div className="welcome-message">
+
             <p className="current-date">
               {currentDate}
             </p>
@@ -689,11 +886,12 @@ function Dashboard() {
             </h1>
 
             <p className="welcome-description">
-              Here is what is
-              happening in your
-              community today.
+              Here is what is happening
+              in your community today.
             </p>
+
           </div>
+
 
           <Link
             className="primary-button"
@@ -705,8 +903,11 @@ function Dashboard() {
 
             Add New Item
           </Link>
+
         </div>
 
+
+        {/* Summary Cards */}
         <section
           className="summary-grid"
           aria-label="Dashboard summary"
@@ -717,6 +918,7 @@ function Dashboard() {
                 className="summary-card"
                 key={card.id}
               >
+
                 <span
                   className={`summary-icon ${card.color}`}
                 >
@@ -724,6 +926,7 @@ function Dashboard() {
                 </span>
 
                 <div className="summary-information">
+
                   <strong>
                     {card.value}
                   </strong>
@@ -731,30 +934,35 @@ function Dashboard() {
                   <span>
                     {card.title}
                   </span>
+
                 </div>
 
                 <span className="summary-arrow">
                   ›
                 </span>
+
               </article>
             )
           )}
         </section>
 
+
+        {/* Borrowing Requests */}
         <div className="dashboard-panels">
+
           <section className="requests-panel">
+
             <div className="panel-heading">
+
               <div>
                 <h2>
                   Borrowing Requests
                 </h2>
 
                 <p>
-                  Review requests
-                  from neighbours
-                  who want to
-                  borrow your
-                  items.
+                  Review requests from
+                  neighbours who want to
+                  borrow your items.
                 </p>
               </div>
 
@@ -764,32 +972,42 @@ function Dashboard() {
               >
                 View All
               </Link>
+
             </div>
 
+
             <div className="requests-list">
+
               {requestsLoading ? (
+
                 <div className="requests-empty-state">
                   <p>
                     Loading borrowing
                     requests...
                   </p>
                 </div>
+
               ) : requestsError ? (
+
                 <div className="requests-empty-state error">
                   <p>
                     {requestsError}
                   </p>
                 </div>
+
               ) : recentPendingRequests.length >
                 0 ? (
+
                 recentPendingRequests.map(
                   (request) => {
+
                     const borrowerName =
                       getPersonName(
                         request.borrowerName ??
                           request.borrower_name,
                         request.borrower
                       );
+
 
                     const requestInitials =
                       request.initials ||
@@ -804,6 +1022,7 @@ function Dashboard() {
                         .toUpperCase() ||
                       "N";
 
+
                     const startDate =
                       request.startDate ??
                       request.start_date;
@@ -811,6 +1030,7 @@ function Dashboard() {
                     const endDate =
                       request.endDate ??
                       request.end_date;
+
 
                     const isUpdating =
                       String(
@@ -820,34 +1040,32 @@ function Dashboard() {
                         request.id
                       );
 
+
                     return (
                       <article
                         className="request-card"
-                        key={
-                          request.id
-                        }
+                        key={request.id}
                       >
+
                         <span
                           className={`borrower-avatar ${
                             request.avatarColor ||
                             "blue"
                           }`}
                         >
-                          {
-                            requestInitials
-                          }
+                          {requestInitials}
                         </span>
 
+
                         <div className="request-information">
+
                           <strong>
-                            {
-                              borrowerName
-                            }
+                            {borrowerName}
                           </strong>
 
                           <span className="request-description">
-                            Wants to
-                            borrow{" "}
+                            Wants to borrow{" "}
+
                             <b>
                               {getItemName(
                                 request
@@ -864,9 +1082,12 @@ function Dashboard() {
                               endDate
                             )}
                           </small>
+
                         </div>
 
+
                         <div className="request-buttons">
+
                           <button
                             className="decline-button"
                             type="button"
@@ -885,6 +1106,7 @@ function Dashboard() {
                               : "Decline"}
                           </button>
 
+
                           <button
                             className="approve-button"
                             type="button"
@@ -902,48 +1124,58 @@ function Dashboard() {
                               ? "Updating..."
                               : "Approve"}
                           </button>
+
                         </div>
+
                       </article>
                     );
                   }
                 )
+
               ) : (
+
                 <div className="requests-empty-state">
+
                   <span className="empty-state-icon">
                     ✓
                   </span>
 
                   <div>
+
                     <strong>
-                      All requests
-                      reviewed
+                      All requests reviewed
                     </strong>
 
                     <p>
-                      You have no
-                      pending
-                      borrowing
-                      requests.
+                      You have no pending
+                      borrowing requests.
                     </p>
+
                   </div>
+
                 </div>
               )}
+
             </div>
+
           </section>
+
         </div>
 
+
+        {/* Active Loans */}
         <section className="loans-panel">
+
           <div className="panel-heading">
+
             <div>
               <h2>
                 Active Loans
               </h2>
 
               <p>
-                Items you are
-                currently
-                borrowing or
-                lending.
+                Items you are currently
+                borrowing or lending.
               </p>
             </div>
 
@@ -953,35 +1185,45 @@ function Dashboard() {
             >
               View All
             </Link>
+
           </div>
 
+
           <div className="loans-list">
+
             {loansLoading ? (
+
               <div className="loans-empty-state">
                 <p>
-                  Loading active
-                  loans...
+                  Loading active loans...
                 </p>
               </div>
+
             ) : loansError ? (
+
               <div className="loans-empty-state error">
                 <p>
                   {loansError}
                 </p>
               </div>
+
             ) : recentActiveLoans.length >
               0 ? (
+
               recentActiveLoans.map(
                 (loan) => {
+
                   const currentStatus =
                     getLoanStatus(
                       loan
                     );
 
+
                   const borrowerId =
                     getRecordBorrowerId(
                       loan
                     );
+
 
                   const loanType =
                     String(
@@ -989,6 +1231,7 @@ function Dashboard() {
                         loan.loan_type ??
                         ""
                     ).toLowerCase();
+
 
                   const isBorrowed =
                     String(
@@ -999,12 +1242,14 @@ function Dashboard() {
                     loanType ===
                       "borrowed";
 
+
                   const ownerName =
                     getPersonName(
                       loan.ownerName ??
                         loan.owner_name,
                       loan.owner
                     );
+
 
                   const borrowerName =
                     getPersonName(
@@ -1013,11 +1258,13 @@ function Dashboard() {
                       loan.borrower
                     );
 
+
                   const fallbackPerson =
                     getPersonName(
                       loan.person,
                       null
                     );
+
 
                   const personName =
                     isBorrowed
@@ -1030,18 +1277,19 @@ function Dashboard() {
                         ? borrowerName
                         : fallbackPerson;
 
+
                   const loanItemName =
                     getItemName(
                       loan
                     );
 
+
                   return (
                     <article
                       className="loan-card"
-                      key={
-                        loan.id
-                      }
+                      key={loan.id}
                     >
+
                       <span className="loan-item-icon">
                         {loan.icon ||
                           loan.item
@@ -1049,11 +1297,11 @@ function Dashboard() {
                           "🧰"}
                       </span>
 
+
                       <div className="loan-information">
+
                         <strong>
-                          {
-                            loanItemName
-                          }
+                          {loanItemName}
                         </strong>
 
                         <span className="loan-person">
@@ -1070,17 +1318,18 @@ function Dashboard() {
                             )
                           )}
                         </small>
+
                       </div>
+
 
                       <span
                         className={`loan-status ${getStatusClass(
                           currentStatus
                         )}`}
                       >
-                        {
-                          currentStatus
-                        }
+                        {currentStatus}
                       </span>
+
 
                       <Link
                         className="loan-options-button"
@@ -1089,47 +1338,62 @@ function Dashboard() {
                       >
                         •••
                       </Link>
+
                     </article>
                   );
                 }
               )
+
             ) : (
+
               <div className="loans-empty-state">
+
                 <span className="empty-state-icon">
                   ✓
                 </span>
 
                 <div>
+
                   <strong>
                     No active loans
                   </strong>
 
                   <p>
-                    You have no
-                    borrowed or lent
-                    items at the
+                    You have no borrowed
+                    or lent items at the
                     moment.
                   </p>
+
                 </div>
+
               </div>
             )}
+
           </div>
+
         </section>
 
+
+        {/* My Listings + Return Reminder */}
         <div className="listings-reminder-layout">
+
           <section className="listings-panel">
+
             <div className="panel-heading">
+
               <div>
+
                 <h2>
                   My Listings
                 </h2>
 
                 <p>
-                  Your recently
-                  added tools and
-                  equipment.
+                  Your recently added
+                  tools and equipment.
                 </p>
+
               </div>
+
 
               <Link
                 className="view-all-button"
@@ -1137,11 +1401,15 @@ function Dashboard() {
               >
                 View All
               </Link>
+
             </div>
 
+
             <div className="listings-grid">
+
               {recentListings.length >
               0 ? (
+
                 recentListings.map(
                   (item) => {
                     const availability =
@@ -1153,6 +1421,9 @@ function Dashboard() {
                       item.statusColor ||
                       String(
                         availability
+                        item.availability ||
+                          item.status ||
+                          ""
                       )
                         .toLowerCase()
                         .replaceAll(
@@ -1160,13 +1431,13 @@ function Dashboard() {
                           "-"
                         );
 
+
                     return (
                       <article
                         className="listing-card"
-                        key={
-                          item.id
-                        }
+                        key={item.id}
                       >
+
                         <div className="listing-image">
                           {item.image ? (
                             <img
@@ -1180,6 +1451,12 @@ function Dashboard() {
                             </span>
                           )}
 
+                          <span>
+                            {item.icon ||
+                              "🧰"}
+                          </span>
+
+
                           <Link
                             className="listing-options-button"
                             to="/listings"
@@ -1190,18 +1467,23 @@ function Dashboard() {
                           >
                             •••
                           </Link>
+
                         </div>
 
+
                         <div className="listing-information">
+
                           <strong>
                             {item.name ||
                               "Equipment"}
                           </strong>
 
+
                           <span className="item-condition">
                             {item.condition ||
                               "Unknown"}
                           </span>
+
 
                           <small
                             className={`availability-status ${statusClass}`}
@@ -1209,33 +1491,45 @@ function Dashboard() {
                             <span className="status-dot" />
 
                             {availability}
+                            {item.availability ||
+                              item.status ||
+                              "Unknown"}
                           </small>
+
                         </div>
+
                       </article>
                     );
                   }
                 )
+
               ) : (
+
                 <div className="listings-empty-state">
+
                   <p>
-                    You have not
-                    added any items
-                    yet.
+                    You have not added
+                    any items yet.
                   </p>
 
                   <Link
                     className="primary-button"
                     to="/items/new"
                   >
-                    Add Your First
-                    Item
+                    Add Your First Item
                   </Link>
+
                 </div>
               )}
+
             </div>
+
           </section>
 
+
+          {/* Return Reminder */}
           {returnReminderLoan ? (
+
             <aside
               className={`return-reminder ${getStatusClass(
                 getLoanStatus(
@@ -1243,14 +1537,18 @@ function Dashboard() {
                 )
               )}`}
             >
+
               <span className="reminder-icon">
                 !
               </span>
 
+
               <div className="reminder-information">
+
                 <small>
                   RETURN REMINDER
                 </small>
+
 
                 <strong>
                   {getItemName(
@@ -1258,8 +1556,10 @@ function Dashboard() {
                   )}
                 </strong>
 
+
                 <p>
                   Return to{" "}
+
                   {getPersonName(
                     returnReminderLoan
                       .ownerName ??
@@ -1269,7 +1569,9 @@ function Dashboard() {
                     returnReminderLoan.person ||
                       "the item owner"
                   )}{" "}
+
                   by{" "}
+
                   <b>
                     {formatDate(
                       getDueDate(
@@ -1280,12 +1582,15 @@ function Dashboard() {
                   .
                 </p>
 
+
                 <span className="reminder-due-status">
                   {getReturnReminderText(
                     returnReminderLoan
                   )}
                 </span>
+
               </div>
+
 
               <Link
                 className="view-loan-button"
@@ -1293,14 +1598,20 @@ function Dashboard() {
               >
                 View Loan
               </Link>
+
             </aside>
+
           ) : (
+
             <aside className="return-reminder empty">
+
               <span className="reminder-icon">
                 ✓
               </span>
 
+
               <div className="reminder-information">
+
                 <small>
                   RETURN REMINDER
                 </small>
@@ -1310,11 +1621,12 @@ function Dashboard() {
                 </strong>
 
                 <p>
-                  You have no
-                  borrowed items to
-                  return.
+                  You have no borrowed
+                  items to return.
                 </p>
+
               </div>
+
 
               <Link
                 className="view-loan-button"
@@ -1322,12 +1634,17 @@ function Dashboard() {
               >
                 Browse Items
               </Link>
+
             </aside>
           )}
+
         </div>
+
       </section>
+
     </main>
   );
 }
+
 
 export default Dashboard;

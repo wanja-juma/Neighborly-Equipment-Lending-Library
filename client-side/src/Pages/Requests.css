@@ -3,12 +3,12 @@
 ========================================= */
 
 .requests-page {
-  width: 100%;
-  max-width: 1400px;
+  width: calc(100% - 280px);
+  max-width: none;
   min-width: 0;
   min-height: 100vh;
 
-  margin: 0 auto;
+  margin-left: 280px;
   padding: 2rem;
 
   box-sizing: border-box;
@@ -29,7 +29,7 @@
   gap: 1rem;
 
   width: 100%;
-  max-width: 1100px;
+  max-width: 1200px;
 
   margin-bottom: 1.5rem;
 }
@@ -54,7 +54,7 @@
 
 
 /* =========================================
-   INCOMING / OUTGOING TAB SWITCHER
+   INCOMING / OUTGOING TABS
 ========================================= */
 
 .requests-tab-switcher {
@@ -74,12 +74,10 @@
 
   background: #eef2f0;
 
-  box-shadow: 0 2px 8px
+  box-shadow:
+    0 2px 8px
     rgba(30, 55, 38, 0.06);
 }
-
-
-/* Individual tab */
 
 .requests-tab-button {
   display: inline-flex;
@@ -110,27 +108,19 @@
     transform 0.2s ease;
 }
 
-
-/* Tab hover */
-
 .requests-tab-button:hover {
   background: #ffffff;
   color: #173f3b;
 }
 
-
-/* Active tab */
-
 .requests-tab-button.active {
   background: #173f3b;
   color: #ffffff;
 
-  box-shadow: 0 2px 6px
+  box-shadow:
+    0 2px 6px
     rgba(0, 0, 0, 0.12);
 }
-
-
-/* Keyboard focus */
 
 .requests-tab-button:focus-visible {
   outline: 2px solid #173f3b;
@@ -139,7 +129,7 @@
 
 
 /* =========================================
-   TAB REQUEST COUNT
+   TAB COUNT
 ========================================= */
 
 .tab-count {
@@ -163,9 +153,6 @@
   font-weight: 700;
 }
 
-
-/* Count inside active tab */
-
 .requests-tab-button.active .tab-count {
   background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
@@ -178,7 +165,7 @@
 
 .requests-panel {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1200px;
   min-width: 0;
 
   padding: 1.5rem;
@@ -190,7 +177,8 @@
 
   background: #ffffff;
 
-  box-shadow: 0 8px 24px
+  box-shadow:
+    0 8px 24px
     rgba(30, 55, 38, 0.06);
 }
 
@@ -228,9 +216,6 @@
   font-size: 0.95rem;
   line-height: 1.5;
 }
-
-
-/* Number shown on panel heading */
 
 .request-count {
   display: inline-flex;
@@ -302,7 +287,8 @@
 .request-list-card:hover {
   border-color: #cbd9cf;
 
-  box-shadow: 0 4px 14px
+  box-shadow:
+    0 4px 14px
     rgba(30, 55, 38, 0.06);
 }
 
@@ -340,10 +326,14 @@
   overflow: hidden;
 }
 
-.request-details strong {
+.request-details > strong {
+  display: block;
+
+  margin-bottom: 0.3rem;
+
   color: #25332a;
 
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
@@ -358,9 +348,12 @@
 .request-details small {
   display: block;
 
+  margin-top: 0.35rem;
+
   color: #707b73;
 
   font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .request-details strong,
@@ -375,8 +368,11 @@
 ========================================= */
 
 .request-status {
-  justify-self: end;
+  display: inline-flex;
 
+  width: fit-content;
+
+  margin-top: 0.6rem;
   padding: 0.4rem 0.7rem;
 
   border-radius: 999px;
@@ -390,28 +386,25 @@
   text-transform: capitalize;
 }
 
-
-/* Pending */
-
-.request-status.pending {
+.request-status--pending {
   background: #fff2d8;
   color: #9a6300;
 }
 
-
-/* Approved */
-
-.request-status.approved {
+.request-status--approved {
   background: #e2f4e7;
   color: #267341;
 }
 
-
-/* Declined */
-
-.request-status.declined {
+.request-status--declined,
+.request-status--rejected {
   background: #fde7e7;
   color: #a53838;
+}
+
+.request-status--cancelled {
+  background: #eef0ef;
+  color: #66716a;
 }
 
 
@@ -434,6 +427,8 @@
    ACTION BUTTONS
 ========================================= */
 
+.approve-btn,
+.decline-btn,
 .approve-request-button,
 .decline-request-button,
 .pay-request-button {
@@ -464,10 +459,9 @@
 }
 
 
-/* =========================================
-   APPROVE BUTTON
-========================================= */
+/* APPROVE */
 
+.approve-btn,
 .approve-request-button {
   border-color: #2f7d4b;
 
@@ -475,6 +469,7 @@
   color: #ffffff;
 }
 
+.approve-btn:hover:not(:disabled),
 .approve-request-button:hover:not(:disabled) {
   border-color: #25663c;
 
@@ -485,10 +480,9 @@
 }
 
 
-/* =========================================
-   DECLINE BUTTON
-========================================= */
+/* DECLINE */
 
+.decline-btn,
 .decline-request-button {
   border-color: #d84a4a;
 
@@ -496,6 +490,7 @@
   color: #b83232;
 }
 
+.decline-btn:hover:not(:disabled),
 .decline-request-button:hover:not(:disabled) {
   border-color: #b83232;
 
@@ -506,9 +501,7 @@
 }
 
 
-/* =========================================
-   PAY NOW BUTTON
-========================================= */
+/* PAY NOW */
 
 .pay-request-button {
   border-color: #2f6f44;
@@ -527,10 +520,10 @@
 }
 
 
-/* =========================================
-   DISABLED BUTTONS
-========================================= */
+/* DISABLED */
 
+.approve-btn:disabled,
+.decline-btn:disabled,
 .approve-request-button:disabled,
 .decline-request-button:disabled {
   cursor: not-allowed;
@@ -542,32 +535,28 @@
 
 
 /* =========================================
-   SUCCESS / ERROR NOTICES
+   MESSAGES
 ========================================= */
 
-.request-action-notice {
+.requests-message {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1200px;
 
   margin: 0 0 1rem;
-  padding: 0.8rem 1rem;
+  padding: 0.9rem 1rem;
 
   box-sizing: border-box;
 
   border-radius: 8px;
 
-  font-size: 0.9rem;
+  background: #edf5ef;
+  color: #52645d;
+
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
-.request-action-notice.success {
-  border: 1px solid #b9ddc4;
-
-  background: #edf8f0;
-  color: #267341;
-}
-
-.request-action-notice.error {
+.requests-message--error {
   border: 1px solid #efb5b5;
 
   background: #fff0f0;
@@ -576,47 +565,63 @@
 
 
 /* =========================================
-   LOADING / ERROR / EMPTY STATE
+   EMPTY STATE
 ========================================= */
 
-.requests-state {
+.empty-requests {
+  width: 100%;
+
   padding: 3rem 1rem;
+
+  box-sizing: border-box;
 
   color: #718077;
 
   text-align: center;
 }
 
-.requests-state h3 {
-  margin: 0.75rem 0 0.35rem;
-
-  color: #25332a;
-}
-
-.requests-state p {
+.empty-requests p {
   margin: 0;
 }
 
-.requests-state.error {
-  color: #a53838;
+.request-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
+.pay-now-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
 
-/* Empty state icon */
+  background: #17663c;
+  color: #ffffff;
 
-.empty-icon {
-  display: inline-grid;
-  place-items: center;
+  font-size: 15px;
+  font-weight: 600;
 
-  width: 48px;
-  height: 48px;
+  cursor: pointer;
 
-  border-radius: 50%;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
 
-  background: #e2f4e7;
-  color: #267341;
+.pay-now-btn:hover {
+  background: #125232;
+  transform: translateY(-1px);
+}
 
-  font-size: 1.25rem;
+.pay-now-btn:focus {
+  outline: 2px solid #17663c;
+  outline-offset: 2px;
+}
+
+.pay-now-btn:active {
+  transform: translateY(0);
 }
 
 
@@ -624,7 +629,7 @@
    TABLET
 ========================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .requests-page {
     padding: 1.5rem;
   }
@@ -636,19 +641,11 @@
     align-items: flex-start;
   }
 
-  .request-status {
-    grid-column: 2;
-
-    justify-self: start;
-  }
-
   .request-actions,
   .request-payment-action {
     grid-column: 1 / -1;
 
     width: 100%;
-
-    padding-left: 0;
 
     justify-content: flex-end;
   }
@@ -718,16 +715,14 @@
     grid-column: 1;
   }
 
-  .request-status {
-    justify-self: start;
-  }
-
   .request-actions,
   .request-payment-action {
     justify-content: flex-start;
     flex-wrap: wrap;
   }
 
+  .approve-btn,
+  .decline-btn,
   .approve-request-button,
   .decline-request-button,
   .pay-request-button {

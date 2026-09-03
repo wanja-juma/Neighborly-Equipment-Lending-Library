@@ -269,6 +269,28 @@ export const updateItem =
     );
   };
 
+  export const getProfile = async (
+  profileId
+) => {
+  const response = await request(
+    `/profiles/${profileId}`
+  );
+
+  return (
+    response?.profile ||
+    response
+  );
+};
+
+
+export const updateMyProfile = async (profileData) => {
+  const response = await request("/profile", {
+    method: "PUT",
+    body: JSON.stringify(profileData),
+  });
+
+  return response?.profile || response;
+};
 
 export const deleteItem = (
   itemId
@@ -280,6 +302,10 @@ export const deleteItem = (
     }
   );
 };
+
+
+
+
 
 
 /* Borrowing requests */
@@ -546,6 +572,32 @@ export const refundPayment =
   };
 
 
+/* =========================
+   Memberships
+
+export const getMembership = async (membershipId) => {
+  const response = await request(`/memberships/${membershipId}`);
+  return response?.membership || response;
+};
+
+export const createMembership = async (membershipData) => {
+  const response = await request("/memberships", {
+    method: "POST",
+    body: JSON.stringify(membershipData),
+  });
+  return response?.membership || response;
+};
+
+export const updateMembership = async (membershipId, updates) => {
+  const response = await request(`/memberships/${membershipId}`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
+  return response?.membership || response;
+};
+
+/* =========================
+   Damage reports
 /* Damage reports */
 
 export const getDamageReports =

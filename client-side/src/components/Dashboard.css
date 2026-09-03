@@ -1250,6 +1250,42 @@ button {
   pointer-events: none;
 }
 
+.dashboard-search-results {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.dashboard-search-results h2 {
+  margin-bottom: 16px;
+}
+
+.search-results-list {
+  display: grid;
+  gap: 12px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-result-item:hover {
+  background: #f8fafc;
+}
+
+.search-result-item strong {
+  flex: 1;
+}
+
 /* Basic responsiveness */
 
 @media (max-width: 800px) {

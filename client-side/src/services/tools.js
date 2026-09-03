@@ -1,29 +1,71 @@
 const API_URL =
-  import.meta.env.VITE_TOOLS_API_URL ||
-  "http://localhost:3000";
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5555/api";
 
-export async function getTools({ page = 1, limit = 6 } = {}) {
+
+export async function getTools({
+  page = 1,
+  limit = 6,
+} = {}) {
   const response = await fetch(
-    `${API_URL}/items?_page=${page}&_limit=${limit}`
+    `${API_URL}/items`
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch tools");
+    throw new Error(
+      "Failed to fetch tools"
+    );
   }
 
-  const tools = await response.json();
+  const data = await response.json();
 
-  const totalCount = Number(
-    response.headers.get("X-Total-Count") || tools.length
-  );
+  const allTools = Array.isArray(data)
+    ? data
+    : data?.items || [];
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalCount / limit)
-  );
+  const startIndex =
+    (page - 1) * limit;
+
+  const endIndex =
+    startIndex + limit;
+
+  const tools =
+    allTools.slice(
+      startIndex,
+      endIndex
+    );
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        allTools.length /
+          limit
+      )
+    );
 
   return {
     tools,
     totalPages,
   };
+}
+
+
+export async function getToolById(
+  toolId
+) {
+  const response = await fetch(
+    `${API_URL}/items/${toolId}`
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch tool"
+    );
+  }
+
+  const data =
+    await response.json();
+
+  return data?.item || data;
 }
