@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
+
 import "./Items.css";
+
 
 
 function MyListings() {
@@ -31,27 +33,30 @@ function MyListings() {
 
 
   const currentUserId = String(
-    currentUser?.id || "1"
+    currentUser?.id || ""
   );
 
-  const safeItems = Array.isArray(items)
-    ? items
-    : [];
+
+  const safeItems =
+    Array.isArray(items)
+      ? items
+      : [];
 
 
-  const myItems = safeItems.filter(
-    (item) => {
-      const ownerId =
-        item.ownerId ??
-        item.owner_id ??
-        item.owner?.id;
+  const myItems =
+    safeItems.filter(
+      (item) => {
+        const ownerId =
+          item.ownerId ??
+          item.owner_id ??
+          item.owner?.id;
 
-      return (
-        String(ownerId) ===
-        currentUserId
-      );
-    }
-  );
+        return (
+          String(ownerId) ===
+          currentUserId
+        );
+      }
+    );
 
 
   const getCategoryName = (
@@ -154,10 +159,13 @@ function MyListings() {
 
   return (
     <main className="dashboard-main">
+
       <section className="items-page">
 
         <header className="items-page-header">
+
           <div>
+
             <p className="page-label">
               OWNER INVENTORY
             </p>
@@ -170,7 +178,9 @@ function MyListings() {
               Manage the tools and
               equipment you have listed.
             </p>
+
           </div>
+
 
           <Link
             className="add-item-link"
@@ -182,6 +192,7 @@ function MyListings() {
 
             Add New Item
           </Link>
+
         </header>
 
 
@@ -230,7 +241,9 @@ function MyListings() {
 
 
         <div className="listings-summary">
+
           <span>
+
             <strong>
               {myItems.length}
             </strong>{" "}
@@ -238,15 +251,19 @@ function MyListings() {
             {myItems.length === 1
               ? "item listed"
               : "items listed"}
+
           </span>
+
         </div>
 
 
         {myItems.length > 0 ? (
+
           <div className="items-page-grid">
 
             {myItems.map(
               (item) => {
+
                 const isDeleting =
                   String(
                     deletingItemId
@@ -255,10 +272,12 @@ function MyListings() {
                     item.id
                   );
 
+
                 const availability =
                   item.availability ||
                   item.status ||
                   "Unknown";
+
 
                 const availabilityClass =
                   item.statusColor ||
@@ -277,25 +296,14 @@ function MyListings() {
                     className="equipment-card"
                     key={item.id}
                   >
+
                     <div className="equipment-image">
 
-                      <span>
-                        {item.icon ||
-                          "🧰"}
-                      </span>
+  <span>
+    {item.icon || "🧰"}
+  </span>
 
-                      <button
-                        className="equipment-options"
-                        type="button"
-                        aria-label={`Options for ${
-                          item.name ||
-                          "equipment"
-                        }`}
-                      >
-                        •••
-                      </button>
-
-                    </div>
+</div>
 
 
                     <div className="equipment-content">
@@ -309,6 +317,7 @@ function MyListings() {
                             )
                           }
                         </span>
+
 
                         <span
                           className={`equipment-availability ${availabilityClass}`}
@@ -341,6 +350,7 @@ function MyListings() {
                             "Not specified"}
                         </span>
 
+
                         <span>
                           <b>
                             Location:
@@ -355,7 +365,7 @@ function MyListings() {
                       <div className="listing-actions">
 
                         <Link
-                          to={`/items/${item.id}/edit`}
+                          to={`/listings/${item.id}/edit`}
                           className="listing-action-btn edit-listing-btn"
                         >
                           Edit Listing
@@ -363,7 +373,7 @@ function MyListings() {
 
 
                         <Link
-                          to={`/items/${item.id}/availability`}
+                          to={`/listings/${item.id}/availability`}
                           className="listing-action-btn availability-btn"
                         >
                           Change Availability
@@ -390,13 +400,16 @@ function MyListings() {
                       </div>
 
                     </div>
+
                   </article>
                 );
               }
             )}
 
           </div>
+
         ) : (
+
           <div className="items-empty-state">
 
             <span>
@@ -421,9 +434,11 @@ function MyListings() {
             </Link>
 
           </div>
+
         )}
 
       </section>
+
     </main>
   );
 }

@@ -1277,6 +1277,29 @@ button {
   flex: 1;
 }
 
+.navigation-label {
+  flex: 1;
+}
+
+.sidebar-cart-count {
+  min-width: 22px;
+  height: 22px;
+
+  padding: 0 6px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  background: #d8f15b;
+  color: #173e34;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
 /* Basic responsiveness */
 
 @media (max-width: 800px) {

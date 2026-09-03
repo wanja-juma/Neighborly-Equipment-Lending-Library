@@ -1,6 +1,9 @@
 .availability-page {
-  min-height: 100%;
+  margin-left: 286px;
+  width: calc(100% - 286px);
+  min-height: 100vh;
   padding: 2rem;
+  box-sizing: border-box;
   background: #f5f7f5;
 }
 
@@ -8,10 +11,15 @@
   width: min(100%, 680px);
   margin: 0 auto;
   padding: 2rem;
+  box-sizing: border-box;
+
   border: 1px solid #e1e8e3;
   border-radius: 16px;
+
   background: #ffffff;
-  box-shadow: 0 8px 24px
+
+  box-shadow:
+    0 8px 24px
     rgba(35, 66, 46, 0.08);
 }
 
@@ -35,16 +43,23 @@
   text-decoration: none;
 }
 
+.back-link:hover {
+  text-decoration: underline;
+}
+
 .availability-options {
   display: grid;
   gap: 0.85rem;
+
   margin: 0;
   padding: 0;
+
   border: 0;
 }
 
 .availability-options legend {
   margin-bottom: 1rem;
+
   color: #25332a;
   font-weight: 700;
 }
@@ -53,10 +68,24 @@
   display: flex;
   align-items: flex-start;
   gap: 0.9rem;
+
+  width: 100%;
   padding: 1rem;
+
+  box-sizing: border-box;
+
   border: 1px solid #dce4de;
   border-radius: 12px;
+
   cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.availability-option:hover {
+  border-color: #8bb99a;
 }
 
 .availability-option.selected {
@@ -66,6 +95,8 @@
 
 .availability-option input {
   margin-top: 0.2rem;
+  flex-shrink: 0;
+
   accent-color: #2f7d4b;
 }
 
@@ -73,15 +104,24 @@
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+
+  min-width: 0;
+}
+
+.availability-option strong {
+  color: #25332a;
 }
 
 .availability-option small {
   color: #718077;
+  line-height: 1.5;
 }
 
 .availability-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+
   gap: 0.75rem;
   margin-top: 1.75rem;
 }
@@ -91,23 +131,35 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   min-height: 42px;
   padding: 0.7rem 1.1rem;
+
+  box-sizing: border-box;
+
   border-radius: 9px;
+
   font-weight: 600;
   text-decoration: none;
 }
 
 .cancel-button {
   border: 1px solid #d2dbd5;
+
   background: #ffffff;
   color: #536158;
 }
 
+.cancel-button:hover {
+  background: #f5f7f5;
+}
+
 .save-availability-button {
   border: 1px solid #2f7d4b;
+
   background: #2f7d4b;
   color: #ffffff;
+
   cursor: pointer;
 }
 
@@ -123,4 +175,62 @@
 .availability-error {
   margin-top: 1rem;
   color: #a53838;
+}
+
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .availability-page {
+    padding: 1.5rem;
+  }
+
+  .availability-card {
+    max-width: 100%;
+  }
+}
+
+
+/* Mobile / collapsed sidebar */
+@media (max-width: 900px) {
+  .availability-page {
+    margin-left: 0;
+    width: 100%;
+    padding: 1.25rem;
+  }
+
+  .availability-card {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .availability-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .cancel-button,
+  .save-availability-button {
+    width: 100%;
+  }
+}
+
+
+/* Smaller phones */
+@media (max-width: 520px) {
+  .availability-page {
+    padding: 1rem;
+  }
+
+  .availability-card {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .availability-heading h1 {
+    font-size: 1.6rem;
+  }
+
+  .availability-option {
+    padding: 0.85rem;
+  }
 }

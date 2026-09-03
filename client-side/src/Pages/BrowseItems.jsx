@@ -3,9 +3,17 @@ import {
   useState,
 } from "react";
 
+import {
+  ShoppingCart,
+} from "lucide-react";
+
+import {
+  useNavigate,
+} from "react-router-dom";
+
 import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
-import useRequests from "../hooks/useRequests";
+import { useCart } from "../context/CartProvider";
 
 import "./BrowseItems.css";
 
@@ -20,24 +28,6 @@ const DEFAULT_CATEGORIES = [
   "Automotive",
   "Other",
 ];
-
-
-const getLocalDate = () => {
-  const today = new Date();
-
-  const year =
-    today.getFullYear();
-
-  const month = String(
-    today.getMonth() + 1
-  ).padStart(2, "0");
-
-  const day = String(
-    today.getDate()
-  ).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
 
 
 const getItemCategory = (item) => {
@@ -203,6 +193,8 @@ const getItemIcon = (item) => {
 
 
 function BrowseItems() {
+  const navigate = useNavigate();
+
   const {
     currentUser,
   } = useAuth();
@@ -214,8 +206,11 @@ function BrowseItems() {
   } = useItems();
 
   const {
-    addBorrowingRequest,
-  } = useRequests();
+    cartItems,
+    cartCount,
+    addToCart,
+    isInCart,
+  } = useCart();
 
 
   const [
@@ -242,36 +237,9 @@ function BrowseItems() {
     setNotice,
   ] = useState("");
 
-  const [
-    selectedItem,
-    setSelectedItem,
-  ] = useState(null);
-
-  const [
-    borrowDates,
-    setBorrowDates,
-  ] = useState({
-    startDate: "",
-    endDate: "",
-  });
-
-  const [
-    formError,
-    setFormError,
-  ] = useState("");
-
-  const [
-    submittingRequest,
-    setSubmittingRequest,
-  ] = useState(false);
-
-
-  const minimumDate =
-    getLocalDate();
 
   const currentUserId =
-    currentUser?.id !==
-      undefined &&
+    currentUser?.id !== undefined &&
     currentUser?.id !== null
       ? String(currentUser.id)
       : "";
@@ -442,7 +410,14 @@ function BrowseItems() {
     ]);
 
 
-  const openBorrowForm = (item) => {
+  /*
+   * Add an available item to
+   * the user's cart.
+   *
+   * No borrowing request is
+   * created at this point.
+   */
+  const handleAddToCart = (item) => {
     const availability =
       String(
         getItemAvailability(
@@ -461,221 +436,50 @@ function BrowseItems() {
       return;
     }
 
-    setSelectedItem(item);
 
-    setBorrowDates({
-      startDate: "",
-      endDate: "",
-    });
+    if (!currentUserId) {
+      setNotice(
+        "You must be logged in to add an item to your cart."
+      );
 
-    setFormError("");
-    setNotice("");
-  };
-
-
-  const closeBorrowForm = () => {
-    if (submittingRequest) {
       return;
     }
 
-    setSelectedItem(null);
 
-    setBorrowDates({
-      startDate: "",
-      endDate: "",
-    });
+    const ownerId =
+      getItemOwnerId(
+        item
+      );
 
-    setFormError("");
-  };
+    if (
+      ownerId !== undefined &&
+      ownerId !== null &&
+      String(ownerId) ===
+        currentUserId
+    ) {
+      setNotice(
+        "You cannot add your own item to the cart."
+      );
+
+      return;
+    }
 
 
-  const handleDateChange = (
-    event
-  ) => {
-    const {
-      name,
-      value,
-    } = event.target;
+    if (isInCart(item.id)) {
+      setNotice(
+        `${item.name} is already in your cart.`
+      );
 
-    setBorrowDates(
-      (currentDates) => ({
-        ...currentDates,
-        [name]: value,
-      })
+      return;
+    }
+
+
+    addToCart(item);
+
+    setNotice(
+      `${item.name} added to cart.`
     );
-
-    setFormError("");
   };
-
-
-  const handleBorrowRequest =
-    async (event) => {
-      event.preventDefault();
-
-      if (!selectedItem) {
-        return;
-      }
-
-
-      if (!currentUserId) {
-        setFormError(
-          "You must be logged in to request an item."
-        );
-
-        return;
-      }
-
-
-      const availability =
-        String(
-          getItemAvailability(
-            selectedItem
-          ) || ""
-        ).toLowerCase();
-
-      if (
-        availability !==
-        "available"
-      ) {
-        setFormError(
-          "This item is no longer available to borrow."
-        );
-
-        return;
-      }
-
-
-      const ownerId =
-        getItemOwnerId(
-          selectedItem
-        );
-
-      if (
-        ownerId !==
-          undefined &&
-        ownerId !== null &&
-        String(ownerId) ===
-          currentUserId
-      ) {
-        setFormError(
-          "You cannot request your own item."
-        );
-
-        return;
-      }
-
-
-      if (
-        !borrowDates.startDate ||
-        !borrowDates.endDate
-      ) {
-        setFormError(
-          "Please select both the borrowing and return dates."
-        );
-
-        return;
-      }
-
-
-      if (
-        borrowDates.startDate <
-        minimumDate
-      ) {
-        setFormError(
-          "The borrowing date cannot be in the past."
-        );
-
-        return;
-      }
-
-
-      if (
-        borrowDates.endDate <
-        borrowDates.startDate
-      ) {
-        setFormError(
-          "The return date must be after the borrowing date."
-        );
-
-        return;
-      }
-
-
-      const itemId =
-        Number(
-          selectedItem.id
-        );
-
-      if (
-        !Number.isInteger(itemId) ||
-        itemId <= 0
-      ) {
-        setFormError(
-          "This item has an invalid ID."
-        );
-
-        return;
-      }
-
-
-      try {
-        setSubmittingRequest(true);
-        setFormError("");
-
-
-        /*
-         * IMPORTANT:
-         *
-         * Send the field names expected
-         * by the Flask borrowing-request
-         * API.
-         *
-         * Do not send borrower_id.
-         * Flask should get the borrower
-         * from the JWT identity.
-         */
-        const result =
-  await addBorrowingRequest({
-    equipment_id: itemId,
-    start_date:
-      borrowDates.startDate,
-    end_date:
-      borrowDates.endDate,
-  });
-
-
-        setNotice(
-          result?.message ||
-            "Borrowing request submitted successfully."
-        );
-
-
-        setSelectedItem(
-          null
-        );
-
-        setBorrowDates({
-          startDate: "",
-          endDate: "",
-        });
-
-        setFormError("");
-      } catch (error) {
-        console.error(
-          "Borrowing request failed:",
-          error
-        );
-
-        setFormError(
-          error?.message ||
-            "Unable to submit the borrowing request."
-        );
-      } finally {
-        setSubmittingRequest(
-          false
-        );
-      }
-    };
 
 
   const clearFilters = () => {
@@ -720,6 +524,7 @@ function BrowseItems() {
   return (
     <main className="dashboard-main">
       <section className="items-page">
+
         {notice && (
           <div
             className="browse-notice"
@@ -759,6 +564,30 @@ function BrowseItems() {
               your community.
             </p>
           </div>
+
+
+          <button
+            type="button"
+            className="browse-cart-button"
+            onClick={() =>
+              navigate("/cart")
+            }
+            aria-label={`Open cart with ${cartCount} items`}
+          >
+            <ShoppingCart
+              size={24}
+            />
+
+            <span>
+              Cart
+            </span>
+
+            {cartCount > 0 && (
+              <span className="cart-count-badge">
+                {cartCount}
+              </span>
+            )}
+          </button>
         </header>
 
 
@@ -875,6 +704,19 @@ function BrowseItems() {
               ? "item found"
               : "items found"}
           </p>
+
+          {cartItems.length > 0 && (
+            <button
+              type="button"
+              className="view-cart-link"
+              onClick={() =>
+                navigate("/cart")
+              }
+            >
+              View Cart (
+              {cartCount})
+            </button>
+          )}
         </div>
 
 
@@ -909,6 +751,11 @@ function BrowseItems() {
                     availability
                   ).toLowerCase() ===
                   "available";
+
+                const itemInCart =
+                  isInCart(
+                    item.id
+                  );
 
                 const statusClass =
                   item.statusColor ||
@@ -989,17 +836,20 @@ function BrowseItems() {
                         className="borrow-item-button"
                         type="button"
                         disabled={
-                          !isAvailable
+                          !isAvailable ||
+                          itemInCart
                         }
                         onClick={() =>
-                          openBorrowForm(
+                          handleAddToCart(
                             item
                           )
                         }
                       >
-                        {isAvailable
-                          ? "Request to Borrow"
-                          : "Currently Unavailable"}
+                        {!isAvailable
+                          ? "Currently Unavailable"
+                          : itemInCart
+                            ? "Added to Cart"
+                            : "Add to Cart"}
                       </button>
                     </div>
                   </article>
@@ -1035,220 +885,6 @@ function BrowseItems() {
           </div>
         )}
       </section>
-
-
-      {selectedItem && (
-        <div className="borrow-modal-overlay">
-          <section
-            className="borrow-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="borrow-modal-title"
-          >
-            <header className="borrow-modal-header">
-              <div>
-                <p className="page-label">
-                  BORROWING REQUEST
-                </p>
-
-                <h2 id="borrow-modal-title">
-                  Request{" "}
-                  {
-                    selectedItem.name
-                  }
-                </h2>
-
-                <p>
-                  Select the dates
-                  you would like to
-                  borrow this item.
-                </p>
-              </div>
-
-
-              <button
-                className="close-modal-button"
-                type="button"
-                onClick={
-                  closeBorrowForm
-                }
-                aria-label="Close borrowing form"
-                disabled={
-                  submittingRequest
-                }
-              >
-                ×
-              </button>
-            </header>
-
-
-            <div className="borrow-item-summary">
-              <span className="borrow-summary-icon">
-                {
-                  getItemIcon(
-                    selectedItem
-                  )
-                }
-              </span>
-
-              <div>
-                <strong>
-                  {
-                    selectedItem.name
-                  }
-                </strong>
-
-                <span>
-                  Owned by{" "}
-                  {
-                    getItemOwnerName(
-                      selectedItem
-                    )
-                  }
-                </span>
-
-                <small>
-                  {selectedItem.condition ||
-                    "Condition not specified"}
-                </small>
-              </div>
-            </div>
-
-
-            <form
-              className="borrow-date-form"
-              onSubmit={
-                handleBorrowRequest
-              }
-            >
-              <div className="borrow-date-fields">
-                <label className="item-form-field">
-                  <span>
-                    Borrowing Date{" "}
-                    <b>
-                      *
-                    </b>
-                  </span>
-
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={
-                      borrowDates.startDate
-                    }
-                    min={
-                      minimumDate
-                    }
-                    onChange={
-                      handleDateChange
-                    }
-                    disabled={
-                      submittingRequest
-                    }
-                    required
-                  />
-                </label>
-
-
-                <label className="item-form-field">
-                  <span>
-                    Return Date{" "}
-                    <b>
-                      *
-                    </b>
-                  </span>
-
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={
-                      borrowDates.endDate
-                    }
-                    min={
-                      borrowDates.startDate ||
-                      minimumDate
-                    }
-                    onChange={
-                      handleDateChange
-                    }
-                    disabled={
-                      submittingRequest
-                    }
-                    required
-                  />
-                </label>
-              </div>
-
-
-              {formError && (
-                <div
-                  className="borrow-form-error"
-                  role="alert"
-                >
-                  {formError}
-                </div>
-              )}
-
-
-              <div className="borrow-request-information">
-                <strong>
-                  Before submitting
-                </strong>
-
-                <ul>
-                  <li>
-                    Wait for the item
-                    owner to approve
-                    your request.
-                  </li>
-
-                  <li>
-                    Collect the item
-                    only after the
-                    request is
-                    approved.
-                  </li>
-
-                  <li>
-                    Return the item
-                    by the selected
-                    return date.
-                  </li>
-                </ul>
-              </div>
-
-
-              <div className="borrow-modal-actions">
-                <button
-                  className="cancel-request-button"
-                  type="button"
-                  onClick={
-                    closeBorrowForm
-                  }
-                  disabled={
-                    submittingRequest
-                  }
-                >
-                  Cancel
-                </button>
-
-
-                <button
-                  className="submit-request-button"
-                  type="submit"
-                  disabled={
-                    submittingRequest
-                  }
-                >
-                  {submittingRequest
-                    ? "Submitting..."
-                    : "Submit Request"}
-                </button>
-              </div>
-            </form>
-          </section>
-        </div>
-      )}
     </main>
   );
 }
