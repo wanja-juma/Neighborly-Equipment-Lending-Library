@@ -20,6 +20,7 @@ import PaymentRouteGuard from "./components/PaymentRouteGuard.jsx";
 import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
 import PaymentBar from "./components/PaymentBar";
+import Profile from "./Pages/Profile";
 
 import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
@@ -36,6 +37,7 @@ import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
 import Settings from "./Pages/Settings";
+import ItemDetails from "./Pages/ItemDetails";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 import CartProvider from "./context/CartProvider";
 
@@ -75,6 +77,7 @@ function App() {
     "/payments",
     "/damage-reports",
     "/settings",
+     "/profile",
   ];
 
 
@@ -113,6 +116,54 @@ function App() {
                         </>
                       }
                     />
+              <Navbar />
+
+              <div className="app-content">
+                <Routes>
+
+                  {/* PUBLIC ROUTES*/}
+
+                  <Route
+                    path="/"
+                    element={
+                      <>
+                        <Home />
+                        <About />
+                      </>
+                    }
+                  />
+
+                  <Route
+                    path="/about"
+                    element={
+                      <Navigate
+                        to="/#about"
+                        replace
+                      />
+                    }
+                  />
+
+                  <Route
+                    path="/browse-tools"
+                    element={<BrowseTools />}
+                  />
+
+                  <Route
+                    path="/tools/:id"
+                    element={<ItemDetail />}
+                  />
+
+                  <Route
+                    path="/auth"
+                    element={<AuthPage />}
+                  />
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout />
+                      </ProtectedRoute>
+                    }
+                  >
 
                     <Route
                       path="/about"
@@ -179,6 +230,24 @@ function App() {
                         path="/listings/:itemId/edit"
                         element={<EditItem />}
                       />
+                    <Route
+                      path="/items/:itemId"
+                      element={<ItemDetails />}
+                    />
+
+                    <Route
+                      path="/loans"
+                      element={<Loans />}
+                    />
+
+                    <Route
+                      path="/payments/:loanId"
+                      element={
+                        <PaymentRouteGuard>
+                          <PaymentBar />
+                        </PaymentRouteGuard>
+                      }
+                    />
 
                       <Route
                         path="/listings/:itemId/availability"
@@ -220,6 +289,12 @@ function App() {
                         }
                       />
 
+                    <Route
+                      path="/profile"
+                      element={<Profile />}
+                    />
+
+                  </Route>
 
                       <Route
                         path="/damage-reports"
