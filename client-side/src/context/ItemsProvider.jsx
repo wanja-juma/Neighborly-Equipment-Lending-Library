@@ -6,8 +6,10 @@ import {
   updateItem as updateItemRequest,
 } from "../services/api";
 import ItemsContext from "./ItemsContext";
+import useAuth from "../hooks/useAuth";
 
 function ItemsProvider({ children }) {
+  const { currentUser } = useAuth();
   const [items, setItems] = useState([]);
   const [itemsLoading, setItemsLoading] =
     useState(true);
@@ -39,8 +41,8 @@ function ItemsProvider({ children }) {
   const addItem = async (itemData) => {
     const newItemData = {
       ...itemData,
-      ownerId: "1",
-      owner: "Wanja Juma",
+      ownerId: Number(currentUser?.id),
+      owner: currentUser?.name || "Neighbour",
       location: "Greenview Estate",
       availability: "Available",
       statusColor: "available",
