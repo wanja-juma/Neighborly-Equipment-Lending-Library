@@ -14,7 +14,7 @@ function Footer() {
         <div className="footer-column">
           <h4>Explore</h4>
           <ul>
-            <li><a href="/about">About / Our Mission</a></li>
+            <li><Link to="/about">About</Link></li>
             <li><a href="/how-it-works">How It Works</a></li>
             <li><a href="/faq">FAQ</a></li>
           </ul>
