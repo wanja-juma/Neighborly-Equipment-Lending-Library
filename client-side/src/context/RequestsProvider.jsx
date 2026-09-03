@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -6,22 +7,34 @@ import {
 import {
   createBorrowingRequest,
   getBorrowingRequests,
-  updateBorrowingRequest,
+  updateBorrowingRequest as updateBorrowingRequestApi,
 } from "../services/api";
 
+import useAuth from "../hooks/useAuth";
 import RequestsContext from "./RequestsContext";
 
 
-function RequestsProvider({ children }) {
+function RequestsProvider({
+  children,
+}) {
+  const {
+    currentUser,
+  } = useAuth();
+
+
   const [
     borrowingRequests,
     setBorrowingRequests,
   ] = useState([]);
 
+
   const [
     requestsLoading,
     setRequestsLoading,
-  ] = useState(true);
+  ] = useState(
+    Boolean(currentUser)
+  );
+
 
   const [
     requestsError,
@@ -29,330 +42,354 @@ function RequestsProvider({ children }) {
   ] = useState("");
 
 
+  /*
+   * Normalize the response returned
+   * from the Flask API.
+   */
+  const normalizeRequests = (
+    data
+  ) => {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (
+      Array.isArray(
+        data?.borrowing_requests
+      )
+    ) {
+      return data.borrowing_requests;
+    }
+
+    if (
+      Array.isArray(
+        data?.borrowingRequests
+      )
+    ) {
+      return data.borrowingRequests;
+    }
+
+    if (
+      Array.isArray(
+        data?.requests
+      )
+    ) {
+      return data.requests;
+    }
+
+    return [];
+  };
+
+
+  /*
+   * Manually refresh borrowing
+   * requests.
+   *
+   * Used by Requests.jsx when the
+   * browser regains focus or after
+   * approving/declining a request.
+   */
+  const refreshRequests =
+    useCallback(
+      async () => {
+        if (!currentUser) {
+          return [];
+        }
+
+        try {
+          setRequestsLoading(true);
+          setRequestsError("");
+
+          const data =
+            await getBorrowingRequests();
+
+          const requests =
+            normalizeRequests(data);
+
+          setBorrowingRequests(
+            requests
+          );
+
+          return requests;
+        } catch (error) {
+          setRequestsError(
+            error.message ||
+              "Failed to load borrowing requests."
+          );
+
+          return [];
+        } finally {
+          setRequestsLoading(
+            false
+          );
+        }
+      },
+      [currentUser]
+    );
+
+
+  /*
+   * Load requests when a user
+   * becomes authenticated.
+   *
+   * IMPORTANT:
+   * We do not synchronously call
+   * setState when currentUser is null.
+   */
   useEffect(() => {
-    const loadRequests = async () => {
+    if (!currentUser) {
+      return;
+    }
+
+    let cancelled = false;
+
+
+    const loadRequests =
+      async () => {
+        try {
+          /*
+           * Wait for the external API
+           * before updating React state.
+           */
+          const data =
+            await getBorrowingRequests();
+
+          if (cancelled) {
+            return;
+          }
+
+          const requests =
+            normalizeRequests(data);
+
+          setBorrowingRequests(
+            requests
+          );
+
+          setRequestsError("");
+        } catch (error) {
+          if (cancelled) {
+            return;
+          }
+
+          setRequestsError(
+            error.message ||
+              "Failed to load borrowing requests."
+          );
+        } finally {
+          if (!cancelled) {
+            setRequestsLoading(
+              false
+            );
+          }
+        }
+      };
+
+
+    loadRequests();
+
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser]);
+
+
+  /*
+   * Find one request from the
+   * requests currently stored
+   * in context.
+   */
+  const getBorrowingRequestById =
+    (requestId) => {
+      return (
+        borrowingRequests.find(
+          (request) =>
+            String(request.id) ===
+            String(requestId)
+        ) || null
+      );
+    };
+
+
+  /*
+   * Create a new borrowing request.
+   */
+  const addBorrowingRequest =
+    async (requestData) => {
       try {
-        setRequestsLoading(true);
         setRequestsError("");
 
-        const data =
-          await getBorrowingRequests();
+        const createdRequest =
+          await createBorrowingRequest(
+            requestData
+          );
 
-        const requests =
-          Array.isArray(data)
-            ? data
-            : data?.borrowing_requests ||
-              data?.borrowingRequests ||
-              data?.requests ||
-              [];
 
-        setBorrowingRequests(requests);
+        const request =
+          createdRequest
+            ?.borrowing_request ??
+          createdRequest
+            ?.borrowingRequest ??
+          createdRequest
+            ?.request ??
+          createdRequest;
+
+
+        if (request) {
+          setBorrowingRequests(
+            (currentRequests) => [
+              request,
+              ...currentRequests,
+            ]
+          );
+        }
+
+
+        return request;
       } catch (error) {
-        console.error(
-          "Failed to load borrowing requests:",
-          error
-        );
-
         setRequestsError(
           error.message ||
-            "Failed to load borrowing requests."
+            "Unable to create borrowing request."
         );
-      } finally {
-        setRequestsLoading(false);
+
+        throw error;
       }
     };
 
-    loadRequests();
-  }, []);
+
+  /*
+   * Update the status or other
+   * fields of a borrowing request.
+   *
+   * Examples:
+   *
+   * pending -> approved
+   * pending -> declined
+   */
+  const updateRequestStatus =
+    async (
+      requestId,
+      status
+    ) => {
+      try {
+        setRequestsError("");
 
 
-  const addBorrowingRequest = async (
-    requestData
-  ) => {
-    /*
-     * Backend field names:
-     *
-     * user_id
-     * equipment_id
-     * start_date
-     * end_date
-     * status
-     * message
-     */
-
-    const equipmentId =
-      requestData.equipment_id ??
-      requestData.item_id ??
-      requestData.itemId;
-
-    const userId =
-      requestData.user_id ??
-      requestData.borrower_id ??
-      requestData.borrowerId;
-
-    const startDate =
-      requestData.start_date ??
-      requestData.startDate;
-
-    const endDate =
-      requestData.end_date ??
-      requestData.endDate;
+        const payload =
+          typeof status ===
+          "object"
+            ? status
+            : {
+                status,
+              };
 
 
-    const duplicateRequest =
-      borrowingRequests.find(
-        (request) => {
-          const existingEquipmentId =
-            request.equipment_id ??
-            request.item_id ??
-            request.itemId;
+        const result =
+          await updateBorrowingRequestApi(
+            requestId,
+            payload
+          );
 
-          const existingUserId =
-            request.user_id ??
-            request.borrower_id ??
-            request.borrowerId;
 
-          const existingStatus =
-            String(
-              request.status || ""
-            ).toLowerCase();
+        const updatedRequest =
+          result
+            ?.borrowing_request ??
+          result
+            ?.borrowingRequest ??
+          result
+            ?.request ??
+          result;
 
-          return (
-            String(existingEquipmentId) ===
-              String(equipmentId) &&
-            String(existingUserId) ===
-              String(userId) &&
-            existingStatus === "pending"
+
+        if (updatedRequest) {
+          setBorrowingRequests(
+            (currentRequests) =>
+              currentRequests.map(
+                (request) =>
+                  String(
+                    request.id
+                  ) ===
+                  String(
+                    requestId
+                  )
+                    ? {
+                        ...request,
+                        ...updatedRequest,
+                      }
+                    : request
+              )
           );
         }
-      );
 
 
-    if (duplicateRequest) {
-      return {
-        success: false,
-        message:
-          "You already have a pending request for this item.",
-      };
-    }
-
-
-    if (!equipmentId) {
-      return {
-        success: false,
-        message:
-          "The equipment ID is required.",
-      };
-    }
-
-
-    if (!userId) {
-      return {
-        success: false,
-        message:
-          "The borrower ID is required.",
-      };
-    }
-
-
-    if (!startDate || !endDate) {
-      return {
-        success: false,
-        message:
-          "Please select both borrowing dates.",
-      };
-    }
-
-
-    try {
-      /*
-       * Convert the frontend camelCase
-       * fields to the snake_case names
-       * required by Flask.
-       */
-      const payload = {
-        user_id: Number(userId),
-        equipment_id:
-          Number(equipmentId),
-
-        start_date: startDate,
-        end_date: endDate,
-
-        status: "pending",
-
-        message:
-          requestData.message || null,
-      };
-
-
-      const data =
-        await createBorrowingRequest(
-          payload
+        return updatedRequest;
+      } catch (error) {
+        setRequestsError(
+          error.message ||
+            "Unable to update borrowing request."
         );
 
-
-      const savedRequest =
-        data?.borrowing_request ||
-        data?.borrowingRequest ||
-        data?.request ||
-        data;
-
-
-      setBorrowingRequests(
-        (currentRequests) => [
-          savedRequest,
-          ...currentRequests,
-        ]
-      );
-
-
-      return {
-        success: true,
-        request: savedRequest,
-        message:
-          "Borrowing request submitted successfully.",
-      };
-    } catch (error) {
-      console.error(
-        "Failed to create borrowing request:",
-        error
-      );
-
-
-      return {
-        success: false,
-        message:
-          error.message ||
-          "Failed to submit borrowing request.",
-      };
-    }
-  };
-
-
-  const updateRequestStatus = async (
-    requestId,
-    newStatus
-  ) => {
-    /*
-     * The UI currently uses statuses such as:
-     *
-     * Approved
-     * Declined
-     * Cancelled
-     *
-     * Flask expects:
-     *
-     * approved
-     * rejected
-     * cancelled
-     */
-
-    const statusMap = {
-      Pending: "pending",
-      pending: "pending",
-
-      Approved: "approved",
-      approved: "approved",
-
-      Declined: "rejected",
-      declined: "rejected",
-
-      Rejected: "rejected",
-      rejected: "rejected",
-
-      Cancelled: "cancelled",
-      cancelled: "cancelled",
+        throw error;
+      }
     };
 
 
-    const backendStatus =
-      statusMap[newStatus];
-
-
-    if (!backendStatus) {
-      return {
-        success: false,
-        message:
-          "Invalid request status.",
-      };
-    }
-
-
-    try {
-      const data =
-        await updateBorrowingRequest(
-          requestId,
-          {
-            status: backendStatus,
-          }
-        );
-
-
-      const updatedRequest =
-        data?.borrowing_request ||
-        data?.borrowingRequest ||
-        data?.request ||
-        data;
-
-
-      setBorrowingRequests(
-        (currentRequests) =>
-          currentRequests.map(
-            (request) =>
-              String(request.id) ===
-              String(requestId)
-                ? updatedRequest
-                : request
-          )
-      );
-
-
-      const displayStatus =
-        backendStatus === "rejected"
-          ? "declined"
-          : backendStatus;
-
-
-      return {
-        success: true,
-        request: updatedRequest,
-        message:
-          `Request ${displayStatus}.`,
-      };
-    } catch (error) {
-      console.error(
-        "Failed to update request:",
-        error
-      );
-
-
-      return {
-        success: false,
-        message:
-          error.message ||
-          "Failed to update request.",
-      };
-    }
-  };
-
-
-  const cancelBorrowingRequest = (
-    requestId
-  ) => {
-    return updateRequestStatus(
+  /*
+   * Requests.jsx currently calls:
+   *
+   * updateBorrowingRequest(
+   *   request.id,
+   *   { status: "approved" }
+   * )
+   *
+   * Keep this alias so the existing
+   * Requests.jsx does not need to
+   * change.
+   */
+  const updateBorrowingRequest =
+    async (
       requestId,
-      "Cancelled"
-    );
-  };
+      requestData
+    ) => {
+      return updateRequestStatus(
+        requestId,
+        requestData
+      );
+    };
+
+
+  /*
+   * When there is no logged-in user,
+   * expose an empty request list
+   * without calling setState inside
+   * the effect.
+   */
+  const visibleBorrowingRequests =
+    currentUser
+      ? borrowingRequests
+      : [];
 
 
   const value = {
-    borrowingRequests,
-    requestsLoading,
+    borrowingRequests:
+      visibleBorrowingRequests,
+
+    requestsLoading:
+      currentUser
+        ? requestsLoading
+        : false,
+
     requestsError,
+
+    getBorrowingRequestById,
+
     addBorrowingRequest,
+
+    refreshRequests,
+
     updateRequestStatus,
-    cancelBorrowingRequest,
+
+    updateBorrowingRequest,
   };
 
 

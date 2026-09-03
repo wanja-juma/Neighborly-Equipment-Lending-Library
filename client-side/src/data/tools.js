@@ -1,11 +1,74 @@
-const tools = [
-  { id: '1', name: 'Cordless Drill', dailyRate: 5, condition: 'Good', description: 'A reliable cordless drill, great for small home projects.' },
-  { id: '2', name: 'Ladder (6ft)', dailyRate: 3, condition: 'Excellent', description: 'Sturdy 6ft ladder, ideal for painting or gutter cleaning.' },
-  { id: '3', name: 'Lawnmower', dailyRate: 8, condition: 'Fair', description: 'Petrol lawnmower, works well for small to medium yards.' },
-];
+// const API_URL =
+//   import.meta.env.VITE_API_URL ||
+//   "http://localhost:5555/api";
 
-export default tools;
 
+// export async function getTools({
+//   page = 1,
+//   limit = 6,
+// } = {}) {
+//   const response = await fetch(
+//     `${API_URL}/items`
+//   );
+
+//   if (!response.ok) {
+//     throw new Error(
+//       "Failed to fetch tools"
+//     );
+//   }
+
+//   const data = await response.json();
+
+//   const allTools = Array.isArray(data)
+//     ? data
+//     : data?.items || [];
+
+//   const startIndex =
+//     (page - 1) * limit;
+
+//   const endIndex =
+//     startIndex + limit;
+
+//   const tools =
+//     allTools.slice(
+//       startIndex,
+//       endIndex
+//     );
+
+//   const totalPages =
+//     Math.max(
+//       1,
+//       Math.ceil(
+//         allTools.length /
+//           limit
+//       )
+//     );
+
+//   return {
+//     tools,
+//     totalPages,
+//   };
+// }
+
+
+// export async function getToolById(
+//   toolId
+// ) {
+//   const response = await fetch(
+//     `${API_URL}/items/${toolId}`
+//   );
+
+//   if (!response.ok) {
+//     throw new Error(
+//       "Failed to fetch tool"
+//     );
+//   }
+
+//   const data =
+//     await response.json();
+
+//   return data?.item || data;
+// }
 
 
 
