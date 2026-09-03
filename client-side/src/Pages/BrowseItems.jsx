@@ -610,43 +610,11 @@ function BrowseItems() {
 
 
       try {
-        const result =
-          await addBorrowingRequest(
-            {
-              itemId:
-                selectedItem.id,
-
-              itemName:
-                selectedItem.name,
-
-              itemIcon:
-                getItemIcon(
-                  selectedItem
-                ),
-
-              ownerId:
-                getItemOwnerId(
-                  selectedItem
-                ),
-
-              ownerName:
-                getItemOwnerName(
-                  selectedItem
-                ),
-
-              borrowerId:
-                CURRENT_USER_ID,
-
-              borrowerName:
-                "Wanja Juma",
-
-              startDate:
-                borrowDates.startDate,
-
-              endDate:
-                borrowDates.endDate,
-            }
-          );
+       const result = await addBorrowingRequest({
+  equipment_id: Number(selectedItem.id),
+  start_date: borrowDates.startDate,
+  end_date: borrowDates.endDate,
+});
 
 
         if (

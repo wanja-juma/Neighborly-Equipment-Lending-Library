@@ -6,11 +6,12 @@ import {
   updateItem as updateItemRequest,
 } from "../services/api";
 import ItemsContext from "./ItemsContext";
+import useAuth from "../hooks/useAuth";
 
 function ItemsProvider({ children }) {
   const [items, setItems] = useState([]);
-  const [itemsLoading, setItemsLoading] =
-    useState(true);
+  const { currentUser } = useAuth();
+  const [itemsLoading, setItemsLoading] = useState(true);
     
   const [itemsError, setItemsError] =
     useState("");
@@ -36,18 +37,18 @@ function ItemsProvider({ children }) {
     loadItems();
   }, []);
 
-  const addItem = async (itemData) => {
+const addItem = async (itemData) => {
     const newItemData = {
       ...itemData,
-      ownerId: "1",
-      owner: "Wanja Juma",
-      location: "Greenview Estate",
+      ownerId: Number(currentUser.id),
+      owner: currentUser.name,
+      location: currentUser.community || currentUser.location,
       availability: "Available",
       statusColor: "available",
     };
 
-    const savedItem = await createItem(
-      newItemData
+  const savedItem = await createItem(
+    newItemData
     );
 
     setItems((currentItems) => [

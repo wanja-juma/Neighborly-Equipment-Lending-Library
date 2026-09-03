@@ -217,7 +217,7 @@ function Loans() {
       const loanResult =
         await updateLoanStatus(
           loanId,
-          "Returned"
+          "returned"
         );
 
       if (
@@ -275,8 +275,10 @@ function Loans() {
       String(loan.id);
 
     const dueDate =
-      loan.dueDate ||
-      loan.due_date;
+  loan.dueDate ||
+  loan.due_date ||
+  loan.endDate ||
+  loan.end_date;
 
     const returnedAt =
       loan.returnedAt ||

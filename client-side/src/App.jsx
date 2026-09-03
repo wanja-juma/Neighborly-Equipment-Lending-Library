@@ -23,9 +23,9 @@ import PaymentBar from "./components/PaymentBar";
 
 import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
-// import Loans from "./Pages/Loans";
+import Loans from "./Pages/Loans";
 import MyListings from "./Pages/MyListings";
-// import Requests from "./Pages/Requests";
+import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
 import EditItem from "./Pages/EditItem";
 import ChangeAvailability from "./Pages/ChangeAvailability";
@@ -38,8 +38,8 @@ import Settings from "./Pages/Settings";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 
 
-import Requests from './components/Requests';
-import Loans from './components/Loans';
+// import Requests from './components/Requests';
+// import Loans from './components/Loans';
 
 import "./App.css";
 

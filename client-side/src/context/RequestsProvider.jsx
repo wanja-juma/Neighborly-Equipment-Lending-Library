@@ -266,72 +266,34 @@ function RequestsProvider({
    * pending -> approved
    * pending -> declined
    */
-  const updateRequestStatus =
-    async (
-      requestId,
-      status
-    ) => {
-      try {
-        setRequestsError("");
+   const updateRequestStatus = async (requestId, status) => {
+  const payload =
+    typeof status === "object" ? status : { status };
 
+  const result = await updateBorrowingRequestApi(
+    requestId,
+    payload
+  );
 
-        const payload =
-          typeof status ===
-          "object"
-            ? status
-            : {
-                status,
-              };
+  const updatedRequest =
+    result?.borrowing_request ??
+    result?.borrowingRequest ??
+    result?.request ??
+    result;
 
+  if (updatedRequest) {
+    setBorrowingRequests((currentRequests) =>
+      currentRequests.map((request) =>
+        String(request.id) === String(requestId)
+          ? { ...request, ...updatedRequest }
+          : request
+      )
+    );
+  }
+  return updatedRequest;
+};
 
-        const result =
-          await updateBorrowingRequestApi(
-            requestId,
-            payload
-          );
-
-
-        const updatedRequest =
-          result
-            ?.borrowing_request ??
-          result
-            ?.borrowingRequest ??
-          result
-            ?.request ??
-          result;
-
-
-        if (updatedRequest) {
-          setBorrowingRequests(
-            (currentRequests) =>
-              currentRequests.map(
-                (request) =>
-                  String(
-                    request.id
-                  ) ===
-                  String(
-                    requestId
-                  )
-                    ? {
-                        ...request,
-                        ...updatedRequest,
-                      }
-                    : request
-              )
-          );
-        }
-
-
-        return updatedRequest;
-      } catch (error) {
-        setRequestsError(
-          error.message ||
-            "Unable to update borrowing request."
-        );
-
-        throw error;
-      }
-    };
+  
 
 
   /*

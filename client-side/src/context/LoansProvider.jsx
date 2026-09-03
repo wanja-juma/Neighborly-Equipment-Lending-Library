@@ -92,7 +92,7 @@ function LoansProvider({ children }) {
         {
           status: newStatus,
           returnedAt:
-            newStatus === "Returned"
+            newStatus === "returned"
               ? new Date().toISOString()
               : null,
         }
