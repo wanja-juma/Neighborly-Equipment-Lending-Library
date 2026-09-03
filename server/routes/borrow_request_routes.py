@@ -177,9 +177,6 @@ def create_borrowing_request():
     except Exception as error:
         db.session.rollback()
 
-<<<<<<< HEAD
-@borrow_requests_bp.get("")
-=======
         return jsonify({
             "error":
                 "Unable to create borrowing request.",
@@ -191,7 +188,6 @@ def create_borrowing_request():
 @borrow_requests_bp.get(
     "/<int:request_id>"
 )
->>>>>>> origin/dev
 @jwt_required()
 def get_borrowing_request(
     request_id
