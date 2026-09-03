@@ -45,9 +45,9 @@ function Footer() {
             <button type="submit">Subscribe</button>
           </form>
           <div className="footer-socials">
-            <a href="#" aria-label="Facebook">FB</a>
-            <a href="#" aria-label="Twitter">X</a>
-            <a href="#" aria-label="Instagram">IG</a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">FB</a>
+            <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">X</a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">IG</a>
           </div>
         </div>
       </div>
