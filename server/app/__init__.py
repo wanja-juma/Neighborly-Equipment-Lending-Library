@@ -56,11 +56,14 @@ def create_app(config_class=Config):
     from routes import (
     auth_bp,
     borrow_requests_bp,
+    categories_bp,
+    damage_reports_bp,
     loans_bp,
     membership_bp,
     payment_bp,
     profile_bp,
     user_bp,
+    items_bp,
 )
 
     # Register each blueprint once.
@@ -69,9 +72,12 @@ def create_app(config_class=Config):
     app.register_blueprint(user_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(borrow_requests_bp)
+    app.register_blueprint(categories_bp)
+    app.register_blueprint(damage_reports_bp)
     app.register_blueprint(loans_bp)
     app.register_blueprint(membership_bp)
     app.register_blueprint(payment_bp)
+    app.register_blueprint(items_bp)
 
     # Health check route.
     @app.get("/api/health")
