@@ -24,6 +24,7 @@ function Footer() {
           <h4>Account</h4>
           <ul>
             <li><Link to="/dashboard">Dashboard</Link></li>
+            <li><Link to="/listings">My Listings</Link></li>
           </ul>
         </div>
 
