@@ -34,6 +34,7 @@ function Footer() {
           <h4>Support</h4>
           <ul>
             <li><Link to="/damage-reports">Report an Issue / Tool</Link></li>
+            <li><Link to="/payments">Payments</Link></li>
           </ul>
         </div>
 
