@@ -21,6 +21,13 @@ function Footer() {
         </div>
 
         <div className="footer-column">
+          <h4>Account</h4>
+          <ul>
+            <li><Link to="/dashboard">Dashboard</Link></li>
+          </ul>
+        </div>
+
+        <div className="footer-column">
           <h4>Support</h4>
           <ul>
             <li><a href="/contact">Contact Us</a></li>
