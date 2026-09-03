@@ -18,7 +18,7 @@ class Loan(db.Model):
     
     item = db.relationship('Item', back_populates='loans')
     borrower = db.relationship('User', backref='loans')
-    payments = db.relationship('Payment', back_populates='loan', cascade='all, delete-orphan')
+    payment = db.relationship('Payment', back_populates='loan', cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<Loan {self.id}>'

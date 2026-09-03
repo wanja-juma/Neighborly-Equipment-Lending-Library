@@ -9,7 +9,6 @@ from app.extensions import (
     migrate,
 )
 
-
 def create_app(config_class=Config):
     app = Flask(__name__)
     
@@ -87,11 +86,11 @@ def create_app(config_class=Config):
     @app.get("/api/health")
     def health_check():
         return {
-            "status": "healthy",
-            "message": (
-                "Neighborly API is running."
-            ),
-        }, 200
+        "status": "healthy",
+        "message": (
+            "Neighborly API is running."
+        ),
+    }, 200
 
     # Temporary test seeder route for mock assumptions
     @app.get("/api/seed-test-data")

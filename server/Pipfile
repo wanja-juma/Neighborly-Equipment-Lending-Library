@@ -1,7 +1,7 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
+name = "pypi"
 
 [packages]
 flask = "*"
@@ -19,6 +19,7 @@ marshmallow = "*"
 python-dotenv = "*"
 pyjwt = "==2.13.0"
 blinker = "==1.9.0"
+certifi = "==2026.7.22"
 click = "==8.4.2"
 greenlet = "==3.5.5"
 itsdangerous = "==2.2.0"

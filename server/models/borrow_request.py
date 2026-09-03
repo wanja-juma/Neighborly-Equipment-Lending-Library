@@ -31,6 +31,7 @@ class BorrowingRequest(db.Model):
         nullable=False
     )
 
+
     # Dates selected by the borrower.
     start_date = db.Column(
         db.DateTime,

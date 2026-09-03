@@ -90,7 +90,7 @@ def get_borrowing_requests():
     }), 200
 
 
-@borrow_requests_bp.post("")
+@borrow_requests_bp.route('/borrowing_requests', methods=['POST'])
 @jwt_required()
 def create_borrowing_request():
     """
