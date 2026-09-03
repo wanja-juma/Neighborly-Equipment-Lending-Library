@@ -9,12 +9,11 @@ import ItemsContext from "./ItemsContext";
 import useAuth from "../hooks/useAuth";
 
 function ItemsProvider({ children }) {
-  const [items, setItems] = useState([]);
   const { currentUser } = useAuth();
+
+  const [items, setItems] = useState([]);
   const [itemsLoading, setItemsLoading] = useState(true);
-    
-  const [itemsError, setItemsError] =
-    useState("");
+  const [itemsError, setItemsError] = useState("");
 
   useEffect(() => {
     const loadItems = async () => {
@@ -43,7 +42,7 @@ setItems(normalizedItems);
     loadItems();
   }, []);
 
-const addItem = async (itemData) => {
+ const addItem = async (itemData) => {
     const newItemData = {
       ...itemData,
       ownerId: Number(currentUser.id),
@@ -53,9 +52,12 @@ const addItem = async (itemData) => {
       statusColor: "available",
     };
 
-  const savedItem = await createItem(
-    newItemData
-    );
+    const savedItem = await createItem(newItemData);
+
+    setItems((currentItems) => [savedItem, ...currentItems]);
+
+    return savedItem;
+  };
 
     setItems((currentItems) => [
       savedItem,
@@ -64,6 +66,16 @@ const addItem = async (itemData) => {
 
     return savedItem;
   };
+
+  const savedItem = await createItem(newItemData);
+
+  setItems((currentItems) => [
+    savedItem,
+    ...currentItems,
+  ]);
+
+  return savedItem;
+;
 
   const updateItem = async (
     itemId,
@@ -108,6 +120,6 @@ const addItem = async (itemData) => {
       {children}
     </ItemsContext.Provider>
   );
-}
+
 
 export default ItemsProvider;

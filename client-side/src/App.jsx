@@ -20,6 +20,11 @@ import PaymentRouteGuard from "./components/PaymentRouteGuard.jsx";
 import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
 import PaymentBar from "./components/PaymentBar";
+<<<<<<< HEAD
+=======
+import Profile from "./Pages/Profile";
+import Cart from "./Pages/Cart";
+>>>>>>> 0eb4de73f94a5095eddf991849fed584dc3fd202
 
 import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
@@ -36,6 +41,7 @@ import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
 import Settings from "./Pages/Settings";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
+import CartProvider from "./context/CartProvider";
 
 
 // import Requests from './components/Requests';
@@ -97,8 +103,9 @@ function App() {
         <RequestsProvider>
           <LoansProvider>
             <DamageReportsProvider>
+              <CartProvider>
 
-              <Navbar />
+                <Navbar />
 
               <div className="app-content">
                 <Routes>
@@ -128,6 +135,11 @@ function App() {
                   <Route
                     path="/browse-tools"
                     element={<BrowseTools />}
+                  />
+
+                  <Route
+                    path="/cart"
+                    element={<Cart />}
                   />
 
                   <Route
@@ -250,6 +262,7 @@ function App() {
                 <Footer />
               )}
 
+              </CartProvider>
             </DamageReportsProvider>
           </LoansProvider>
         </RequestsProvider>

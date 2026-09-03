@@ -1,0 +1,136 @@
+.cart-page {
+  padding: 3rem 6%;
+  font-family: 'Inter', sans-serif;
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.cart-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1F2B38;
+  margin: 0;
+}
+
+.cart-count {
+  font-size: 13px;
+  color: #55534E;
+}
+
+.cart-notice {
+  background: #EAF6EE;
+  color: #1E5E3D;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 14px;
+}
+
+.cart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 4rem 1rem;
+  color: #8B8A84;
+  text-align: center;
+}
+
+.cart-empty h2 {
+  color: #141414;
+  margin: 0.5rem 0 0;
+}
+
+.cart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.5rem;
+}
+
+.cart-card {
+  background: #FFFFFF;
+  border: 1px solid #EDECE6;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.cart-card__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 140px;
+  background: #FBF6ED;
+}
+
+.cart-card__icon {
+  font-size: 48px;
+}
+
+.cart-card__body {
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.cart-card__name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #141414;
+  margin: 0 0 4px;
+}
+
+.cart-card__condition {
+  font-size: 13px;
+  color: #55534E;
+  margin: 0;
+}
+
+.cart-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.cart-card__meta span {
+  font-size: 12px;
+  color: #8B8A84;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cart-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.cart-card__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0.55rem 0.6rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cart-card__btn--request {
+  flex: 1;
+  background: #1E5E3D;
+  color: #FFFFFF;
+  border: none;
+}
+
+.cart-card__btn--remove {
+  background: transparent;
+  color: #B00020;
+  border: 1px solid #E3E3DD;
+}

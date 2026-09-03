@@ -29,9 +29,13 @@ def create_app(config_class=Config):
             r"/api/*": {
                 "origins": [
                     "http://localhost:5173",
+<<<<<<< HEAD
                     "http://localhost:5174",
                     "http://127.0.0.1:5173",
                     "http://127.0.0.1:5174",
+=======
+                    "http://127.0.0.1:5173",
+>>>>>>> 0eb4de73f94a5095eddf991849fed584dc3fd202
                 ],
                 "methods": [
                     "GET",
