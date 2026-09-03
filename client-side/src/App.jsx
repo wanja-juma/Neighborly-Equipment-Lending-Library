@@ -21,6 +21,7 @@ import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
 import PaymentBar from "./components/PaymentBar";
 import Profile from "./Pages/Profile";
+import Cart from "./Pages/Cart";
 
 import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
@@ -38,6 +39,7 @@ import LoansProvider from "./context/LoansProvider.jsx";
 import Settings from "./Pages/Settings";
 import ItemDetails from "./Pages/ItemDetails";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
+import CartProvider from "./context/CartProvider";
 
 import "./App.css";
 
@@ -96,8 +98,9 @@ function App() {
         <RequestsProvider>
           <LoansProvider>
             <DamageReportsProvider>
+              <CartProvider>
 
-              <Navbar />
+                <Navbar />
 
               <div className="app-content">
                 <Routes>
@@ -127,6 +130,11 @@ function App() {
                   <Route
                     path="/browse-tools"
                     element={<BrowseTools />}
+                  />
+
+                  <Route
+                    path="/cart"
+                    element={<Cart />}
                   />
 
                   <Route
@@ -252,6 +260,7 @@ function App() {
                 <Footer />
               )}
 
+              </CartProvider>
             </DamageReportsProvider>
           </LoansProvider>
         </RequestsProvider>
