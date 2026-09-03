@@ -23,9 +23,9 @@ import PaymentBar from "./components/PaymentBar";
 
 import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
-// import Loans from "./Pages/Loans";
+import Loans from "./Pages/Loans";
 import MyListings from "./Pages/MyListings";
-// import Requests from "./Pages/Requests";
+import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
 import EditItem from "./Pages/EditItem";
 import ChangeAvailability from "./Pages/ChangeAvailability";
@@ -38,8 +38,8 @@ import Settings from "./Pages/Settings";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 
 
-import Requests from './components/Requests';
-import Loans from './components/Loans';
+// import Requests from './components/Requests';
+// import Loans from './components/Loans';
 
 import "./App.css";
 
@@ -143,23 +143,6 @@ function App() {
 
                   {/* PROTECTED DASHBOARD*/}
 
-<<<<<<< HEAD
-                 <Route element={
-                  <ProtectedRoute>
-    <DashboardLayout />
-  </ProtectedRoute>
-}>
-  <Route path="/dashboard" element={<Dashboard />} />
-  <Route path="/items" element={<BrowseItems />} />
-  <Route path="/items/new" element={<AddItem />} />
-  <Route path="/listings" element={<MyListings />} />
-  <Route path="/listings/:itemId/edit" element={<EditItem />} />
-  <Route path="/listings/:itemId/availability" element={<ChangeAvailability />} />
-  <Route path="/requests" element={<Requests />} />
-  <Route path="/loans" element={<Loans />} />
-  <Route path="/damage-reports" element={<DamageReports />} />
-</Route>
-=======
                   <Route
                     element={
                       <ProtectedRoute>
@@ -247,7 +230,6 @@ function App() {
                     />
 
                   </Route>
->>>>>>> dev
 
 
                   <Route

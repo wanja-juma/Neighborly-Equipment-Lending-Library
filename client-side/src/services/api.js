@@ -3,15 +3,6 @@ const API_URL =
   "http://localhost:5555/api";
 
 
-<<<<<<< HEAD
-const TOKEN_KEY = 'neighborlyToken';
-
-export const getAuthToken = () => localStorage.getItem(TOKEN_KEY);
-
-
-
-=======
->>>>>>> dev
 const getAccessToken = () => {
   return (
     localStorage.getItem(
@@ -146,67 +137,6 @@ export const changePassword =
       {
         method: "PUT",
 
-<<<<<<< HEAD
-  return response?.items || [];
-};
-
-export const getItem = async (
-  itemId
-) => {
-  const response = await request(
-    `/items/${itemId}`
-  );
-
-  return response?.item || response;
-};
-
-export const createItem = async (
-  itemData
-) => {
-  const response = await request(
-    "/items",
-    {
-      method: "POST",
-      body: JSON.stringify(itemData),
-    }
-  );
-
-  return response?.item || response;
-};
-
-export const updateItem = async (
-  itemId,
-  updates
-) => {
-  const response = await request(
-    `/items/${itemId}`,
-    {
-      method: "PATCH",
-      body: JSON.stringify(updates),
-    }
-  );
-
-  return response?.item || response;
-};
-
-export const deleteItem = (
-  itemId
-) => {
-  return request(`/items/${itemId}`, {
-    method: "DELETE",
-  });
-};
-
-/* =========================
-   Borrowing requests
-========================= */
-
-export const getBorrowingRequests = async (type = 'incoming') => {
-  const response = await request(`/borrowing-requests?type=${type}`);
-  if (Array.isArray(response)) return response;
-  return response?.borrowing_requests || response?.borrowingRequests || [];
-};
-=======
         body: JSON.stringify(
           passwordData
         ),
@@ -254,7 +184,6 @@ export const getItems =
       []
     );
   };
->>>>>>> dev
 
 
 export const getItem =
