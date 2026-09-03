@@ -43,10 +43,20 @@ function Footer() {
 
         <div className="footer-column">
           <h4>Stay Updated</h4>
-          <form className="footer-newsletter" onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder="Your email" required />
-            <button type="submit">Subscribe</button>
-          </form>
+          {subscribed ? (
+            <p className="footer-subscribed">Subscribed!</p>
+          ) : (
+            <form
+              className="footer-newsletter"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSubscribed(true);
+              }}
+            >
+              <input type="email" placeholder="Your email" required />
+              <button type="submit">Subscribe</button>
+            </form>
+          )}
           <div className="footer-socials">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">FB</a>
             <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">X</a>
