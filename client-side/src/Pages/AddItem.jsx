@@ -9,6 +9,7 @@ const initialFormData = {
   description: "",
   condition: "",
   icon: "🧰",
+  image: null,
 };
 
 const categories = [
@@ -49,6 +50,7 @@ function AddItem() {
     useState(initialFormData);
 
   const [errors, setErrors] = useState({});
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -61,6 +63,35 @@ function AddItem() {
     setErrors((currentErrors) => ({
       ...currentErrors,
       [name]: "",
+      submit: "",
+    }));
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        image: "Please choose an image file.",
+      }));
+      return;
+    }
+
+    setFormData((currentData) => ({
+      ...currentData,
+      image: file,
+    }));
+
+    setImagePreview(URL.createObjectURL(file));
+
+    setErrors((currentErrors) => ({
+      ...currentErrors,
+      image: "",
       submit: "",
     }));
   };
@@ -112,6 +143,7 @@ function AddItem() {
           formData.description.trim(),
         condition: formData.condition,
         icon: formData.icon,
+        image: formData.image,
       });
 
       navigate("/listings");
@@ -303,6 +335,32 @@ function AddItem() {
               </div>
             </label>
 
+            {/* Item image */}
+            <label className="item-form-field">
+              <span>Item Photo</span>
+
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+
+              {errors.image && (
+                <small className="field-error">
+                  {errors.image}
+                </small>
+              )}
+
+              {imagePreview && (
+                <img
+                  className="item-image-preview"
+                  src={imagePreview}
+                  alt="Preview"
+                />
+              )}
+            </label>
+
             {/* Item icon */}
             <fieldset className="icon-fieldset">
               <legend>Choose an item icon</legend>
@@ -368,7 +426,14 @@ function AddItem() {
 
             <article className="equipment-card preview-card">
               <div className="equipment-image">
-                <span>{formData.icon}</span>
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                  />
+                ) : (
+                  <span>{formData.icon}</span>
+                )}
 
                 <span className="image-status available">
                   Available

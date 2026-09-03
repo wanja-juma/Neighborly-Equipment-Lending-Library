@@ -991,9 +991,16 @@ function BrowseItems() {
 
                     <div className="equipment-image">
 
-                      <span>
-                        {itemIcon}
-                      </span>
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name || "Item"}
+                        />
+                      ) : (
+                        <span>
+                          {itemIcon}
+                        </span>
+                      )}
 
 
                       <span
@@ -1181,13 +1188,21 @@ function BrowseItems() {
 
             <div className="borrow-item-summary">
 
-              <span className="borrow-summary-icon">
-                {
-                  getItemIcon(
-                    selectedItem
-                  )
-                }
-              </span>
+              {selectedItem.image ? (
+                <img
+                  className="borrow-summary-icon"
+                  src={selectedItem.image}
+                  alt={selectedItem.name || "Item"}
+                />
+              ) : (
+                <span className="borrow-summary-icon">
+                  {
+                    getItemIcon(
+                      selectedItem
+                    )
+                  }
+                </span>
+              )}
 
 
               <div>

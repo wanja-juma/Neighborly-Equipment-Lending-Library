@@ -7,6 +7,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
+import useItems from "../hooks/useItems";
 import "./ChangeAvailability.css";
 
 const API_URL =
@@ -34,6 +35,7 @@ const availabilityOptions = [
 function ChangeAvailability() {
   const { itemId } = useParams();
   const navigate = useNavigate();
+  const { updateItem } = useItems();
 
   const [item, setItem] = useState(null);
   const [availability, setAvailability] =
@@ -50,7 +52,7 @@ function ChangeAvailability() {
   useEffect(() => {
     const fetchItem = async () => {
       const token = localStorage.getItem(
-        "access_token"
+        "neighborlyToken"
       );
 
       try {
@@ -78,7 +80,7 @@ function ChangeAvailability() {
         setItem(loadedItem);
 
         setAvailability(
-          loadedItem.availability ||
+          loadedItem.status ||
             "Available"
         );
       } catch (requestError) {
@@ -94,37 +96,13 @@ function ChangeAvailability() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const token = localStorage.getItem(
-      "access_token"
-    );
-
     setSaving(true);
     setError("");
 
     try {
-      const response = await fetch(
-        `${API_URL}/items/${itemId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type":
-              "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            availability,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            "Unable to update availability."
-        );
-      }
+      await updateItem(itemId, {
+        availability,
+      });
 
       navigate("/listings", {
         replace: true,

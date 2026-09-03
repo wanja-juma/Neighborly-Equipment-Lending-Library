@@ -487,12 +487,20 @@ function BrowseTools() {
 
                   <div className="tool-card__icon-wrap">
 
-                    <span
-                      className="tool-card__icon"
-                      aria-hidden="true"
-                    >
-                      {icon}
-                    </span>
+                    {tool.image ? (
+                      <img
+                        className="tool-card__icon"
+                        src={tool.image}
+                        alt={tool.name || "Tool"}
+                      />
+                    ) : (
+                      <span
+                        className="tool-card__icon"
+                        aria-hidden="true"
+                      >
+                        {icon}
+                      </span>
+                    )}
 
 
                     {!available && (

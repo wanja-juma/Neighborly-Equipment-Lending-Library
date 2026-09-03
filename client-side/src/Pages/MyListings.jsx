@@ -279,10 +279,17 @@ function MyListings() {
                   >
                     <div className="equipment-image">
 
-                      <span>
-                        {item.icon ||
-                          "🧰"}
-                      </span>
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name || "Item"}
+                        />
+                      ) : (
+                        <span>
+                          {item.icon ||
+                            "🧰"}
+                        </span>
+                      )}
 
                       <button
                         className="equipment-options"
@@ -355,7 +362,7 @@ function MyListings() {
                       <div className="listing-actions">
 
                         <Link
-                          to={`/items/${item.id}/edit`}
+                          to={`/listings/${item.id}/edit`}
                           className="listing-action-btn edit-listing-btn"
                         >
                           Edit Listing
@@ -363,7 +370,7 @@ function MyListings() {
 
 
                         <Link
-                          to={`/items/${item.id}/availability`}
+                          to={`/listings/${item.id}/availability`}
                           className="listing-action-btn availability-btn"
                         >
                           Change Availability
