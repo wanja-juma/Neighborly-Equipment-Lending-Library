@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useDamageReports from "../hooks/useDamageReports";
+import useAuth from "../hooks/useAuth";
 import useLoans from "../hooks/useLoans";
 import "./BrowseItems.css";
 
@@ -12,6 +13,8 @@ const initialFormData = {
 };
 
 function DamageReports() {
+  const { currentUser } = useAuth();
+
   const {
   damageReports,
   damageReportsLoading,
@@ -42,12 +45,12 @@ const [
 ] = useState(null);
 
   const userLoans = loans.filter(
-    (loan) =>
-      String(loan.ownerId) ===
-        CURRENT_USER_ID ||
-      String(loan.borrowerId) ===
-        CURRENT_USER_ID
-  );
+      (loan) =>
+    String(loan.ownerId) ===
+      String(currentUser?.id) ||
+    String(loan.borrowerId) ===
+      String(currentUser?.id)
+    );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -118,28 +121,11 @@ const [
 
     setIsSubmitting(true);
 
-    const result = await addDamageReport({
-      loanId: selectedLoan.id,
-      itemId: selectedLoan.itemId,
-
-      itemName:
-        selectedLoan.item ||
-        selectedLoan.itemName ||
-        "Equipment",
-
-      itemIcon:
-        selectedLoan.icon || "🧰",
-
-      ownerId: selectedLoan.ownerId,
-      borrowerId: selectedLoan.borrowerId,
-
-      reportedById: CURRENT_USER_ID,
-      reportedByName: "Wanja Juma",
-
-      severity: formData.severity,
-      description:
-        formData.description.trim(),
-    });
+  const result = await addDamageReport({
+  loan_id: selectedLoan.id,
+  severity: formData.severity,
+  notes: formData.description.trim(),
+  });
 
     if (result.success) {
       setNotice(result.message);
@@ -319,14 +305,14 @@ const [
                 <option value="">
                   Select severity
                 </option>
-                <option value="Minor">
-                  Minor
+                <option value="low">
+                  Low
                 </option>
-                <option value="Moderate">
-                  Moderate
+                <option value="medium">
+                  Medium
                 </option>
-                <option value="Severe">
-                  Severe
+                <option value="high">
+                  High
                 </option>
               </select>
 
@@ -458,66 +444,39 @@ const [
                       </span>
                     </p>
 
-                    <p>{report.description}</p>
+                    <p>{report.notes}</p>
 
                     <small>
                       Submitted{" "}
-                      {report.createdAt
+                      {report.created_at
                         ? new Date(
-                            report.createdAt
+                            report.created_at
                           ).toLocaleDateString()
                         : "recently"}
                     </small>
                   </div>
 
-                  {String(report.ownerId) ===
-  CURRENT_USER_ID &&
-  report.status?.toLowerCase() !==
-    "resolved" && (
-    <div className="damage-report-actions">
-      {report.status?.toLowerCase() ===
-        "submitted" && (
-        <button
-          className="review-report-button"
-          type="button"
-          disabled={
-            updatingReportId === report.id
-          }
-          onClick={() =>
-            handleReportStatus(
-              report.id,
-              "Under Review"
-            )
-          }
-        >
-          {updatingReportId === report.id
-            ? "Updating..."
-            : "Review Report"}
-        </button>
-      )}
-
-      {report.status?.toLowerCase() ===
-        "under review" && (
-        <button
-          className="resolve-report-button"
-          type="button"
-          disabled={
-  String(updatingReportId) ===
-  String(report.id)
-}
-          onClick={() =>
-            handleReportStatus(
-              report.id,
-              "Resolved"
-            )
-          }
-        >
-          {updatingReportId === report.id
-            ? "Updating..."
-            : "Mark as Resolved"}
-        </button>
-      )}
-    </div>
+                {report.status?.toLowerCase() === "pending" && (
+  <div className="damage-report-actions">
+    <button
+      className="resolve-report-button"
+      type="button"
+      disabled={
+        String(updatingReportId) ===
+        String(report.id)
+      }
+      onClick={() =>
+        handleReportStatus(
+          report.id,
+          "resolved"
+        )
+      }
+    >
+      {updatingReportId === report.id
+        ? "Updating..."
+        : "Mark as Resolved"}
+    </button>
+  </div>
   )}
                 </article>
               ))
