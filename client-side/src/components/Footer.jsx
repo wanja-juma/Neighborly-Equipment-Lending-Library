@@ -17,7 +17,6 @@ function Footer() {
             <li><Link to="/">Home</Link></li>
             <li><Link to="/about">About</Link></li>
             <li><Link to="/browse-tools">Browse Tools</Link></li>
-            <li><a href="/faq">FAQ</a></li>
           </ul>
         </div>
 
