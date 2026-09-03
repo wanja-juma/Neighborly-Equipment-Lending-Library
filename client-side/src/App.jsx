@@ -20,6 +20,7 @@ import PaymentRouteGuard from "./components/PaymentRouteGuard.jsx";
 import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
 import PaymentBar from "./components/PaymentBar";
+import Profile from "./Pages/Profile";
 
 import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
@@ -35,6 +36,7 @@ import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
 import LoansProvider from "./context/LoansProvider.jsx";
 import Settings from "./Pages/Settings";
+import ItemDetails from "./Pages/ItemDetails";
 import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 
 
@@ -77,6 +79,7 @@ function App() {
     "/payments",
     "/damage-reports",
     "/settings",
+     "/profile",
   ];
 
 
@@ -139,10 +142,6 @@ function App() {
                     path="/auth"
                     element={<AuthPage />}
                   />
-
-
-                  {/* PROTECTED DASHBOARD*/}
-
                   <Route
                     element={
                       <ProtectedRoute>
@@ -189,12 +188,14 @@ function App() {
                     />
 
                     <Route
+                      path="/items/:itemId"
+                      element={<ItemDetails />}
+                    />
+
+                    <Route
                       path="/loans"
                       element={<Loans />}
                     />
-
-
-                    {/* PAYMENT ROUTE */}
 
                     <Route
                       path="/payments/:loanId"
@@ -227,6 +228,11 @@ function App() {
                     <Route
                       path="/settings"
                         element={<Settings />}
+                    />
+
+                    <Route
+                      path="/profile"
+                      element={<Profile />}
                     />
 
                   </Route>

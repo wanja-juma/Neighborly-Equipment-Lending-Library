@@ -1,323 +1,225 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import useAuth from "../hooks/useAuth";
-import useRequests from "../hooks/useRequests";
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import useRequests from "../hooks/useRequests.js";
+import useAuth from "../hooks/useAuth.js";
 
 import "./Requests.css";
 
 
-function getPersonName(person) {
-  if (!person) {
-    return "";
-  }
-
-  if (typeof person === "string") {
-    return person;
-  }
-
-  const profile = person.profile || {};
-
-  const firstName =
-    person.firstName ||
-    person.first_name ||
-    profile.firstName ||
-    profile.first_name ||
-    "";
-
-  const lastName =
-    person.lastName ||
-    person.last_name ||
-    profile.lastName ||
-    profile.last_name ||
-    "";
-
-  return (
-    person.name ||
-    `${firstName} ${lastName}`.trim()
-  );
-}
-
-
 function Requests() {
-  const [activeTab, setActiveTab] =
-    useState("incoming");
+  const navigate = useNavigate();
+
+  const {
+    borrowingRequests,
+    requestsLoading,
+    requestsError,
+    refreshRequests,
+    updateBorrowingRequest,
+  } = useRequests();
+
+  const {
+    currentUser,
+  } = useAuth();
 
   const [
-    updatingRequestId,
-    setUpdatingRequestId,
-  ] = useState(null);
+    activeTab,
+    setActiveTab,
+  ] = useState("incoming");
 
   const [
     actionError,
     setActionError,
   ] = useState("");
 
-  const [notice, setNotice] =
-    useState("");
-
-  const { currentUser } = useAuth();
-
-  const {
-    borrowingRequests,
-    requestsLoading,
-    requestsError,
-    updateRequestStatus,
-  } = useRequests();
-
-  const currentUserId = String(
-    currentUser?.id || ""
-  );
-
-  const safeRequests = Array.isArray(
-    borrowingRequests
-  )
-    ? borrowingRequests
-    : [];
+  const [
+    updatingRequestId,
+    setUpdatingRequestId,
+  ] = useState(null);
 
 
-  const getBorrowerId = (request) => {
-    return (
-      request.borrowerId ??
-      request.borrower_id ??
-      request.userId ??
-      request.user_id ??
-      request.borrower?.id ??
-      request.user?.id ??
-      request.loan?.borrowerId ??
-      request.loan?.borrower_id ??
-      request.loan?.borrower?.id
+  const currentUserId =
+    currentUser?.id;
+
+
+  /*
+   * Refresh when the user comes
+   * back to the browser window.
+   */
+  useEffect(() => {
+    const handleFocus =
+      async () => {
+        if (!currentUserId) {
+          return;
+        }
+
+        await refreshRequests();
+      };
+
+    window.addEventListener(
+      "focus",
+      handleFocus
     );
-  };
+
+    return () => {
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+    };
+  }, [
+    refreshRequests,
+    currentUserId,
+  ]);
 
 
-  const getOwnerId = (request) => {
-    return (
-      request.ownerId ??
-      request.owner_id ??
-      request.owner?.id ??
-      request.item?.ownerId ??
-      request.item?.owner_id ??
-      request.item?.owner?.id ??
-      request.loan?.item?.ownerId ??
-      request.loan?.item?.owner_id ??
-      request.loan?.item?.owner?.id
-    );
-  };
-
-
-  const getRequestDirection = (
+  /*
+   * Normalize possible API field names
+   * for the borrower ID.
+   */
+  const getBorrowerId = (
     request
   ) => {
-    return String(
-      request.requestType ||
-        request.request_type ||
-        request.direction ||
-        request.type ||
-        ""
-    ).toLowerCase();
-  };
-
-
-  const incomingRequests =
-    safeRequests.filter((request) => {
-      const ownerId =
-        getOwnerId(request);
-
-      const direction =
-        getRequestDirection(request);
-
-      return (
-        String(ownerId) ===
-          currentUserId ||
-        direction === "incoming"
-      );
-    });
-
-
-  const outgoingRequests =
-    safeRequests.filter((request) => {
-      const borrowerId =
-        getBorrowerId(request);
-
-      const direction =
-        getRequestDirection(request);
-
-      return (
-        String(borrowerId) ===
-          currentUserId ||
-        direction === "outgoing"
-      );
-    });
-
-
-  const displayedRequests =
-    activeTab === "incoming"
-      ? incomingRequests
-      : outgoingRequests;
-
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setActionError("");
-    setNotice("");
-  };
-
-
-  const handleRequestAction = async (
-    requestId,
-    newStatus
-  ) => {
-    setActionError("");
-    setNotice("");
-    setUpdatingRequestId(requestId);
-
-    try {
-      const result =
-        await updateRequestStatus(
-          requestId,
-          newStatus
-        );
-
-      if (!result?.success) {
-        setActionError(
-          result?.message ||
-            `Unable to ${newStatus} the request.`
-        );
-
-        return;
-      }
-
-      setNotice(
-        newStatus === "approved"
-          ? "The request was approved."
-          : "The request was declined."
-      );
-    } catch (error) {
-      setActionError(
-        error.message ||
-          `Unable to ${newStatus} the request.`
-      );
-    } finally {
-      setUpdatingRequestId(null);
-    }
-  };
-
-
-  const getItem = (request) => {
     return (
-      request.item ||
-      request.loan?.item ||
+      request?.user_id ??
+      request?.userId ??
+      request?.borrower_id ??
+      request?.borrowerId ??
+      request?.user?.id ??
+      request?.borrower?.id ??
       null
     );
   };
 
 
-  const getItemName = (request) => {
-    const item = getItem(request);
-
-    if (typeof item === "string") {
-      return item;
-    }
-
+  /*
+   * Normalize possible API field names
+   * for the item owner ID.
+   */
+  const getOwnerId = (
+    request
+  ) => {
     return (
-      request.itemName ||
-      request.item_name ||
-      item?.name ||
-      "Equipment"
-    );
-  };
-
-
-  const getPerson = (request) => {
-    if (activeTab === "incoming") {
-      return (
-        request.borrower ||
-        request.user ||
-        request.loan?.borrower ||
-        null
-      );
-    }
-
-    return (
-      request.owner ||
-      getItem(request)?.owner ||
-      request.loan?.item?.owner ||
+      request?.owner_id ??
+      request?.ownerId ??
+      request?.item?.owner_id ??
+      request?.item?.ownerId ??
+      request?.equipment?.owner_id ??
+      request?.equipment?.ownerId ??
       null
     );
   };
 
 
-  const getDisplayedPersonName = (
+  /*
+   * Normalize possible API field names
+   * for the loan ID.
+   */
+  const getLoanId = (
     request
   ) => {
-    const directName =
-      activeTab === "incoming"
-        ? request.borrowerName ||
-          request.borrower_name ||
-          request.userName ||
-          request.user_name
-        : request.ownerName ||
-          request.owner_name;
+    return (
+      request?.loan_id ??
+      request?.loanId ??
+      request?.loan?.id ??
+      null
+    );
+  };
+
+
+  const getItemName = (
+    request
+  ) => {
+    return (
+      request?.item?.name ??
+      request?.equipment?.name ??
+      request?.item_name ??
+      request?.itemName ??
+      "Item"
+    );
+  };
+
+
+  const getBorrowerName = (
+    request
+  ) => {
+    if (
+      request?.user &&
+      typeof request.user ===
+        "object"
+    ) {
+      const firstName =
+        request.user.first_name ??
+        request.user.firstName ??
+        "";
+
+      const lastName =
+        request.user.last_name ??
+        request.user.lastName ??
+        "";
+
+      return (
+        request.user.name ||
+        [firstName, lastName]
+          .filter(Boolean)
+          .join(" ") ||
+        "Neighbour"
+      );
+    }
+
+    if (
+      request?.borrower &&
+      typeof request.borrower ===
+        "object"
+    ) {
+      const firstName =
+        request.borrower.first_name ??
+        request.borrower.firstName ??
+        "";
+
+      const lastName =
+        request.borrower.last_name ??
+        request.borrower.lastName ??
+        "";
+
+      return (
+        request.borrower.name ||
+        [firstName, lastName]
+          .filter(Boolean)
+          .join(" ") ||
+        "Neighbour"
+      );
+    }
 
     return (
-      directName ||
-      getPersonName(
-        getPerson(request)
-      ) ||
+      request?.borrower_name ??
+      request?.borrowerName ??
       "Neighbour"
     );
   };
 
 
-  const getStartDate = (request) => {
-    return (
-      request.startDate ||
-      request.start_date ||
-      request.loan?.startDate ||
-      request.loan?.start_date ||
-      "Start date unavailable"
-    );
-  };
-
-
-  const getEndDate = (request) => {
-    return (
-      request.endDate ||
-      request.end_date ||
-      request.dueDate ||
-      request.due_date ||
-      request.loan?.endDate ||
-      request.loan?.end_date ||
-      request.loan?.dueDate ||
-      request.loan?.due_date ||
-      "End date unavailable"
-    );
-  };
-
-
-  const getLoanId = (request) => {
-    return (
-      request.loan_id ??
-      request.loanId ??
-      request.loan?.id ??
-      null
-    );
-  };
-
-
-  const formatDate = (value) => {
-    if (
-      !value ||
-      value.includes?.("unavailable")
-    ) {
-      return value;
+  const formatDate = (
+    value
+  ) => {
+    if (!value) {
+      return "Not specified";
     }
 
-    const date = new Date(value);
+    const date =
+      new Date(value);
 
     if (
-      Number.isNaN(date.getTime())
+      Number.isNaN(
+        date.getTime()
+      )
     ) {
       return value;
     }
@@ -326,27 +228,124 @@ function Requests() {
   };
 
 
-  const getInitials = (name) => {
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  };
+  /*
+   * Requests sent BY the currently
+   * logged-in user.
+   */
+  const outgoingRequests =
+    useMemo(() => {
+      if (!currentUserId) {
+        return [];
+      }
+
+      return borrowingRequests.filter(
+        (request) =>
+          String(
+            getBorrowerId(
+              request
+            )
+          ) ===
+          String(
+            currentUserId
+          )
+      );
+    }, [
+      borrowingRequests,
+      currentUserId,
+    ]);
+
+
+  /*
+   * Requests received FOR items
+   * owned by the current user.
+   */
+  const incomingRequests =
+    useMemo(() => {
+      if (!currentUserId) {
+        return [];
+      }
+
+      return borrowingRequests.filter(
+        (request) =>
+          String(
+            getOwnerId(
+              request
+            )
+          ) ===
+          String(
+            currentUserId
+          )
+      );
+    }, [
+      borrowingRequests,
+      currentUserId,
+    ]);
+
+
+  const displayedRequests =
+    activeTab === "incoming"
+      ? incomingRequests
+      : outgoingRequests;
+
+
+  const handleRequestAction =
+    async (
+      requestId,
+      status
+    ) => {
+      try {
+        setActionError("");
+
+        setUpdatingRequestId(
+          requestId
+        );
+
+        await updateBorrowingRequest(
+          requestId,
+          {
+            status,
+          }
+        );
+
+        await refreshRequests();
+      } catch (error) {
+        setActionError(
+          error.message ||
+            "Unable to update request."
+        );
+      } finally {
+        setUpdatingRequestId(
+          null
+        );
+      }
+    };
+
+
+  const handlePayment =
+    (request) => {
+      const loanId =
+        getLoanId(request);
+
+      if (!loanId) {
+        setActionError(
+          "This approved request does not have a loan attached yet."
+        );
+
+        return;
+      }
+
+      navigate(
+        `/payments/${loanId}`
+      );
+    };
 
 
   if (requestsLoading) {
     return (
-      <main className="dashboard-main">
-        <section className="requests-page">
-          <div className="requests-state">
-            <p>
-              Loading requests...
-            </p>
-          </div>
-        </section>
+      <main className="requests-page">
+        <p className="requests-message">
+          Loading requests...
+        </p>
       </main>
     );
   }
@@ -354,327 +353,330 @@ function Requests() {
 
   if (requestsError) {
     return (
-      <main className="dashboard-main">
-        <section className="requests-page">
-          <div
-            className="requests-state error"
-            role="alert"
-          >
-            <p>{requestsError}</p>
-          </div>
-        </section>
+      <main className="requests-page">
+        <p className="requests-message requests-message--error">
+          {requestsError}
+        </p>
       </main>
     );
   }
 
 
   return (
-    <main className="dashboard-main">
-      <section className="requests-page">
+    <main className="requests-page">
+      <div className="requests-heading">
+        <div>
+          <h1>
+            Borrowing Requests
+          </h1>
 
-        <header className="requests-heading">
+          <p>
+            Manage requests you have
+            received and requests you
+            have sent.
+          </p>
+        </div>
+      </div>
+
+
+      {actionError && (
+        <p className="requests-message requests-message--error">
+          {actionError}
+        </p>
+      )}
+
+
+      <div className="requests-tab-switcher">
+        <button
+          type="button"
+          className={
+            activeTab === "incoming"
+              ? "requests-tab-button active"
+              : "requests-tab-button"
+          }
+          onClick={() =>
+            setActiveTab(
+              "incoming"
+            )
+          }
+        >
+          Incoming Requests
+
+          <span className="tab-count">
+            {
+              incomingRequests.length
+            }
+          </span>
+        </button>
+
+
+        <button
+          type="button"
+          className={
+            activeTab === "outgoing"
+              ? "requests-tab-button active"
+              : "requests-tab-button"
+          }
+          onClick={() =>
+            setActiveTab(
+              "outgoing"
+            )
+          }
+        >
+          Outgoing Requests
+
+          <span className="tab-count">
+            {
+              outgoingRequests.length
+            }
+          </span>
+        </button>
+      </div>
+
+
+      <section className="requests-panel">
+        <div className="requests-panel-heading">
           <div>
-            <h1>
-              Borrowing Requests
-            </h1>
+            <h2>
+              {
+                activeTab ===
+                "incoming"
+                  ? "Incoming Requests"
+                  : "Outgoing Requests"
+              }
+            </h2>
 
             <p>
-              Manage requests for borrowing
-              and lending equipment.
+              {
+                activeTab ===
+                "incoming"
+                  ? "Requests from neighbours who want to borrow your items."
+                  : "Requests you have sent to borrow items from neighbours."
+              }
             </p>
           </div>
-        </header>
 
-
-        <div
-          className="requests-tab-switcher"
-          role="tablist"
-          aria-label="Borrowing request type"
-        >
-          <button
-            type="button"
-            role="tab"
-            className={`requests-tab-button ${
-              activeTab === "incoming"
-                ? "active"
-                : ""
-            }`}
-            aria-selected={
-              activeTab === "incoming"
+          <span className="request-count">
+            {
+              displayedRequests.length
             }
-            onClick={() =>
-              handleTabChange("incoming")
-            }
-          >
-            Incoming
-
-            <span className="tab-count">
-              {incomingRequests.length}
-            </span>
-          </button>
-
-
-          <button
-            type="button"
-            role="tab"
-            className={`requests-tab-button ${
-              activeTab === "outgoing"
-                ? "active"
-                : ""
-            }`}
-            aria-selected={
-              activeTab === "outgoing"
-            }
-            onClick={() =>
-              handleTabChange("outgoing")
-            }
-          >
-            Outgoing
-
-            <span className="tab-count">
-              {outgoingRequests.length}
-            </span>
-          </button>
+          </span>
         </div>
 
 
-        {notice && (
-          <p
-            className="request-action-notice success"
-            role="status"
-          >
-            {notice}
-          </p>
-        )}
-
-
-        {actionError && (
-          <p
-            className="request-action-notice error"
-            role="alert"
-          >
-            {actionError}
-          </p>
-        )}
-
-
-        <section
-          className="requests-panel"
-          role="tabpanel"
-        >
-          <div className="requests-panel-heading">
-
-            <div>
-              <h2>
-                {activeTab === "incoming"
-                  ? "Incoming Requests"
-                  : "Outgoing Requests"}
-              </h2>
-
-              <p>
-                {activeTab === "incoming"
-                  ? "Requests from neighbours who want to borrow your items."
-                  : "Requests you have sent to borrow your neighbours’ items."}
-              </p>
-            </div>
-
-            <span className="request-count">
-              {displayedRequests.length}
-            </span>
-
-          </div>
-
-
-          {displayedRequests.length === 0 ? (
-            <div className="requests-state">
-
-              <span className="empty-icon">
-                ✓
-              </span>
-
-              <h3>
-                No {activeTab} requests
-              </h3>
-
-              <p>
-                {activeTab === "incoming"
-                  ? "You have no incoming borrowing requests."
-                  : "You have not sent any borrowing requests."}
-              </p>
-
-            </div>
-          ) : (
-            <div className="requests-list">
-
-              {displayedRequests.map(
+        <div className="requests-list">
+          {
+            displayedRequests.length ===
+            0 ? (
+              <div className="empty-requests">
+                <p>
+                  {
+                    activeTab ===
+                    "incoming"
+                      ? "You have no incoming requests."
+                      : "You have no outgoing requests."
+                  }
+                </p>
+              </div>
+            ) : (
+              displayedRequests.map(
                 (request) => {
-                  const requestId =
-                    request.id;
-
-                  const status = String(
-                    request.status ||
-                      "pending"
-                  ).toLowerCase();
-
-                  const statusClass =
-                    status.replace(
-                      /\s+/g,
-                      "-"
-                    );
-
-                  const isPending =
-                    status === "pending";
+                  const status =
+                    String(
+                      request.status ||
+                        "pending"
+                    ).toLowerCase();
 
                   const isUpdating =
                     String(
                       updatingRequestId
                     ) ===
-                    String(requestId);
-
-                  const loanId =
-                    getLoanId(request);
-
-                  const canPay =
-                    activeTab ===
-                      "outgoing" &&
-                    status ===
-                      "approved" &&
-                    Boolean(loanId);
-
-                  const personName =
-                    getDisplayedPersonName(
-                      request
+                    String(
+                      request.id
                     );
 
                   const itemName =
-                    getItemName(request);
+                    getItemName(
+                      request
+                    );
+
+                  const borrowerName =
+                    getBorrowerName(
+                      request
+                    );
+
+                  const startDate =
+                    request.start_date ??
+                    request.startDate;
+
+                  const endDate =
+                    request.end_date ??
+                    request.endDate;
+
+                  const loanId =
+                    getLoanId(
+                      request
+                    );
+
+                  const initials =
+                    borrowerName
+                      .split(" ")
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map(
+                        (name) =>
+                          name
+                            .charAt(0)
+                            .toUpperCase()
+                      )
+                      .join("") ||
+                    "N";
 
 
                   return (
                     <article
                       className="request-list-card"
-                      key={requestId}
+                      key={
+                        request.id
+                      }
                     >
-
-                      <span className="request-avatar">
-                        {getInitials(
-                          personName
-                        ) || "N"}
-                      </span>
-
-
-                      <div className="request-details">
-
-                        <strong>
-                          {personName}
-                        </strong>
-
-                        <p>
-                          {activeTab ===
-                          "incoming"
-                            ? "Wants to borrow "
-                            : "Request to borrow "}
-
-                          <b>
-                            {itemName}
-                          </b>
-                        </p>
-
-                        <small>
-                          {formatDate(
-                            getStartDate(
-                              request
-                            )
-                          )}
-
-                          {" – "}
-
-                          {formatDate(
-                            getEndDate(
-                              request
-                            )
-                          )}
-                        </small>
-
+                      <div className="request-avatar">
+                        {initials}
                       </div>
 
 
-                      <span
-                        className={`request-status ${statusClass}`}
-                      >
-                        {status}
-                      </span>
+                      <div className="request-details">
+                        <strong>
+                          {itemName}
+                        </strong>
 
 
-                      {activeTab ===
-                        "incoming" &&
-                        isPending && (
+                        {
+                          activeTab ===
+                            "incoming" && (
+                            <p>
+                              Requested by{" "}
+                              <strong>
+                                {
+                                  borrowerName
+                                }
+                              </strong>
+                            </p>
+                          )
+                        }
+
+
+                        <p>
+                          {
+                            formatDate(
+                              startDate
+                            )
+                          }{" "}
+                          →{" "}
+                          {
+                            formatDate(
+                              endDate
+                            )
+                          }
+                        </p>
+
+
+                        {
+                          request.message && (
+                            <small>
+                              {
+                                request.message
+                              }
+                            </small>
+                          )
+                        }
+
+
+                        <div className="request-status-actions">
+                          <span
+                            className={
+                              `request-status request-status--${status}`
+                            }
+                          >
+                            {status}
+                          </span>
+
+
+                          {
+                            activeTab ===
+                              "outgoing" &&
+                            status ===
+                              "approved" &&
+                            loanId && (
+                              <button
+                                type="button"
+                                className="pay-now-btn"
+                                onClick={() =>
+                                  handlePayment(
+                                    request
+                                  )
+                                }
+                              >
+                                Pay Now
+                              </button>
+                            )
+                          }
+                        </div>
+                      </div>
+
+
+                      {
+                        activeTab ===
+                          "incoming" &&
+                        status ===
+                          "pending" && (
                           <div className="request-actions">
-
                             <button
                               type="button"
-                              className="decline-request-button"
+                              className="approve-btn"
                               disabled={
                                 isUpdating
                               }
                               onClick={() =>
                                 handleRequestAction(
-                                  requestId,
-                                  "declined"
-                                )
-                              }
-                            >
-                              {isUpdating
-                                ? "Updating..."
-                                : "Decline"}
-                            </button>
-
-
-                            <button
-                              type="button"
-                              className="approve-request-button"
-                              disabled={
-                                isUpdating
-                              }
-                              onClick={() =>
-                                handleRequestAction(
-                                  requestId,
+                                  request.id,
                                   "approved"
                                 )
                               }
                             >
-                              {isUpdating
-                                ? "Updating..."
-                                : "Approve"}
+                              {
+                                isUpdating
+                                  ? "Updating..."
+                                  : "Approve"
+                              }
                             </button>
 
+
+                            <button
+                              type="button"
+                              className="decline-btn"
+                              disabled={
+                                isUpdating
+                              }
+                              onClick={() =>
+                                handleRequestAction(
+                                  request.id,
+                                  "declined"
+                                )
+                              }
+                            >
+                              Decline
+                            </button>
                           </div>
-                        )}
-
-
-                      {canPay && (
-                        <div className="request-payment-action">
-
-                          <Link
-                            className="pay-request-button"
-                            to={`/payments/${loanId}`}
-                          >
-                            Pay Now
-                          </Link>
-
-                        </div>
-                      )}
-
+                        )
+                      }
                     </article>
                   );
                 }
-              )}
-
-            </div>
-          )}
-
-        </section>
-
+              )
+            )
+          }
+        </div>
       </section>
     </main>
   );

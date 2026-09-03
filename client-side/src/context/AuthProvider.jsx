@@ -301,17 +301,20 @@ function AuthProvider({
   ]);
 
   const value = {
-    currentUser,
+  currentUser,
 
-    isAuthenticated:
-      Boolean(currentUser),
+  isAuthenticated:
+    Boolean(currentUser),
 
-    authLoading,
+  authLoading,
 
-    login,
+  login,
 
-    logout,
-  };
+  logout,
+
+  updateCurrentUser:
+    saveUser,
+};
 
   return (
     <AuthContext.Provider
