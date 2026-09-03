@@ -221,7 +221,7 @@ Desktop.ini
 *.sqlite
 *.sqlite3
 *.db-journal
-server/instance/*.db
+server/instance/
 !server/instance/.gitkeep
 
 # ============================================
