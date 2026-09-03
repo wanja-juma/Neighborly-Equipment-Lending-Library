@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import './Footer.css';
 
 function Footer() {
+  const [subscribed, setSubscribed] = useState(false);
+
   return (
     <footer className="footer">
       <div className="footer-content">
