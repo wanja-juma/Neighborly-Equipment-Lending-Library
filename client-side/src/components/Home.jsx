@@ -1,7 +1,7 @@
 
 import { House, Calendar, Plus, Sparkles } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import heroPhoto from "../assets/hero-photo.jpg";
+import heroPhoto from "../assets/hero-photo (2).jpg";
 import "./Home.css";
 
 function Home() {

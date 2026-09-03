@@ -7,6 +7,7 @@ import {
 } from "../services/api";
 import useAuth from "../hooks/useAuth";
 import ItemsContext from "./ItemsContext";
+import useAuth from "../hooks/useAuth";
 
 // The backend expects categoryId/status; older parts of the UI still
 // collect them as category/availability. Translate here, in one place,
@@ -30,6 +31,7 @@ const toBackendFields = (data) => {
 
 function ItemsProvider({ children }) {
   const { currentUser } = useAuth();
+
   const [items, setItems] = useState([]);
   const [itemsLoading, setItemsLoading] =
     useState(true);
@@ -65,14 +67,24 @@ function ItemsProvider({ children }) {
         ownerId: Number(currentUser?.id),
       })
     );
+  if (!currentUser?.id) {
+    throw new Error("You must be logged in to add an item.");
+  }
 
-    setItems((currentItems) => [
-      savedItem,
-      ...currentItems,
-    ]);
-
-    return savedItem;
+  const newItemData = {
+    ...itemData,
+    ownerId: Number(currentUser.id),
   };
+
+  const savedItem = await createItem(newItemData);
+
+  setItems((currentItems) => [
+    savedItem,
+    ...currentItems,
+  ]);
+
+  return savedItem;
+};
 
   const updateItem = async (
     itemId,

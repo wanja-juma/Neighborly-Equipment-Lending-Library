@@ -87,15 +87,19 @@ function LoansProvider({ children }) {
     newStatus
   ) => {
     try {
+      const normalizedStatus = newStatus.toLowerCase();
+
+      const payload = {
+        status: normalizedStatus,
+      };
+
+      if (normalizedStatus === "returned") {
+        payload.returned_at = new Date().toISOString();
+      }
+
       const updatedLoan = await updateLoan(
         loanId,
-        {
-          status: newStatus,
-          returnedAt:
-            newStatus === "Returned"
-              ? new Date().toISOString()
-              : null,
-        }
+        payload
       );
 
       setLoans((currentLoans) =>
@@ -109,7 +113,7 @@ function LoansProvider({ children }) {
       return {
         success: true,
         loan: updatedLoan,
-        message: `Loan marked as ${newStatus.toLowerCase()}.`,
+        message: `Loan marked as ${normalizedStatus}.`,
       };
     } catch (error) {
       return {

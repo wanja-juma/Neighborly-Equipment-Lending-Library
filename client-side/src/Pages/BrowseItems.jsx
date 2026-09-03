@@ -10,9 +10,6 @@ import useRequests from "../hooks/useRequests";
 import "./BrowseItems.css";
 
 
-const CURRENT_USER_ID = "1";
-
-
 const DEFAULT_CATEGORIES = [
   "Power Tools",
   "Hand Tools",
@@ -43,13 +40,10 @@ const getLocalDate = () => {
 };
 
 
-const getItemCategory = (
-  item
-) => {
+const getItemCategory = (item) => {
   if (
     item?.category &&
-    typeof item.category ===
-      "object"
+    typeof item.category === "object"
   ) {
     return (
       item.category.name ||
@@ -69,9 +63,7 @@ const getItemCategory = (
 };
 
 
-const getItemOwnerId = (
-  item
-) => {
+const getItemOwnerId = (item) => {
   return (
     item?.ownerId ??
     item?.owner_id ??
@@ -81,13 +73,10 @@ const getItemOwnerId = (
 };
 
 
-const getItemOwnerName = (
-  item
-) => {
+const getItemOwnerName = (item) => {
   if (
     item?.owner &&
-    typeof item.owner ===
-      "object"
+    typeof item.owner === "object"
   ) {
     const firstName =
       item.owner.first_name ||
@@ -117,9 +106,7 @@ const getItemOwnerName = (
 };
 
 
-const getItemAvailability = (
-  item
-) => {
+const getItemAvailability = (item) => {
   return (
     item?.availability ||
     item?.status ||
@@ -128,9 +115,7 @@ const getItemAvailability = (
 };
 
 
-const getItemIcon = (
-  item
-) => {
+const getItemIcon = (item) => {
   if (item?.icon) {
     return item.icon;
   }
@@ -143,20 +128,13 @@ const getItemIcon = (
     getItemCategory(item) || ""
   ).toLowerCase();
 
-
-  if (
-    name.includes("ladder")
-  ) {
+  if (name.includes("ladder")) {
     return "🪜";
   }
 
-
-  if (
-    name.includes("hammer")
-  ) {
+  if (name.includes("hammer")) {
     return "🔨";
   }
-
 
   if (
     name.includes("pressure washer") ||
@@ -164,7 +142,6 @@ const getItemIcon = (
   ) {
     return "💦";
   }
-
 
   if (
     name.includes("lawnmower") ||
@@ -174,7 +151,6 @@ const getItemIcon = (
     return "🌿";
   }
 
-
   if (
     name.includes("hedge") ||
     name.includes("trimmer")
@@ -182,13 +158,9 @@ const getItemIcon = (
     return "✂️";
   }
 
-
-  if (
-    name.includes("drill")
-  ) {
+  if (name.includes("drill")) {
     return "🛠️";
   }
-
 
   if (
     name.includes("circular saw") ||
@@ -197,61 +169,36 @@ const getItemIcon = (
     return "⚙️";
   }
 
-
   if (
     name.includes("hand tool") ||
     name.includes("tool set") ||
-    category.includes(
-      "hand tool"
-    )
+    category.includes("hand tool")
   ) {
     return "🔧";
   }
 
-
   if (
     name.includes("vacuum") ||
-    category.includes(
-      "clean"
-    )
+    category.includes("clean")
   ) {
     return "🧹";
   }
 
-
-  if (
-    name.includes("wheelbarrow")
-  ) {
+  if (name.includes("wheelbarrow")) {
     return "🛒";
   }
 
-
-  if (
-    category.includes(
-      "gardening"
-    )
-  ) {
+  if (category.includes("gardening")) {
     return "🌱";
   }
 
-
-  if (
-    category.includes(
-      "power"
-    )
-  ) {
+  if (category.includes("power")) {
     return "🛠️";
   }
 
-
-  if (
-    category.includes(
-      "outdoor"
-    )
-  ) {
+  if (category.includes("outdoor")) {
     return "🏡";
   }
-
 
   return "🔧";
 };
@@ -265,11 +212,14 @@ function BrowseItems() {
   );
 
   const {
+    currentUser,
+  } = useAuth();
+
+  const {
     items,
     itemsLoading,
     itemsError,
   } = useItems();
-
 
   const {
     addBorrowingRequest,
@@ -281,7 +231,6 @@ function BrowseItems() {
     setSearchTerm,
   ] = useState("");
 
-
   const [
     selectedCategory,
     setSelectedCategory,
@@ -289,14 +238,12 @@ function BrowseItems() {
     "All Categories"
   );
 
-
   const [
     selectedAvailability,
     setSelectedAvailability,
   ] = useState(
     "Available"
   );
-
 
   const [
     notice,
@@ -329,7 +276,6 @@ function BrowseItems() {
     setSelectedItem,
   ] = useState(null);
 
-
   const [
     borrowDates,
     setBorrowDates,
@@ -338,15 +284,26 @@ function BrowseItems() {
     endDate: "",
   });
 
-
   const [
     formError,
     setFormError,
   ] = useState("");
 
+  const [
+    submittingRequest,
+    setSubmittingRequest,
+  ] = useState(false);
+
 
   const minimumDate =
     getLocalDate();
+
+  const currentUserId =
+    currentUser?.id !==
+      undefined &&
+    currentUser?.id !== null
+      ? String(currentUser.id)
+      : "";
 
 
   const safeItems =
@@ -360,45 +317,57 @@ function BrowseItems() {
 
 
   /*
-   * Do not display the
-   * current user's items
-   * in community browsing.
+   * Do not show items belonging
+   * to the currently logged-in user.
    */
   const communityItems =
     useMemo(
       () =>
         safeItems.filter(
-          (item) =>
-            String(
+          (item) => {
+            const ownerId =
               getItemOwnerId(
                 item
-              )
-            ) !==
-            CURRENT_USER_ID
+              );
+
+            if (!currentUserId) {
+              return true;
+            }
+
+            return (
+              String(ownerId) !==
+              currentUserId
+            );
+          }
         ),
-      [safeItems]
+      [
+        safeItems,
+        currentUserId,
+      ]
     );
 
 
   /*
-   * Build category list
-   * from defaults plus
-   * categories returned
-   * from the backend.
+   * Build categories using both
+   * predefined categories and
+   * categories returned from Flask.
    */
   const categories =
     useMemo(() => {
       const itemCategories =
         communityItems
           .map((item) =>
-            getItemCategory(
-              item
+            String(
+              getItemCategory(
+                item
+              ) || ""
             ).trim()
           )
           .filter(Boolean);
 
       return [
         "All Categories",
+
         ...new Set([
           ...DEFAULT_CATEGORIES,
           ...itemCategories,
@@ -408,7 +377,7 @@ function BrowseItems() {
 
 
   /*
-   * Search and filters
+   * Filter community items.
    */
   const filteredItems =
     useMemo(() => {
@@ -425,7 +394,6 @@ function BrowseItems() {
         selectedAvailability
           .toLowerCase();
 
-
       return communityItems.filter(
         (item) => {
           const itemName =
@@ -433,29 +401,31 @@ function BrowseItems() {
               item?.name || ""
             ).toLowerCase();
 
-
           const itemDescription =
             String(
               item?.description ||
                 ""
             ).toLowerCase();
 
-
           const itemOwner =
-            getItemOwnerName(
-              item
+            String(
+              getItemOwnerName(
+                item
+              ) || ""
             ).toLowerCase();
-
 
           const itemCategory =
-            getItemCategory(
-              item
+            String(
+              getItemCategory(
+                item
+              ) || ""
             ).toLowerCase();
 
-
           const itemAvailability =
-            getItemAvailability(
-              item
+            String(
+              getItemAvailability(
+                item
+              ) || ""
             ).toLowerCase();
 
 
@@ -501,14 +471,13 @@ function BrowseItems() {
     ]);
 
 
-  const openBorrowForm = (
-    item
-  ) => {
+  const openBorrowForm = (item) => {
     const availability =
-      getItemAvailability(
-        item
+      String(
+        getItemAvailability(
+          item
+        ) || ""
       ).toLowerCase();
-
 
     if (
       availability !==
@@ -521,35 +490,32 @@ function BrowseItems() {
       return;
     }
 
-
     setSelectedItem(item);
-
 
     setBorrowDates({
       startDate: "",
       endDate: "",
     });
 
-
     setFormError("");
-
     setNotice("");
   };
 
 
-  const closeBorrowForm =
-    () => {
-      setSelectedItem(null);
+  const closeBorrowForm = () => {
+    if (submittingRequest) {
+      return;
+    }
 
+    setSelectedItem(null);
 
-      setBorrowDates({
-        startDate: "",
-        endDate: "",
-      });
+    setBorrowDates({
+      startDate: "",
+      endDate: "",
+    });
 
-
-      setFormError("");
-    };
+    setFormError("");
+  };
 
 
   const handleDateChange = (
@@ -560,15 +526,12 @@ function BrowseItems() {
       value,
     } = event.target;
 
-
     setBorrowDates(
       (currentDates) => ({
         ...currentDates,
-
         [name]: value,
       })
     );
-
 
     setFormError("");
   };
@@ -577,7 +540,6 @@ function BrowseItems() {
   const handleBorrowRequest =
     async (event) => {
       event.preventDefault();
-
 
       if (!selectedItem) {
         return;
@@ -610,11 +572,21 @@ function BrowseItems() {
           endDate:
             borrowDates.endDate,
         });
-      const availability =
-        getItemAvailability(
-          selectedItem
-        ).toLowerCase();
+      if (!currentUserId) {
+        setFormError(
+          "You must be logged in to request an item."
+        );
 
+        return;
+      }
+
+
+      const availability =
+        String(
+          getItemAvailability(
+            selectedItem
+          ) || ""
+        ).toLowerCase();
 
       if (
         availability !==
@@ -622,6 +594,26 @@ function BrowseItems() {
       ) {
         setFormError(
           "This item is no longer available to borrow."
+        );
+
+        return;
+      }
+
+
+      const ownerId =
+        getItemOwnerId(
+          selectedItem
+        );
+
+      if (
+        ownerId !==
+          undefined &&
+        ownerId !== null &&
+        String(ownerId) ===
+          currentUserId
+      ) {
+        setFormError(
+          "You cannot request your own item."
         );
 
         return;
@@ -664,58 +656,47 @@ function BrowseItems() {
       }
 
 
+      const itemId =
+        Number(
+          selectedItem.id
+        );
+
+      if (
+        !Number.isInteger(itemId) ||
+        itemId <= 0
+      ) {
+        setFormError(
+          "This item has an invalid ID."
+        );
+
+        return;
+      }
+
+
       try {
+        setSubmittingRequest(true);
+        setFormError("");
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Send the field names expected
+         * by the Flask borrowing-request
+         * API.
+         *
+         * Do not send borrower_id.
+         * Flask should get the borrower
+         * from the JWT identity.
+         */
         const result =
-          await addBorrowingRequest(
-            {
-              itemId:
-                selectedItem.id,
-
-              itemName:
-                selectedItem.name,
-
-              itemIcon:
-                getItemIcon(
-                  selectedItem
-                ),
-
-              ownerId:
-                getItemOwnerId(
-                  selectedItem
-                ),
-
-              ownerName:
-                getItemOwnerName(
-                  selectedItem
-                ),
-
-              borrowerId:
-                CURRENT_USER_ID,
-
-              borrowerName:
-                "Wanja Juma",
-
-              startDate:
-                borrowDates.startDate,
-
-              endDate:
-                borrowDates.endDate,
-            }
-          );
-
-
-        if (
-          result &&
-          result.success ===
-            false
-        ) {
-          setFormError(
-            result.message ||
-              "Unable to submit the request."
-          );
-
-          return;
-        }
+  await addBorrowingRequest({
+    equipment_id: itemId,
+    start_date:
+      borrowDates.startDate,
+    end_date:
+      borrowDates.endDate,
+  });
 
 
         setNotice(
@@ -724,11 +705,29 @@ function BrowseItems() {
         );
 
 
-        closeBorrowForm();
+        setSelectedItem(
+          null
+        );
+
+        setBorrowDates({
+          startDate: "",
+          endDate: "",
+        });
+
+        setFormError("");
       } catch (error) {
+        console.error(
+          "Borrowing request failed:",
+          error
+        );
+
         setFormError(
-          error.message ||
+          error?.message ||
             "Unable to submit the borrowing request."
+        );
+      } finally {
+        setSubmittingRequest(
+          false
         );
       }
     };
@@ -737,11 +736,9 @@ function BrowseItems() {
   const clearFilters = () => {
     setSearchTerm("");
 
-
     setSelectedCategory(
       "All Categories"
     );
-
 
     setSelectedAvailability(
       "Available"
@@ -752,16 +749,11 @@ function BrowseItems() {
   if (itemsLoading) {
     return (
       <main className="dashboard-main">
-
         <section className="items-page">
-
           <p>
-            Loading available
-            items...
+            Loading available items...
           </p>
-
         </section>
-
       </main>
     );
   }
@@ -770,15 +762,11 @@ function BrowseItems() {
   if (itemsError) {
     return (
       <main className="dashboard-main">
-
         <section className="items-page">
-
           <p>
             {itemsError}
           </p>
-
         </section>
-
       </main>
     );
   }
@@ -786,9 +774,7 @@ function BrowseItems() {
 
   return (
     <main className="dashboard-main">
-
       <section className="items-page">
-
         {notice && (
           <div
             className="browse-notice"
@@ -797,7 +783,6 @@ function BrowseItems() {
             <span>
               {notice}
             </span>
-
 
             <button
               type="button"
@@ -808,24 +793,19 @@ function BrowseItems() {
             >
               ×
             </button>
-
           </div>
         )}
 
 
         <header className="items-page-header">
-
           <div>
-
             <p className="page-label">
               COMMUNITY EQUIPMENT
             </p>
 
-
             <h1>
               Browse Items
             </h1>
-
 
             <p>
               Find tools and
@@ -833,9 +813,7 @@ function BrowseItems() {
               from neighbours in
               your community.
             </p>
-
           </div>
-
         </header>
 
 
@@ -843,53 +821,40 @@ function BrowseItems() {
           className="browse-filters"
           aria-label="Item filters"
         >
-
           <label className="browse-search">
-
             <span>
               ⌕
             </span>
 
-
             <input
               type="search"
               value={searchTerm}
-              onChange={(
-                event
-              ) =>
+              onChange={(event) =>
                 setSearchTerm(
-                  event.target
-                    .value
+                  event.target.value
                 )
               }
               placeholder="Search items"
               aria-label="Search community items"
             />
-
           </label>
 
 
           <label className="filter-field">
-
             <span>
               Category
             </span>
-
 
             <select
               value={
                 selectedCategory
               }
-              onChange={(
-                event
-              ) =>
+              onChange={(event) =>
                 setSelectedCategory(
-                  event.target
-                    .value
+                  event.target.value
                 )
               }
             >
-
               {categories.map(
                 (category) => (
                   <option
@@ -904,54 +869,41 @@ function BrowseItems() {
                   </option>
                 )
               )}
-
             </select>
-
           </label>
 
 
           <label className="filter-field">
-
             <span>
               Availability
             </span>
-
 
             <select
               value={
                 selectedAvailability
               }
-              onChange={(
-                event
-              ) =>
+              onChange={(event) =>
                 setSelectedAvailability(
-                  event.target
-                    .value
+                  event.target.value
                 )
               }
             >
-
               <option value="Available">
                 Available
               </option>
-
 
               <option value="All Statuses">
                 All Statuses
               </option>
 
-
               <option value="Requested">
                 Requested
               </option>
 
-
               <option value="On Loan">
                 On Loan
               </option>
-
             </select>
-
           </label>
 
 
@@ -964,35 +916,25 @@ function BrowseItems() {
           >
             Clear Filters
           </button>
-
         </section>
 
 
         <div className="browse-results-heading">
-
           <p>
-
             <strong>
-              {
-                filteredItems.length
-              }
+              {filteredItems.length}
             </strong>{" "}
 
-            {
-              filteredItems.length ===
-              1
-                ? "item found"
-                : "items found"
-            }
-
+            {filteredItems.length ===
+            1
+              ? "item found"
+              : "items found"}
           </p>
-
         </div>
 
 
         {filteredItems.length >
         0 ? (
-
           <div className="items-page-grid">
             {filteredItems.map((item) => {
               const category =
@@ -1054,34 +996,32 @@ function BrowseItems() {
                   ) ||
                   "Other";
 
-
                 const owner =
                   getItemOwnerName(
                     item
                   );
-
 
                 const availability =
                   getItemAvailability(
                     item
                   );
 
-
                 const itemIcon =
                   getItemIcon(
                     item
                   );
 
-
                 const isAvailable =
-                  availability
-                    .toLowerCase() ===
+                  String(
+                    availability
+                  ).toLowerCase() ===
                   "available";
-
 
                 const statusClass =
                   item.statusColor ||
-                  availability
+                  String(
+                    availability
+                  )
                     .toLowerCase()
                     .replaceAll(
                       " ",
@@ -1094,35 +1034,24 @@ function BrowseItems() {
                     className="equipment-card"
                     key={item.id}
                   >
-
                     <div className="equipment-image">
-
                       <span>
                         {itemIcon}
                       </span>
 
-
                       <span
                         className={`image-status ${statusClass}`}
                       >
-                        {
-                          availability
-                        }
+                        {availability}
                       </span>
-
                     </div>
 
 
                     <div className="equipment-content">
-
                       <div className="equipment-heading">
-
                         <span className="equipment-category">
-                          {
-                            category
-                          }
+                          {category}
                         </span>
-
                       </div>
 
 
@@ -1132,15 +1061,12 @@ function BrowseItems() {
 
 
                       <p className="equipment-description">
-
                         {item.description ||
                           "No description available."}
-
                       </p>
 
 
                       <div className="equipment-details">
-
                         <span>
                           <b>
                             Condition:
@@ -1149,14 +1075,12 @@ function BrowseItems() {
                             "Not specified"}
                         </span>
 
-
                         <span>
                           <b>
                             Owner:
                           </b>{" "}
                           {owner}
                         </span>
-
 
                         <span>
                           <b>
@@ -1165,7 +1089,6 @@ function BrowseItems() {
                           {item.location ||
                             "Not specified"}
                         </span>
-
                       </div>
 
 
@@ -1185,37 +1108,27 @@ function BrowseItems() {
                           ? "Request to Borrow"
                           : "Currently Unavailable"}
                       </button>
-
                     </div>
-
                   </article>
                 );
               }
             )}
-
           </div>
-
         ) : (
-
           <div className="items-empty-state">
-
             <span>
               🔍
             </span>
 
-
             <h2>
-              No matching items
-              found
+              No matching items found
             </h2>
-
 
             <p>
               Try changing your
               search term, category
               or availability filter.
             </p>
-
 
             <button
               className="empty-clear-button"
@@ -1226,33 +1139,24 @@ function BrowseItems() {
             >
               Clear Filters
             </button>
-
           </div>
-
         )}
-
       </section>
 
 
       {selectedItem && (
-
         <div className="borrow-modal-overlay">
-
           <section
             className="borrow-modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby="borrow-modal-title"
           >
-
             <header className="borrow-modal-header">
-
               <div>
-
                 <p className="page-label">
                   BORROWING REQUEST
                 </p>
-
 
                 <h2 id="borrow-modal-title">
                   Request{" "}
@@ -1261,13 +1165,11 @@ function BrowseItems() {
                   }
                 </h2>
 
-
                 <p>
                   Select the dates
                   you would like to
                   borrow this item.
                 </p>
-
               </div>
 
 
@@ -1278,10 +1180,12 @@ function BrowseItems() {
                   closeBorrowForm
                 }
                 aria-label="Close borrowing form"
+                disabled={
+                  submittingRequest
+                }
               >
                 ×
               </button>
-
             </header>
 
 
@@ -1307,15 +1211,12 @@ function BrowseItems() {
                 }
               </span>
 
-
               <div>
-
                 <strong>
                   {
                     selectedItem.name
                   }
                 </strong>
-
 
                 <span>
                   Owned by{" "}
@@ -1326,14 +1227,11 @@ function BrowseItems() {
                   }
                 </span>
 
-
                 <small>
                   {selectedItem.condition ||
                     "Condition not specified"}
                 </small>
-
               </div>
-
             </div>
 
 
@@ -1343,18 +1241,14 @@ function BrowseItems() {
                 handleBorrowRequest
               }
             >
-
               <div className="borrow-date-fields">
-
                 <label className="item-form-field">
-
                   <span>
                     Borrowing Date{" "}
                     <b>
                       *
                     </b>
                   </span>
-
 
                   <input
                     type="date"
@@ -1368,21 +1262,21 @@ function BrowseItems() {
                     onChange={
                       handleDateChange
                     }
+                    disabled={
+                      submittingRequest
+                    }
                     required
                   />
-
                 </label>
 
 
                 <label className="item-form-field">
-
                   <span>
                     Return Date{" "}
                     <b>
                       *
                     </b>
                   </span>
-
 
                   <input
                     type="date"
@@ -1397,43 +1291,36 @@ function BrowseItems() {
                     onChange={
                       handleDateChange
                     }
+                    disabled={
+                      submittingRequest
+                    }
                     required
                   />
-
                 </label>
-
               </div>
 
 
               {formError && (
-
                 <div
                   className="borrow-form-error"
                   role="alert"
                 >
-                  {
-                    formError
-                  }
+                  {formError}
                 </div>
-
               )}
 
 
               <div className="borrow-request-information">
-
                 <strong>
                   Before submitting
                 </strong>
 
-
                 <ul>
-
                   <li>
                     Wait for the item
                     owner to approve
                     your request.
                   </li>
-
 
                   <li>
                     Collect the item
@@ -1442,25 +1329,24 @@ function BrowseItems() {
                     approved.
                   </li>
 
-
                   <li>
                     Return the item
                     by the selected
                     return date.
                   </li>
-
                 </ul>
-
               </div>
 
 
               <div className="borrow-modal-actions">
-
                 <button
                   className="cancel-request-button"
                   type="button"
                   onClick={
                     closeBorrowForm
+                  }
+                  disabled={
+                    submittingRequest
                   }
                 >
                   Cancel
@@ -1470,20 +1356,19 @@ function BrowseItems() {
                 <button
                   className="submit-request-button"
                   type="submit"
+                  disabled={
+                    submittingRequest
+                  }
                 >
-                  Submit Request
+                  {submittingRequest
+                    ? "Submitting..."
+                    : "Submit Request"}
                 </button>
-
               </div>
-
             </form>
-
           </section>
-
         </div>
-
       )}
-
     </main>
   );
 }
