@@ -81,20 +81,25 @@ function BorrowRequestModal({ item, onClose, onSuccess }) {
 
     setSubmitting(true);
     try {
+      // Send exactly the field names the real backend schema expects.
+      // The backend assigns user_id and status itself from the JWT — it
+      // doesn't need (and will reject as "Unknown field") anything else.
       const result = await addBorrowingRequest({
-        itemId: item.id,
-        itemName: item.name,
-        itemIcon: item.icon || "🧰",
-        ownerId: getItemOwnerId(item),
-        ownerName: getItemOwnerName(item),
-        borrowerId: currentUser?.id,
-        borrowerName: currentUser?.name,
-        startDate: borrowDates.startDate,
-        endDate: borrowDates.endDate,
+        equipment_id: item.id,
+        start_date: borrowDates.startDate,
+        end_date: borrowDates.endDate,
       });
 
       if (result && result.success === false) {
-        setFormError(result.message || "Unable to submit the request.");
+        const detailText = result.details
+          ? Object.entries(result.details)
+              .map(([field, messages]) => `${field}: ${[].concat(messages).join(", ")}`)
+              .join(" | ")
+          : "";
+        setFormError(
+          [result.message, detailText].filter(Boolean).join(" — ") ||
+            "Unable to submit the request."
+        );
         return;
       }
 
