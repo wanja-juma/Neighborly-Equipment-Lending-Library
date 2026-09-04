@@ -26,7 +26,7 @@ def upgrade():
             sa.Column(
                 "start_date",
                 sa.DateTime(),
-                nullable=False
+                nullable=True
             )
         )
 
@@ -34,7 +34,7 @@ def upgrade():
             sa.Column(
                 "end_date",
                 sa.DateTime(),
-                nullable=False
+                nullable=True
             )
         )
 

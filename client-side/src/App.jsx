@@ -14,11 +14,14 @@ import About from "./components/About";
 import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
 import PaymentBar from "./components/PaymentBar";
+
 import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import DashboardLayout from "./components/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
+import Profile from "./Pages/Profile";
+import Cart from "./Pages/Cart";
 import BrowseItems from "./Pages/BrowseItems";
 import DamageReports from "./Pages/DamageReports";
 import Loans from "./Pages/Loans";
@@ -27,21 +30,19 @@ import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
 import EditListing from "./Pages/EditItem";
 import ChangeAvailability from "./Pages/ChangeAvailability";
-import Cart from "./Pages/Cart";
+import Settings from "./Pages/Settings";
 
 import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
 import RequestsProvider from "./context/RequestsProvider";
-import LoansProvider from "./context/LoansProvider";
-import DamageReportsProvider from "./context/DamageReportsProvider";
+import LoansProvider from "./context/LoansProvider.jsx";
+import DamageReportsProvider from "./context/DamageReportsProvider.jsx";
 import CartProvider from "./context/CartProvider";
 
 import "./App.css";
 
-
 function App() {
   const location = useLocation();
-
 
   useEffect(() => {
     if (!location.hash) {
@@ -68,7 +69,6 @@ function App() {
     };
   }, [location]);
 
-
   const dashboardRoutePrefixes = [
     "/dashboard",
     "/items",
@@ -82,7 +82,6 @@ function App() {
     "/profile",
   ];
 
-
   const isDashboardRoute =
     dashboardRoutePrefixes.some(
       (routePrefix) =>
@@ -91,7 +90,6 @@ function App() {
           `${routePrefix}/`
         )
     );
-
 
   return (
     <AuthProvider>
@@ -105,7 +103,6 @@ function App() {
                 <div className="app-content">
                   <Routes>
                     {/* PUBLIC ROUTES */}
-
                     <Route
                       path="/"
                       element={
@@ -132,6 +129,11 @@ function App() {
                     />
 
                     <Route
+                      path="/cart"
+                      element={<Cart />}
+                    />
+
+                    <Route
                       path="/tools/:id"
                       element={<ItemDetail />}
                     />
@@ -141,9 +143,7 @@ function App() {
                       element={<AuthPage />}
                     />
 
-
                     {/* PROTECTED ROUTES */}
-
                     <Route
                       element={
                         <ProtectedRoute>
@@ -159,11 +159,6 @@ function App() {
                       <Route
                         path="/items"
                         element={<BrowseItems />}
-                      />
-
-                      <Route
-                        path="/cart"
-                        element={<Cart />}
                       />
 
                       <Route
@@ -215,11 +210,19 @@ function App() {
                         path="/damage-reports"
                         element={<DamageReports />}
                       />
+
+                      <Route
+                        path="/settings"
+                        element={<Settings />}
+                      />
+
+                      <Route
+                        path="/profile"
+                        element={<Profile />}
+                      />
                     </Route>
 
-
                     {/* UNKNOWN ROUTES */}
-
                     <Route
                       path="*"
                       element={
@@ -232,9 +235,7 @@ function App() {
                   </Routes>
                 </div>
 
-                {!isDashboardRoute && (
-                  <Footer />
-                )}
+                {!isDashboardRoute && <Footer />}
               </CartProvider>
             </DamageReportsProvider>
           </LoansProvider>
@@ -243,6 +244,5 @@ function App() {
     </AuthProvider>
   );
 }
-
 
 export default App;

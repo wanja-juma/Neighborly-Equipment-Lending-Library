@@ -99,7 +99,13 @@ function LoansProvider({ children }) {
 
       const updatedLoan = await updateLoan(
         loanId,
-        payload
+        {
+          status: newStatus,
+          returnedAt:
+            newStatus === "returned"
+              ? new Date().toISOString()
+              : null,
+        }
       );
 
       setLoans((currentLoans) =>
