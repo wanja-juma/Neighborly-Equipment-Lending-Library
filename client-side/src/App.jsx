@@ -20,6 +20,8 @@ import PaymentRouteGuard from "./components/PaymentRouteGuard.jsx";
 import BrowseTools from "./components/BrowseTools";
 import ItemDetail from "./components/ItemDetail";
 import PaymentBar from "./components/PaymentBar";
+import Profile from "./Pages/Profile";
+import Cart from "./Pages/Cart";
 
 import Profile from "./Pages/Profile";
 import Cart from "./Pages/Cart";
@@ -110,6 +112,63 @@ function App() {
               <CartProvider>
 
                 <Navbar />
+
+              <div className="app-content">
+                <Routes>
+
+                  {/* PUBLIC ROUTES*/}
+
+                  <Route
+                    path="/"
+                    element={
+                      <>
+                        <Home />
+                        <About />
+                      </>
+                    }
+                  />
+
+                  <Route
+                    path="/about"
+                    element={
+                      <Navigate
+                        to="/#about"
+                        replace
+                      />
+                    }
+                  />
+
+                  <Route
+                    path="/browse-tools"
+                    element={<BrowseTools />}
+                  />
+
+                  <Route
+                    path="/cart"
+                    element={<Cart />}
+                  />
+
+                  <Route
+                    path="/tools/:id"
+                    element={<ItemDetail />}
+                  />
+
+                  <Route
+                    path="/auth"
+                    element={<AuthPage />}
+                  />
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+
+                    <Route
+                      path="/dashboard"
+                      element={<Dashboard />}
+                    />
 
                 <div className="app-content">
                   <Routes>

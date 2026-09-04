@@ -1,4 +1,5 @@
 import { useState } from "react";
+import useAuth from "../hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import useItems from "../hooks/useItems";
 import "./Items.css";
@@ -43,6 +44,7 @@ const itemIcons = [
 
 function AddItem() {
   const { addItem } = useItems();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] =

@@ -17,3 +17,8 @@ class Config:
         "JWT_SECRET_KEY",
         "neighborly-local-development-secret",
     )
+
+    # Required for Flask-RESTful: without this, Flask-RESTful intercepts
+    # exceptions (like Flask-JWT-Extended auth errors) before Flask's own
+    # registered error handlers get a chance to produce a clean response.
+    PROPAGATE_EXCEPTIONS = True
