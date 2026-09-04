@@ -2,7 +2,7 @@ import { useState } from "react";
 import useDamageReports from "../hooks/useDamageReports";
 import useAuth from "../hooks/useAuth";
 import useLoans from "../hooks/useLoans";
-import "./BrowseItems.css";
+import "./DamageReports.css";
 
 const CURRENT_USER_ID = "1";
 
