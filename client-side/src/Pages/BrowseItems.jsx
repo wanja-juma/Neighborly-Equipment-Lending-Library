@@ -13,7 +13,7 @@ import {
 
 import useAuth from "../hooks/useAuth";
 import useItems from "../hooks/useItems";
-import { useCart } from "../context/CartProvider";
+import useCart from "../hooks/useCart";
 
 import "./BrowseItems.css";
 

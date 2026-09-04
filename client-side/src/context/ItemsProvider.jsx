@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -63,125 +64,186 @@ function ItemsProvider({
 
 
   useEffect(() => {
-    refreshItems();
-  }, [refreshItems]);
+    let cancelled = false;
+
+    const loadItems =
+      async () => {
+        try {
+          const data =
+            await getItems();
+
+          if (!cancelled) {
+            setItems(
+              Array.isArray(data)
+                ? data
+                : []
+            );
+
+            setItemsError("");
+          }
+        } catch (error) {
+          if (!cancelled) {
+            setItemsError(
+              error.message ||
+                "Failed to load items."
+            );
+          }
+        } finally {
+          if (!cancelled) {
+            setItemsLoading(false);
+          }
+        }
+      };
+
+    loadItems();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
 
   const addItem =
-    async (itemData) => {
-      const newItemData = {
-        ...itemData,
+    useCallback(
+      async (itemData) => {
+        try {
+          setItemsError("");
 
-        location:
-          itemData.location ||
-          "Greenview Estate",
+          const savedItem =
+            await createItem(
+              itemData
+            );
 
-        availability:
-          itemData.availability ||
-          "Available",
+          setItems(
+            (currentItems) => [
+              savedItem,
+              ...currentItems,
+            ]
+          );
 
-        statusColor:
-          itemData.statusColor ||
-          "available",
-      };
+          return savedItem;
+        } catch (error) {
+          setItemsError(
+            error.message ||
+              "Failed to add item."
+          );
 
-
-      const savedItem =
-        await createItem(
-          newItemData
-        );
-
-
-      setItems(
-        (currentItems) => [
-          savedItem,
-          ...currentItems,
-        ]
-      );
-
-
-      return savedItem;
-    };
+          throw error;
+        }
+      },
+      []
+    );
 
 
   const updateItem =
-    async (
-      itemId,
-      updates
-    ) => {
-      const response =
-        await updateItemRequest(
-          itemId,
-          updates
-        );
+    useCallback(
+      async (
+        itemId,
+        updates
+      ) => {
+        try {
+          setItemsError("");
 
+          const updatedItem =
+            await updateItemRequest(
+              itemId,
+              updates
+            );
 
-      /*
-       * Merge the submitted changes
-       * into the existing item.
-       *
-       * This makes the UI update
-       * immediately even if Flask
-       * only returns part of the item.
-       */
-      setItems(
-        (currentItems) =>
-          currentItems.map(
-            (item) => {
-              if (
-                String(item.id) !==
-                String(itemId)
-              ) {
-                return item;
-              }
+          setItems(
+            (currentItems) =>
+              currentItems.map(
+                (item) => {
+                  if (
+                    String(
+                      item.id
+                    ) !==
+                    String(
+                      itemId
+                    )
+                  ) {
+                    return item;
+                  }
 
+                  return {
+                    ...item,
+                    ...updates,
+                    ...updatedItem,
+                  };
+                }
+              )
+          );
 
-              return {
-                ...item,
-                ...updates,
-                ...(response &&
-                typeof response ===
-                  "object"
-                  ? response
-                  : {}),
-              };
-            }
-          )
-      );
+          return updatedItem;
+        } catch (error) {
+          setItemsError(
+            error.message ||
+              "Failed to update item."
+          );
 
-
-      return response;
-    };
+          throw error;
+        }
+      },
+      []
+    );
 
 
   const deleteItem =
-    async (itemId) => {
-      await deleteItemRequest(
-        itemId
-      );
+    useCallback(
+      async (itemId) => {
+        try {
+          setItemsError("");
+
+          await deleteItemRequest(
+            itemId
+          );
+
+          setItems(
+            (currentItems) =>
+              currentItems.filter(
+                (item) =>
+                  String(
+                    item.id
+                  ) !==
+                  String(
+                    itemId
+                  )
+              )
+          );
+        } catch (error) {
+          setItemsError(
+            error.message ||
+              "Failed to delete item."
+          );
+
+          throw error;
+        }
+      },
+      []
+    );
 
 
-      setItems(
-        (currentItems) =>
-          currentItems.filter(
-            (item) =>
-              String(item.id) !==
-              String(itemId)
-          )
-      );
-    };
-
-
-  const value = {
-    items,
-    itemsLoading,
-    itemsError,
-
-    addItem,
-    updateItem,
-    deleteItem,
-    refreshItems,
-  };
+  const value =
+    useMemo(
+      () => ({
+        items,
+        itemsLoading,
+        itemsError,
+        addItem,
+        updateItem,
+        deleteItem,
+        refreshItems,
+      }),
+      [
+        items,
+        itemsLoading,
+        itemsError,
+        addItem,
+        updateItem,
+        deleteItem,
+        refreshItems,
+      ]
+    );
 
 
   return (

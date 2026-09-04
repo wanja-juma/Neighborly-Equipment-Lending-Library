@@ -7,7 +7,7 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { useCart } from "../context/CartProvider";
+import useCart from "../hooks/useCart";
 import BorrowRequestModal from "../components/BorrowRequestModal";
 
 import "./Cart.css";

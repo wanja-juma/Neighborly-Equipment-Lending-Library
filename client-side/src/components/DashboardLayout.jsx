@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
-import { useCart } from "../context/CartProvider";
+import useCart from "../hooks/useCart";
 
 import "./Dashboard.css";
 
