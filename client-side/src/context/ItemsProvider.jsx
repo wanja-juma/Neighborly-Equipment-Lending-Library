@@ -1,107 +1,289 @@
-import { useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import {
   createItem,
   deleteItem as deleteItemRequest,
   getItems,
   updateItem as updateItemRequest,
 } from "../services/api";
+
 import ItemsContext from "./ItemsContext";
 import useAuth from "../hooks/useAuth";
 
-function ItemsProvider({ children }) {
-  const { currentUser } = useAuth();
 
-  const [items, setItems] = useState([]);
-  const [itemsLoading, setItemsLoading] =
-    useState(true);
-    
-  const [itemsError, setItemsError] =
-    useState("");
+function ItemsProvider({
+  children,
+}) {
+  const {
+    currentUser,
+  } = useAuth();
 
-  useEffect(() => {
-    const loadItems = async () => {
+
+  const [
+    items,
+    setItems,
+  ] = useState([]);
+
+  const [
+    itemsLoading,
+    setItemsLoading,
+  ] = useState(true);
+
+  const [
+    itemsError,
+    setItemsError,
+  ] = useState("");
+
+
+  const refreshItems =
+    useCallback(async () => {
       try {
         setItemsLoading(true);
         setItemsError("");
 
-        const data = await getItems();
+        const data =
+          await getItems();
 
-        setItems(data);
-      } catch (error) {
-        setItemsError(
-          error.message || "Failed to load items."
+        const normalizedItems =
+          Array.isArray(data)
+            ? data
+            : [];
+
+        setItems(
+          normalizedItems
         );
+
+        return normalizedItems;
+      } catch (error) {
+        const message =
+          error.message ||
+          "Failed to load items.";
+
+        setItemsError(
+          message
+        );
+
+        throw error;
       } finally {
         setItemsLoading(false);
       }
-    };
+    }, []);
+
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadItems =
+      async () => {
+        try {
+          const data =
+            await getItems();
+
+          if (cancelled) {
+            return;
+          }
+
+          setItems(
+            Array.isArray(data)
+              ? data
+              : []
+          );
+
+          setItemsError("");
+        } catch (error) {
+          if (cancelled) {
+            return;
+          }
+
+          setItemsError(
+            error.message ||
+              "Failed to load items."
+          );
+        } finally {
+          if (!cancelled) {
+            setItemsLoading(false);
+          }
+        }
+      };
 
     loadItems();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const addItem = async (itemData) => {
-  if (!currentUser?.id) {
-    throw new Error("You must be logged in to add an item.");
-  }
 
-  const newItemData = {
-    ...itemData,
-    ownerId: Number(currentUser.id),
-  };
+  const addItem =
+    useCallback(
+      async (itemData) => {
+        if (!currentUser?.id) {
+          throw new Error(
+            "You must be logged in to add an item."
+          );
+        }
 
-  const savedItem = await createItem(newItemData);
+        try {
+          setItemsError("");
 
-  setItems((currentItems) => [
-    savedItem,
-    ...currentItems,
-  ]);
+          const newItemData = {
+            ...itemData,
+            ownerId:
+              Number(
+                currentUser.id
+              ),
+          };
 
-  return savedItem;
-};
+          const savedItem =
+            await createItem(
+              newItemData
+            );
 
-  const updateItem = async (
-    itemId,
-    updates
-  ) => {
-    const updatedItem = await updateItemRequest(
-      itemId,
-      updates
+          setItems(
+            (currentItems) => [
+              savedItem,
+              ...currentItems,
+            ]
+          );
+
+          return savedItem;
+        } catch (error) {
+          setItemsError(
+            error.message ||
+              "Failed to add item."
+          );
+
+          throw error;
+        }
+      },
+      [currentUser]
     );
 
-    setItems((currentItems) =>
-      currentItems.map((item) =>
-        String(item.id) === String(itemId) ? updatedItem : item
-      )
+
+  const updateItem =
+    useCallback(
+      async (
+        itemId,
+        updates
+      ) => {
+        try {
+          setItemsError("");
+
+          const updatedItem =
+            await updateItemRequest(
+              itemId,
+              updates
+            );
+
+          setItems(
+            (currentItems) =>
+              currentItems.map(
+                (item) => {
+                  if (
+                    String(
+                      item.id
+                    ) !==
+                    String(
+                      itemId
+                    )
+                  ) {
+                    return item;
+                  }
+
+                  return {
+                    ...item,
+                    ...updates,
+                    ...updatedItem,
+                  };
+                }
+              )
+          );
+
+          return updatedItem;
+        } catch (error) {
+          setItemsError(
+            error.message ||
+              "Failed to update item."
+          );
+
+          throw error;
+        }
+      },
+      []
     );
 
-    return updatedItem;
-  };
 
- const deleteItem = async (itemId) => {
-  await deleteItemRequest(itemId);
+  const deleteItem =
+    useCallback(
+      async (itemId) => {
+        try {
+          setItemsError("");
 
-  setItems((currentItems) =>
-    currentItems.filter(
-      (item) =>
-        String(item.id) !== String(itemId)
-    )
-  );
-};
+          await deleteItemRequest(
+            itemId
+          );
 
-  const value = {
-    items,
-    itemsLoading,
-    itemsError,
-    addItem,
-    updateItem,
-    deleteItem,
-  };
+          setItems(
+            (currentItems) =>
+              currentItems.filter(
+                (item) =>
+                  String(
+                    item.id
+                  ) !==
+                  String(
+                    itemId
+                  )
+              )
+          );
+        } catch (error) {
+          setItemsError(
+            error.message ||
+              "Failed to delete item."
+          );
+
+          throw error;
+        }
+      },
+      []
+    );
+
+
+  const value =
+    useMemo(
+      () => ({
+        items,
+        itemsLoading,
+        itemsError,
+        addItem,
+        updateItem,
+        deleteItem,
+        refreshItems,
+      }),
+      [
+        items,
+        itemsLoading,
+        itemsError,
+        addItem,
+        updateItem,
+        deleteItem,
+        refreshItems,
+      ]
+    );
+
 
   return (
-    <ItemsContext.Provider value={value}>
+    <ItemsContext.Provider
+      value={value}
+    >
       {children}
     </ItemsContext.Provider>
   );
 }
+
 
 export default ItemsProvider;

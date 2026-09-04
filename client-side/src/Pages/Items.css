@@ -1410,6 +1410,7 @@
   outline-offset: 3px;
 }
 
+
 @media (max-width: 800px) {
   .edit-item-header {
     flex-direction: column;

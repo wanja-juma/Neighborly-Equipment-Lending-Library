@@ -5,6 +5,7 @@ import {
 } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
+import useCart from "../hooks/useCart";
 
 import "./Dashboard.css";
 
@@ -25,6 +26,10 @@ const navigationItems = [
   {
     name: "Requests",
     path: "/requests",
+  },
+  {
+    name: "Cart",
+    path: "/cart",
   },
   {
     name: "Loans",
@@ -49,6 +54,10 @@ function DashboardLayout() {
   const {
     logout,
   } = useAuth();
+
+  const {
+    cartCount,
+  } = useCart();
 
   const navigate =
     useNavigate();
@@ -101,9 +110,16 @@ function DashboardLayout() {
                   ○
                 </span>
 
-                <span>
+                <span className="navigation-label">
                   {item.name}
                 </span>
+
+                {item.name === "Cart" &&
+                  cartCount > 0 && (
+                    <span className="sidebar-cart-count">
+                      {cartCount}
+                    </span>
+                  )}
               </NavLink>
             )
           )}
