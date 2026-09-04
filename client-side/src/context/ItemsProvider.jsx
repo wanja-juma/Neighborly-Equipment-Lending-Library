@@ -13,11 +13,17 @@ import {
 } from "../services/api";
 
 import ItemsContext from "./ItemsContext";
+import useAuth from "../hooks/useAuth";
 
 
 function ItemsProvider({
   children,
 }) {
+  const {
+    currentUser,
+  } = useAuth();
+
+
   const [
     items,
     setItems,
@@ -43,17 +49,23 @@ function ItemsProvider({
         const data =
           await getItems();
 
-        setItems(
+        const normalizedItems =
           Array.isArray(data)
             ? data
-            : []
+            : [];
+
+        setItems(
+          normalizedItems
         );
 
-        return data;
+        return normalizedItems;
       } catch (error) {
-        setItemsError(
+        const message =
           error.message ||
-            "Failed to load items."
+          "Failed to load items.";
+
+        setItemsError(
+          message
         );
 
         throw error;
@@ -72,22 +84,26 @@ function ItemsProvider({
           const data =
             await getItems();
 
-          if (!cancelled) {
-            setItems(
-              Array.isArray(data)
-                ? data
-                : []
-            );
+          if (cancelled) {
+            return;
+          }
 
-            setItemsError("");
-          }
+          setItems(
+            Array.isArray(data)
+              ? data
+              : []
+          );
+
+          setItemsError("");
         } catch (error) {
-          if (!cancelled) {
-            setItemsError(
-              error.message ||
-                "Failed to load items."
-            );
+          if (cancelled) {
+            return;
           }
+
+          setItemsError(
+            error.message ||
+              "Failed to load items."
+          );
         } finally {
           if (!cancelled) {
             setItemsLoading(false);
@@ -106,12 +122,26 @@ function ItemsProvider({
   const addItem =
     useCallback(
       async (itemData) => {
+        if (!currentUser?.id) {
+          throw new Error(
+            "You must be logged in to add an item."
+          );
+        }
+
         try {
           setItemsError("");
 
+          const newItemData = {
+            ...itemData,
+            ownerId:
+              Number(
+                currentUser.id
+              ),
+          };
+
           const savedItem =
             await createItem(
-              itemData
+              newItemData
             );
 
           setItems(
@@ -131,7 +161,7 @@ function ItemsProvider({
           throw error;
         }
       },
-      []
+      [currentUser]
     );
 
 

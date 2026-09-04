@@ -20,3 +20,6 @@ dist/
 
 # local database
 instance/
+server/instance/
+instance/
+server/instance/

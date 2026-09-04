@@ -4,7 +4,80 @@ import {
 
 import useRequests from "../hooks/useRequests";
 
-export default function BorrowRequestModal({
+import "./BorrowRequestModal.css";
+
+
+const getLocalDate = () => {
+  const today = new Date();
+
+  const year =
+    today.getFullYear();
+
+  const month =
+    String(
+      today.getMonth() + 1
+    ).padStart(2, "0");
+
+  const day =
+    String(
+      today.getDate()
+    ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+
+const getItemOwnerName = (
+  item
+) => {
+  if (
+    item?.owner &&
+    typeof item.owner ===
+      "object"
+  ) {
+    const firstName =
+      item.owner.first_name ||
+      item.owner.firstName ||
+      "";
+
+    const lastName =
+      item.owner.last_name ||
+      item.owner.lastName ||
+      "";
+
+    return (
+      item.owner.name ||
+      [
+        firstName,
+        lastName,
+      ]
+        .filter(Boolean)
+        .join(" ") ||
+      "Neighbour"
+    );
+  }
+
+  return (
+    item?.ownerName ||
+    item?.owner_name ||
+    item?.owner ||
+    "Neighbour"
+  );
+};
+
+
+const getItemAvailability = (
+  item
+) => {
+  return (
+    item?.availability ||
+    item?.status ||
+    "Available"
+  );
+};
+
+
+function BorrowRequestModal({
   item,
   onClose,
   onSuccess,
@@ -14,19 +87,28 @@ export default function BorrowRequestModal({
     refreshRequests,
   } = useRequests();
 
-  const [borrowDates, setBorrowDates] =
-    useState({
-      startDate: "",
-      endDate: "",
-    });
-
-  const [formError, setFormError] =
-    useState("");
 
   const [
-    submittingRequest,
-    setSubmittingRequest,
+    borrowDates,
+    setBorrowDates,
+  ] = useState({
+    startDate: "",
+    endDate: "",
+  });
+
+  const [
+    formError,
+    setFormError,
+  ] = useState("");
+
+  const [
+    submitting,
+    setSubmitting,
   ] = useState(false);
+
+
+  const minimumDate =
+    getLocalDate();
 
 
   if (!item) {
@@ -34,121 +116,183 @@ export default function BorrowRequestModal({
   }
 
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleDateChange = (
+    event
+  ) => {
+    const {
+      name,
+      value,
+    } = event.target;
+
+    setBorrowDates(
+      (current) => ({
+        ...current,
+        [name]: value,
+      })
+    );
 
     setFormError("");
+  };
 
 
-    /*
-     * Validate dates.
-     */
-    if (
-      !borrowDates.startDate ||
-      !borrowDates.endDate
-    ) {
-      setFormError(
-        "Please select both dates."
-      );
+  const handleSubmit =
+    async (event) => {
+      event.preventDefault();
 
-      return;
-    }
-
-
-    if (
-      new Date(borrowDates.endDate) <
-      new Date(borrowDates.startDate)
-    ) {
-      setFormError(
-        "End date cannot be before start date."
-      );
-
-      return;
-    }
-
-
-    /*
-     * Validate item ID.
-     */
-    const equipmentId =
-      Number(item.id);
-
-    if (
-      !Number.isInteger(
-        equipmentId
-      ) ||
-      equipmentId <= 0
-    ) {
-      setFormError(
-        "This item has an invalid ID."
-      );
-
-      return;
-    }
-
-
-    try {
-      setSubmittingRequest(true);
       setFormError("");
 
 
-      /*
-       * Create the borrowing request.
-       *
-       * IMPORTANT:
-       * The Flask API expects
-       * equipment_id, not item_id.
-       */
-      const result =
-        await addBorrowingRequest({
-          equipment_id:
-            equipmentId,
+      const availability =
+        getItemAvailability(
+          item
+        ).toLowerCase();
 
-          start_date:
-            borrowDates.startDate,
-
-          end_date:
-            borrowDates.endDate,
-        });
-
-
-      /*
-       * Refresh request state so the
-       * newly submitted request appears
-       * in the Requests page.
-       */
       if (
-        typeof refreshRequests ===
-        "function"
+        availability !==
+        "available"
       ) {
-        await refreshRequests();
+        setFormError(
+          "This item is no longer available to borrow."
+        );
+
+        return;
       }
 
 
-      /*
-       * Tell Cart.jsx that the
-       * request succeeded.
-       *
-       * Cart.jsx can then remove
-       * this item from the cart.
-       */
-      onSuccess?.(result);
+      if (
+        !borrowDates.startDate ||
+        !borrowDates.endDate
+      ) {
+        setFormError(
+          "Please select both the borrowing and return dates."
+        );
 
-    } catch (error) {
-      console.error(
-        "Borrowing request failed:",
-        error
-      );
+        return;
+      }
 
-      setFormError(
-        error?.message ||
-          "Unable to submit the borrowing request."
-      );
 
-    } finally {
-      setSubmittingRequest(false);
-    }
-  };
+      if (
+        borrowDates.startDate <
+        minimumDate
+      ) {
+        setFormError(
+          "The borrowing date cannot be in the past."
+        );
+
+        return;
+      }
+
+
+      if (
+        borrowDates.endDate <
+        borrowDates.startDate
+      ) {
+        setFormError(
+          "The return date cannot be before the borrowing date."
+        );
+
+        return;
+      }
+
+
+      const equipmentId =
+        Number(item.id);
+
+      if (
+        !Number.isInteger(
+          equipmentId
+        ) ||
+        equipmentId <= 0
+      ) {
+        setFormError(
+          "This item has an invalid ID."
+        );
+
+        return;
+      }
+
+
+      try {
+        setSubmitting(true);
+        setFormError("");
+
+
+        const result =
+          await addBorrowingRequest({
+            equipment_id:
+              equipmentId,
+
+            start_date:
+              borrowDates.startDate,
+
+            end_date:
+              borrowDates.endDate,
+          });
+
+
+        if (
+          result?.success ===
+          false
+        ) {
+          const detailText =
+            result.details
+              ? Object.entries(
+                  result.details
+                )
+                  .map(
+                    ([
+                      field,
+                      messages,
+                    ]) =>
+                      `${field}: ${[]
+                        .concat(
+                          messages
+                        )
+                        .join(", ")}`
+                  )
+                  .join(" | ")
+              : "";
+
+          setFormError(
+            [
+              result.message,
+              detailText,
+            ]
+              .filter(Boolean)
+              .join(" — ") ||
+              "Unable to submit the borrowing request."
+          );
+
+          return;
+        }
+
+
+        if (
+          typeof refreshRequests ===
+          "function"
+        ) {
+          await refreshRequests();
+        }
+
+
+        onSuccess?.(
+          result?.message ||
+            "Borrowing request submitted successfully."
+        );
+      } catch (error) {
+        console.error(
+          "Borrowing request failed:",
+          error
+        );
+
+        setFormError(
+          error?.message ||
+            "Unable to submit the borrowing request."
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    };
 
 
   return (
@@ -162,7 +306,6 @@ export default function BorrowRequestModal({
         aria-modal="true"
         aria-labelledby="borrow-modal-title"
       >
-
         <header className="borrow-modal-header">
           <div>
             <p className="page-label">
@@ -182,13 +325,11 @@ export default function BorrowRequestModal({
 
 
           <button
+            className="close-modal-button"
             type="button"
             onClick={onClose}
-            className="close-modal-button"
             aria-label="Close borrowing form"
-            disabled={
-              submittingRequest
-            }
+            disabled={submitting}
           >
             ×
           </button>
@@ -196,17 +337,29 @@ export default function BorrowRequestModal({
 
 
         <div className="borrow-item-summary">
+          <span
+            className="borrow-summary-icon"
+            aria-hidden="true"
+          >
+            {item.icon || "🧰"}
+          </span>
+
           <div>
             <strong>
               {item.name}
             </strong>
 
-            {item.condition && (
-              <small>
-                Condition:{" "}
-                {item.condition}
-              </small>
-            )}
+            <span>
+              Owned by{" "}
+              {getItemOwnerName(
+                item
+              )}
+            </span>
+
+            <small>
+              {item.condition ||
+                "Condition not specified"}
+            </small>
           </div>
         </div>
 
@@ -215,9 +368,7 @@ export default function BorrowRequestModal({
           className="borrow-date-form"
           onSubmit={handleSubmit}
         >
-
           <div className="borrow-date-fields">
-
             <label className="item-form-field">
               <span>
                 Borrowing Date{" "}
@@ -226,21 +377,18 @@ export default function BorrowRequestModal({
 
               <input
                 type="date"
+                name="startDate"
                 value={
                   borrowDates.startDate
                 }
-                onChange={(event) =>
-                  setBorrowDates(
-                    (current) => ({
-                      ...current,
-
-                      startDate:
-                        event.target.value,
-                    })
-                  )
+                min={
+                  minimumDate
+                }
+                onChange={
+                  handleDateChange
                 }
                 disabled={
-                  submittingRequest
+                  submitting
                 }
                 required
               />
@@ -255,30 +403,23 @@ export default function BorrowRequestModal({
 
               <input
                 type="date"
+                name="endDate"
                 value={
                   borrowDates.endDate
                 }
                 min={
                   borrowDates.startDate ||
-                  undefined
+                  minimumDate
                 }
-                onChange={(event) =>
-                  setBorrowDates(
-                    (current) => ({
-                      ...current,
-
-                      endDate:
-                        event.target.value,
-                    })
-                  )
+                onChange={
+                  handleDateChange
                 }
                 disabled={
-                  submittingRequest
+                  submitting
                 }
                 required
               />
             </label>
-
           </div>
 
 
@@ -320,13 +461,12 @@ export default function BorrowRequestModal({
 
 
           <div className="borrow-modal-actions">
-
             <button
               className="cancel-request-button"
               type="button"
               onClick={onClose}
               disabled={
-                submittingRequest
+                submitting
               }
             >
               Cancel
@@ -337,18 +477,19 @@ export default function BorrowRequestModal({
               className="submit-request-button"
               type="submit"
               disabled={
-                submittingRequest
+                submitting
               }
             >
-              {submittingRequest
+              {submitting
                 ? "Submitting..."
                 : "Submit Request"}
             </button>
-
           </div>
-
         </form>
       </section>
     </div>
   );
 }
+
+
+export default BorrowRequestModal;

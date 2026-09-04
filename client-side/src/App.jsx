@@ -104,7 +104,8 @@ function App() {
 
                 <div className="app-content">
                   <Routes>
-                    {/* Landing page */}
+                    {/* PUBLIC ROUTES */}
+
                     <Route
                       path="/"
                       element={
@@ -115,18 +116,16 @@ function App() {
                       }
                     />
 
-                    {/* About page */}
                     <Route
                       path="/about"
                       element={
-                        <>
-                          <Home />
-                          <About />
-                        </>
+                        <Navigate
+                          to="/#about"
+                          replace
+                        />
                       }
                     />
 
-                    {/* Public browse routes */}
                     <Route
                       path="/browse-tools"
                       element={<BrowseTools />}
@@ -137,13 +136,14 @@ function App() {
                       element={<ItemDetail />}
                     />
 
-                    {/* Authentication */}
                     <Route
                       path="/auth"
                       element={<AuthPage />}
                     />
 
-                    {/* Protected dashboard routes */}
+
+                    {/* PROTECTED ROUTES */}
+
                     <Route
                       element={
                         <ProtectedRoute>
@@ -217,7 +217,9 @@ function App() {
                       />
                     </Route>
 
-                    {/* Unknown routes */}
+
+                    {/* UNKNOWN ROUTES */}
+
                     <Route
                       path="*"
                       element={

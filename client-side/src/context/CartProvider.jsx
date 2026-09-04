@@ -25,8 +25,15 @@ function CartProvider({
           CART_STORAGE_KEY
         );
 
-      return storedCart
-        ? JSON.parse(storedCart)
+      const parsedCart =
+        storedCart
+          ? JSON.parse(storedCart)
+          : [];
+
+      return Array.isArray(
+        parsedCart
+      )
+        ? parsedCart
         : [];
     } catch {
       return [];
@@ -59,7 +66,9 @@ function CartProvider({
                 )
             );
 
-          if (alreadyInCart) {
+          if (
+            alreadyInCart
+          ) {
             return currentItems;
           }
 
@@ -109,6 +118,12 @@ function CartProvider({
     );
 
 
+  const clearCart =
+    useCallback(() => {
+      setCartItems([]);
+    }, []);
+
+
   const value =
     useMemo(
       () => ({
@@ -117,17 +132,23 @@ function CartProvider({
         cartCount:
           cartItems.length,
 
+        count:
+          cartItems.length,
+
         addToCart,
 
         removeFromCart,
 
         isInCart,
+
+        clearCart,
       }),
       [
         cartItems,
         addToCart,
         removeFromCart,
         isInCart,
+        clearCart,
       ]
     );
 
