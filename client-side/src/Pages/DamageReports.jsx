@@ -46,10 +46,8 @@ const [
 
   const userLoans = loans.filter(
       (loan) =>
-    String(loan.ownerId) ===
-      String(currentUser?.id) ||
-    String(loan.borrowerId) ===
-      String(currentUser?.id)
+        String(loan.borrower_id) ===
+        String(currentUser?.id)
     );
 
   const handleChange = (event) => {
