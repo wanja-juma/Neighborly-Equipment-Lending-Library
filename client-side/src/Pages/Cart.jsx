@@ -23,7 +23,6 @@ import BorrowRequestModal from "../components/BorrowRequestModal";
 
 import "./Cart.css";
 
-
 function Cart() {
   const {
     cartItems,
