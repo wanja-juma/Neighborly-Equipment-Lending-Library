@@ -28,6 +28,8 @@ import AddItem from "./Pages/AddItem";
 import EditListing from "./Pages/EditItem";
 import ChangeAvailability from "./Pages/ChangeAvailability";
 import Cart from "./Pages/Cart";
+import Profile from "./Pages/Profile";
+import Settings from "./Pages/Settings";
 
 import AuthProvider from "./context/AuthProvider.jsx";
 import ItemsProvider from "./context/ItemsProvider";
@@ -214,6 +216,16 @@ function App() {
                       <Route
                         path="/damage-reports"
                         element={<DamageReports />}
+                      />
+
+                      <Route
+                        path="/profile"
+                        element={<Profile />}
+                      />
+
+                      <Route
+                        path="/settings"
+                        element={<Settings />}
                       />
                     </Route>
 
