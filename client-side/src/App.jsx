@@ -30,6 +30,8 @@ import Requests from "./Pages/Requests";
 import AddItem from "./Pages/AddItem";
 import EditListing from "./Pages/EditItem";
 import ChangeAvailability from "./Pages/ChangeAvailability";
+import Cart from "./Pages/Cart";
+import Profile from "./Pages/Profile";
 import Settings from "./Pages/Settings";
 
 import AuthProvider from "./context/AuthProvider.jsx";
@@ -210,6 +212,17 @@ function App() {
                         path="/damage-reports"
                         element={<DamageReports />}
                       />
+
+                      <Route
+                        path="/profile"
+                        element={<Profile />}
+                      />
+
+                      <Route
+                        path="/settings"
+                        element={<Settings />}
+                      />
+                    </Route>
 
                       <Route
                         path="/settings"

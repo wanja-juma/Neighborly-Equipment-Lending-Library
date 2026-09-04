@@ -720,10 +720,10 @@ function Dashboard() {
                 {filteredItems.map(
                   (item) => (
                     <Link
-                      key={item.id}
-                      to={`/items/${item.id}`}
-                      className="search-result-item"
-                    >
+  key={item.id}
+  to="/items"
+  className="search-result-item"
+>
                       <div className="search-result-icon">
                         {item.icon || "🧰"}
                       </div>
