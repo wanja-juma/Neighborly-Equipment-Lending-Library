@@ -69,9 +69,8 @@ function DamageReportsProvider({
     try {
       const newReportData = {
         ...reportData,
-        status: "Submitted",
-        createdAt: new Date().toISOString(),
-        resolvedAt: null,
+        status: "pending",
+        resolved_at: null,
       };
 
       const savedReport =
@@ -107,9 +106,8 @@ function DamageReportsProvider({
   newStatus
 ) => {
   const allowedStatuses = [
-    "Submitted",
-    "Under Review",
-    "Resolved",
+    "pending",
+    "resolved",
   ];
 
   if (!allowedStatuses.includes(newStatus)) {
@@ -123,8 +121,8 @@ function DamageReportsProvider({
   try {
     const updates = {
       status: newStatus,
-      resolvedAt:
-        newStatus === "Resolved"
+      resolved_at:
+        newStatus === "resolved"
           ? new Date().toISOString()
           : null,
     };
