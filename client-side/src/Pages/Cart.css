@@ -55,6 +55,17 @@
   color: #0b5d4f;
 }
 
+.cart-summary h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1F2B38;
+  margin: 0;
+}
+
+.cart-count {
+  font-size: 13px;
+  color: #55534E;
+}
 
 /* ==========================================
    SUCCESS NOTICE

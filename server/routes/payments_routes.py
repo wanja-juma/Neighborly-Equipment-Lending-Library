@@ -71,7 +71,18 @@ def get_payment(payment_id):
     if not _is_authorized_for_loan(loan, current_user_id):
         return jsonify({"error": "You are not authorized to view this payment."}), 403
 
+<<<<<<< HEAD
+    return jsonify({
+        "payment":
+            payment_schema.dump(
+                payment
+            )
+    }), 200
+
+   
+=======
     return jsonify({"payment": payment_schema.dump(payment)}), 200
+>>>>>>> 0eb4de73f94a5095eddf991849fed584dc3fd202
 
 
 @payment_bp.post("")

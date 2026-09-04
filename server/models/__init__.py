@@ -1,4 +1,3 @@
-
 from models.profile import Profile
 from models.user import User
 from models.membership import Membership
@@ -11,7 +10,6 @@ from models.categories import Category
 from models.damage_reports import DamageReport
 from models.borrow_request import BorrowingRequest
 
-
 __all__ = [
     "User",
     "Profile",
@@ -19,10 +17,7 @@ __all__ = [
     "Item",
     "Payment",
     "Loan",
-     "Category",
-        "DamageReport",
-        "BorrowingRequest",
+    "Category",
+    "DamageReport",
+    "BorrowingRequest",
 ]
-
-
-   

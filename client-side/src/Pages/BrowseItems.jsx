@@ -193,13 +193,16 @@ const getItemIcon = (item) => {
 
 
 function BrowseItems() {
+
   const navigate = useNavigate();
+
 
   const {
     currentUser,
   } = useAuth();
 
   const {
+
     items,
     itemsLoading,
     itemsError,
@@ -482,6 +485,178 @@ function BrowseItems() {
   };
 
 
+
+  const handleBorrowRequest =
+    async (event) => {
+      event.preventDefault();
+
+      if (!selectedItem) {
+        return;
+      }
+
+
+      if (!currentUserId) {
+        setFormError(
+          "You must be logged in to request an item."
+        );
+
+        return;
+      }
+
+
+      const availability =
+        String(
+          getItemAvailability(
+            selectedItem
+          ) || ""
+        ).toLowerCase();
+
+      if (
+        availability !==
+        "available"
+      ) {
+        setFormError(
+          "This item is no longer available to borrow."
+        );
+
+        return;
+      }
+
+
+      const ownerId =
+        getItemOwnerId(
+          selectedItem
+        );
+
+      if (
+        ownerId !==
+          undefined &&
+        ownerId !== null &&
+        String(ownerId) ===
+          currentUserId
+      ) {
+        setFormError(
+          "You cannot request your own item."
+        );
+
+        return;
+      }
+
+
+      if (
+        !borrowDates.startDate ||
+        !borrowDates.endDate
+      ) {
+        setFormError(
+          "Please select both the borrowing and return dates."
+        );
+
+        return;
+      }
+
+
+      if (
+        borrowDates.startDate <
+        minimumDate
+      ) {
+        setFormError(
+          "The borrowing date cannot be in the past."
+        );
+
+        return;
+      }
+
+
+      if (
+        borrowDates.endDate <
+        borrowDates.startDate
+      ) {
+        setFormError(
+          "The return date must be after the borrowing date."
+        );
+
+        return;
+      }
+
+
+      const itemId =
+        Number(
+          selectedItem.id
+        );
+
+      if (
+        !Number.isInteger(itemId) ||
+        itemId <= 0
+      ) {
+        setFormError(
+          "This item has an invalid ID."
+        );
+
+        return;
+      }
+
+
+      try {
+        setSubmittingRequest(true);
+        setFormError("");
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Send the field names expected
+         * by the Flask borrowing-request
+         * API.
+         *
+         * Do not send borrower_id.
+         * Flask should get the borrower
+         * from the JWT identity.
+         */
+        const result =
+  await addBorrowingRequest({
+    equipment_id: itemId,
+    start_date:
+      borrowDates.startDate,
+    end_date:
+      borrowDates.endDate,
+  });
+
+
+        setNotice(
+          result?.message ||
+            "Borrowing request submitted successfully."
+        );
+
+
+        setSelectedItem(
+          null
+        );
+
+        setBorrowDates({
+          startDate: "",
+          endDate: "",
+        });
+
+        setFormError("");
+      } catch (error) {
+        console.error(
+          "Borrowing request failed:",
+          error
+        );
+
+        setFormError(
+          error?.message ||
+            "Unable to submit the borrowing request."
+        );
+      } finally {
+        setSubmittingRequest(
+          false
+        );
+      }
+    };
+
+
+
   const clearFilters = () => {
     setSearchTerm("");
 
@@ -536,9 +711,7 @@ function BrowseItems() {
 
             <button
               type="button"
-              onClick={() =>
-                setNotice("")
-              }
+              onClick={() => setNotice("")}
               aria-label="Dismiss notification"
             >
               ×
@@ -589,7 +762,6 @@ function BrowseItems() {
             )}
           </button>
         </header>
-
 
         <section
           className="browse-filters"
@@ -691,7 +863,6 @@ function BrowseItems() {
             Clear Filters
           </button>
         </section>
-
 
         <div className="browse-results-heading">
           <p>

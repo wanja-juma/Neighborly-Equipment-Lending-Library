@@ -375,29 +375,18 @@ function AuthPage() {
     <div className="auth-page">
       <div className="auth-card">
         <section className="auth-form-panel">
-          <span className="brand-badge">
-            Neighborly
-          </span>
+          <span className="brand-badge">Neighborly</span>
 
           <div className="auth-heading">
-            <h1>
-              {isRegister
-                ? "Create an account"
-                : "Welcome back"}
-            </h1>
-
+            <h1>{isRegister ? 'Create an account' : 'Welcome back'}</h1>
             <p>
               {isRegister
-                ? "Sign up to borrow and lend equipment with your neighbors."
-                : "Sign in to manage your borrowed and lent items."}
+                ? 'Sign up to borrow and lend equipment with your neighbors.'
+                : 'Sign in to manage your borrowed and lent items.'}
             </p>
           </div>
 
-          <form
-            className="auth-form"
-            onSubmit={handleSubmit}
-            noValidate
-          >
+          <form className="auth-form" onSubmit={handleSubmit} noValidate>
             {isRegister && (
               <div className="field-row">
                 <label className="field">
@@ -440,7 +429,6 @@ function AuthPage() {
 
             <label className="field">
               <span>Email</span>
-
               <input
                 type="email"
                 value={form.email}
@@ -455,7 +443,6 @@ function AuthPage() {
 
             <label className="field">
               <span>Password</span>
-
               <div className="password-input">
                 <input
                   type={
@@ -477,21 +464,11 @@ function AuthPage() {
                   }
                   required
                 />
-
                 <button
                   type="button"
                   className="password-toggle"
-                  onClick={() =>
-                    setShowPassword(
-                      (currentValue) =>
-                        !currentValue
-                    )
-                  }
-                  aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
-                  }
+                  onClick={() => setShowPassword((currentValue) => !currentValue)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword
                     ? "🙈"
@@ -501,19 +478,13 @@ function AuthPage() {
             </label>
 
             {error && (
-              <p
-                className="server-error"
-                role="alert"
-              >
+              <p className="server-error" role="alert">
                 {error}
               </p>
             )}
 
             {success && (
-              <p
-                className="server-success"
-                role="status"
-              >
+              <p className="server-success" role="status">
                 {success}
               </p>
             )}
@@ -556,7 +527,7 @@ function AuthPage() {
         </section>
       </div>
     </div>
-  );
+  )
 }
 
 export default AuthPage;

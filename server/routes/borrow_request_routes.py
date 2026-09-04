@@ -90,7 +90,7 @@ def get_borrowing_requests():
     }), 200
 
 
-@borrow_requests_bp.post("")
+@borrow_requests_bp.route('/borrowing_requests', methods=['POST'])
 @jwt_required()
 def create_borrowing_request():
     """
@@ -351,20 +351,21 @@ def update_borrowing_request(
         }), 403
 
     try:
-        updated_request = (
-            borrowing_request_schema.load(
-                json_data,
-                instance=borrowing_request,
-                partial=True,
-                session=db.session
+        if "status" in json_data:
+            borrowing_request.status = str(
+                json_data["status"]
+            ).lower()
+
+        if "message" in json_data:
+            borrowing_request.message = (
+                json_data["message"]
             )
-        )
+
+        updated_request = borrowing_request
 
         new_status = str(
-            updated_request.status
-            or ""
+            updated_request.status or ""
         ).lower()
-
         # Normalize rejected to declined
         # so the frontend sees one value.
         if new_status == "rejected":
@@ -422,6 +423,8 @@ def update_borrowing_request(
                 )
         }), 200
 
+        db.session.commit()
+        return jsonify({"borrowing_request": borrowing_request_schema.dump(updated_request)}), 200
     except ValidationError as error:
         db.session.rollback()
 

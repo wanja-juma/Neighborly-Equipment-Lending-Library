@@ -1,49 +1,45 @@
 .navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-
   padding: 1rem 6%;
-  border-bottom: 1px solid #e3e3dd;
   background-color: #ffffff;
+  border-bottom: 1px solid #e3e3dd;
+  font-family: 'Inter', sans-serif;
 
-  font-family: "Inter", sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar__logo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
   color: #1e5e3d;
   font-size: 1.3rem;
   font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
 }
 
 .navbar__links {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 1.5rem;
 }
 
-.navbar__links a {
-  display: inline-flex;
+.navbar__links a,
+.navbar__login,
+.navbar__register {
+  display: flex;
   align-items: center;
   gap: 0.4rem;
-
-  color: #55534e;
+  text-decoration: none;
   font-size: 0.95rem;
   font-weight: 500;
-  text-decoration: none;
-  white-space: nowrap;
+}
+
+.navbar__links a {
+  color: #55534e;
 }
 
 .navbar__links a:hover {
@@ -53,154 +49,25 @@
 .navbar__actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  flex-shrink: 0;
-}
-
-/* Keep Login and Register side by side */
-.navbar-auth-links {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
   gap: 0.75rem;
-  width: auto;
-  flex-wrap: nowrap;
-}
-
-.navbar__login,
-.navbar__register {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-
-  width: auto;
-  padding: 0.6rem 1rem;
-  border-radius: 7px;
-
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease,
-    border-color 0.2s ease;
 }
 
 .navbar__login {
-  border: 1px solid #1e5e3d;
-  background-color: transparent;
   color: #1e5e3d;
-}
-
-.navbar__login:hover {
-  background-color: #edf6f0;
 }
 
 .navbar__register {
-  border: 1px solid #1e5e3d;
-  background-color: #1e5e3d;
+  padding: 0.6rem 1rem;
   color: #ffffff;
+  background-color: #1e5e3d;
+  border: 1px solid #1e5e3d;
+  border-radius: 7px;
 }
 
 .navbar__register:hover {
-  border-color: #164a30;
   background-color: #164a30;
 }
 
-/* Logged-in user section */
-.navbar-user {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.navbar-user-avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-
-  background-color: #e7f2eb;
-  color: #1e5e3d;
-
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.navbar-user-details {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.navbar-user-details strong {
-  max-width: 150px;
-  overflow: hidden;
-
-  color: #26362c;
-  font-size: 0.9rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.navbar-user-details small {
-  color: #747a75;
-  font-size: 0.75rem;
-}
-
-.navbar-logout-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-
-  padding: 0.6rem 0.85rem;
-  border: 1px solid #d5ddd7;
-  border-radius: 7px;
-
-  background-color: #ffffff;
-  color: #455249;
-
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.navbar-logout-button:hover {
-  border-color: #b83a3a;
-  background-color: #fff2f2;
-  color: #b83a3a;
-}
-
-.navbar-auth-loading {
-  color: #6c756f;
-  font-size: 0.9rem;
-}
-
-/* Tablet layout */
-@media (max-width: 1000px) {
-  .navbar {
-    padding-inline: 3%;
-  }
-
-  .navbar__links {
-    gap: 0.8rem;
-  }
-
-  .navbar-user-details {
-    display: none;
-  }
-}
-
-/* Mobile layout */
 @media (max-width: 800px) {
   .navbar {
     flex-wrap: wrap;
@@ -212,52 +79,5 @@
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
-  }
-
-  .navbar-auth-links {
-    flex-direction: row;
-    gap: 0.5rem;
-  }
-
-  .navbar__login,
-  .navbar__register {
-    padding: 0.55rem 0.75rem;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 520px) {
-  .navbar {
-    padding: 0.8rem 1rem;
-  }
-
-  .navbar__logo span {
-    display: none;
-  }
-
-  .navbar__links {
-    gap: 0.65rem;
-  }
-
-  .navbar__links a {
-    font-size: 0.82rem;
-  }
-
-  .navbar__login,
-  .navbar__register {
-    padding: 0.5rem 0.65rem;
-  }
-
-  .navbar-logout-button {
-    padding: 0.5rem;
-  }
-
-  .navbar-logout-button {
-    font-size: 0;
-  }
-
-  .navbar-logout-button svg {
-    width: 18px;
-    height: 18px;
   }
 }
